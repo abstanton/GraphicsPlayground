@@ -1,4 +1,5 @@
-#version 460
+#pragma once
+const char* def_fs = R"(#version 460
 out vec4 FragColor;
             
 in vec2 uv;
@@ -83,4 +84,4 @@ void main()
    
     vec3 result = (vec3(ambientLight) + diffuseCol + specularCol) * colour;
     FragColor = vec4(result, 1.0f);
-}
+})";

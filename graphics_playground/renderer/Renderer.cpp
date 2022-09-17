@@ -151,25 +151,40 @@ gpu::Texture* Renderer::retrieveGPUTexture(const Texture* texture) {
   }
 
   gpu::TextureFormat gpu_texture_format;
+  gpu::DataType gpu_data_type;
 
   switch (texture->format) {
+    case TextureFormat::R:
+      gpu_texture_format = gpu::TextureFormat::R;
+      gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
     case TextureFormat::R8:
       gpu_texture_format = gpu::TextureFormat::R;
+      gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
+      break;
+    case TextureFormat::R16:
+      gpu_texture_format = gpu::TextureFormat::R_16F;
+      gpu_data_type = gpu::DataType::FLOAT;
+      break;
+    case TextureFormat::R32:
+      gpu_texture_format = gpu::TextureFormat::R_32F;
+      gpu_data_type = gpu::DataType::FLOAT;
       break;
     case TextureFormat::RGB8:
       gpu_texture_format = gpu::TextureFormat::RGB;
+      gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
       break;
     case TextureFormat::RGBA8:
       gpu_texture_format = gpu::TextureFormat::RGBA;
+      gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
       break;
     default:
       gpu_texture_format = gpu::TextureFormat::RGB;
+      gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
   }
 
   gpu::Texture* gpu_texture = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D, gpu_texture_format,
-      gpu::DataType::UNSIGNED_BYTE, texture->width, texture->height, 0, 0, 0,
-      texture->data);
+      gpu::TextureType::TEXTURE_2D, gpu_texture_format, gpu_data_type,
+      texture->width, texture->height, 0, 0, 0, texture->data);
   gpu_texture->generateMipmap();
 
   texture_cache_[texture->id] = gpu_texture;

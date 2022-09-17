@@ -47,9 +47,6 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
   }
   handle_ = glGetTextureHandleARB(id_);
   glMakeTextureHandleResidentARB(handle_);
-  if (glGetError() != GL_NO_ERROR) {
-    std::cout << "gl error making handle" << std::endl;
-  }
 }
 
 void GlTexture::bind(int slot) {

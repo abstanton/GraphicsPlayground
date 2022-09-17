@@ -18,12 +18,12 @@ void DemoApp::setup() {
   MeshRenderer cube_component =
       resource_manager_.loadObject("cube.obj", "cube")[0];
 
-  Material asphalt_material_comp =
+  Material asphalt_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
-  asphalt_material_comp.setColourInput("diffuse", "asphalt_diff", {10, 10});
-  asphalt_material_comp.setColourInput("normal", glm::vec3(0, 0, 1.0f));
-  asphalt_material_comp.setFloatInput("roughness", 1.0);
-  asphalt_material_comp.setFloatInput("metalness", 0);
+  asphalt_material.setColourInput("diffuse", "asphalt_diff", {10, 10});
+  asphalt_material.setColourInput("normal", "asphalt_norm", {10, 10});
+  asphalt_material.setFloatInput("roughness", 1.0);
+  asphalt_material.setFloatInput("metalness", 0);
 
   Material metal_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
@@ -33,10 +33,7 @@ void DemoApp::setup() {
   metal_material.setFloatInput("metalness", "metal_metal", {5, 5});
 
   cube_component.material_comp_ = metal_material;
-
-  MeshRenderer new_mesh_comp(monkey_component.mesh_, asphalt_material_comp,
-                             monkey_component.transform_);
-  monkey_component = new_mesh_comp;
+  monkey_component.material_comp_ = asphalt_material;
 
   auto camera_ent = registry.createEntity();
   Camera& camera =
@@ -71,7 +68,6 @@ void DemoApp::setup() {
       glm::vec3(1.3f, -2.0f, 2.5f),  glm::vec3(1.5f, 2.0f, 2.5f),
       glm::vec3(1.5f, 0.2f, 3.5f),   glm::vec3(-1.3f, 1.0f, 3.5f)};
 
-  monkey_component.material_comp_ = asphalt_material_comp;
   transform.position = glm::vec3(0.0, 0.5, 0.0);
   transform.scale = glm::vec3(1.2f);
   monkey_component.transform_ = transform;

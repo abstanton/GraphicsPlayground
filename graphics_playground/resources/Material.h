@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "gpu/GPUShader.h"
-#include "resources/Texture.h"
+#include "../components/Transform.h"
+#include "../gpu/GPUShader.h"
 
 /*
         Represents the following glsl:

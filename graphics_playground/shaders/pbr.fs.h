@@ -1,4 +1,6 @@
-#version 460
+#pragma once
+
+const char* pbr_fs = R"(#version 460
 #extension GL_ARB_bindless_texture : require
 
 out vec4 FragColor;
@@ -221,4 +223,4 @@ void main()
     color = pow(color, vec3(1.0/2.2));  
    
     FragColor = vec4(color, 1.0);
-}
+})";

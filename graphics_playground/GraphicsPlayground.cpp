@@ -1,7 +1,7 @@
 #include "GraphicsPlayground.h"
 
-#include "Material.h"
 #include "components/MeshRenderer.h"
+#include "resources/Material.h"
 
 GraphicsPlayground::GraphicsPlayground()
     : resource_manager_(ResourceManager::get()) {

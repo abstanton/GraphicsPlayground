@@ -1,12 +1,13 @@
 #pragma once
 #include <unordered_map>
 
-#include "../Material.h"
 #include "../components/Camera.h"
 #include "../components/DirectionLight.h"
 #include "../components/MeshRenderer.h"
 #include "../components/PointLight.h"
 #include "../gpu/GPUBackend.h"
+#include "../resources/Material.h"
+#include "../resources/Texture.h"
 
 #define MAX_POINT_LIGHTS 100
 #define MAX_DIRECTION_LIGHTS 100

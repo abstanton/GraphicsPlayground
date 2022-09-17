@@ -6,8 +6,8 @@
 #include <map>
 #include <optional>
 
-#include "../../IResource.h"
 #include "../../components/MeshRenderer.h"
+#include "../../resources/IResource.h"
 #include "../../resources/Mesh.h"
 #include "../../resources/Texture.h"
 #include "../UUIDGenerator.h"

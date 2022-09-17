@@ -1,11 +1,14 @@
 #pragma once
 #include <string>
 
-#include "../IResource.h"
+#include "IResource.h"
 
 enum class TextureFormat {
+  R,
+
   R8,
   R16,
+  R32,
 
   RGB8,
   RGB16,

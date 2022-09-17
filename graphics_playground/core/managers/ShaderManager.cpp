@@ -4,18 +4,24 @@
 #include <iostream>
 #include <sstream>
 
+#include "../../shaders/default.fs.h"
+#include "../../shaders/default.vs.h"
+#include "../../shaders/light.fs.h"
+#include "../../shaders/pbr.fs.h"
+#include "../../shaders/shadow.fs.h"
+#include "../../shaders/shadow.vs.h"
+
 ShaderManager::ShaderManager() {
   /* Load all default shaders. */
   /* TODO: clean this up. */
   std::cout << "Loading builtin shaders" << std::endl;
-  builtin_shaders_["default"] =
-      compileFromFiles("shaders/defaultVS.vs", "shaders/defaultFS.fs");
+  gpu::Backend* backend = gpu::Backend::get();
+  builtin_shaders_["default"] = backend->compileShaderProgram(def_vs, def_fs);
   builtin_shaders_["emissive"] =
-      compileFromFiles("shaders/defaultVS.vs", "shaders/lightFS.fs");
-  builtin_shaders_["pbr"] =
-      compileFromFiles("shaders/defaultVS.vs", "shaders/pbrFS.fs");
+      backend->compileShaderProgram(def_vs, light_fs);
+  builtin_shaders_["pbr"] = backend->compileShaderProgram(def_vs, pbr_fs);
   builtin_shaders_["shadow"] =
-      compileFromFiles("shaders/shadowVS.vs", "shaders/shadowFS.fs");
+      backend->compileShaderProgram(shadow_vs, shadow_fs);
   std::cout << "Finished" << std::endl;
 }
 
@@ -72,8 +78,8 @@ gpu::Shader* ShaderManager::compileFromFiles(const char* vs_filename,
     std::cout << "ERROR::SHADER::FILE_NOT_LOADED\n" << std::endl;
     return nullptr;
   }
-  return backend->compileShaderProgram(vertex_code.c_str(),
-                                       fragment_code.c_str());
+
+  return backend->compileShaderProgram(vertex_code.c_str(), def_fs);
 }
 
 bool ShaderManager::addShaderProgram(const char* vs_filename,

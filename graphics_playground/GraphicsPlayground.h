@@ -1,10 +1,9 @@
 #pragma once
 #include "core/Window.h"
-#include "core/ecs/Registry.hpp"
 #include "core/managers/InputManager.h"
 #include "core/managers/ResourceManager.h"
 #include "core/managers/SystemManager.h"
-#include "gpu/gl/GlShader.h"
+#include "ecs/Registry.hpp"
 #include "renderer/Renderer.h"
 #include "systems/RenderSystem.h"
 

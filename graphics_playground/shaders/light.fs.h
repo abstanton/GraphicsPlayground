@@ -1,4 +1,5 @@
-#version 460
+#pragma once
+const char* light_fs = R"(#version 460
 out vec4 FragColor;
 
 uniform vec3 colour;
@@ -6,4 +7,4 @@ uniform vec3 colour;
 void main()
 {
     FragColor = vec4(1.0);
-}
+})";

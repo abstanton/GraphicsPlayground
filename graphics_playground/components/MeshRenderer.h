@@ -1,7 +1,7 @@
 #pragma once
-#include "../Material.h"
-#include "../Transform.h"
+#include "../resources/Material.h"
 #include "../resources/Mesh.h"
+#include "Transform.h"
 
 using std::string;
 struct MeshRenderer {

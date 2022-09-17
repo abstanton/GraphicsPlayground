@@ -16,7 +16,7 @@ bool ResourceManager::loadTexture(const char* filepath, const char* name) {
     // TODO: handle all channels
     switch (channels) {
       case 1:
-        format = TextureFormat::R8;
+        format = TextureFormat::R;
         break;
       case 2:
       case 3:
