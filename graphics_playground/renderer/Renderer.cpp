@@ -1,7 +1,5 @@
 #include "Renderer.h"
 
-#include <iostream>
-
 #include "../core/managers/ResourceManager.h"
 #include "../core/managers/ShaderManager.h"
 

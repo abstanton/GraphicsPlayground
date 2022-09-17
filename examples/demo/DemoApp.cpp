@@ -91,49 +91,8 @@ void DemoApp::setup() {
   registry.addComponent<DirectionLight>(light_2, glm::vec3(0.0f, 6.0f, -2.5f),
                                         glm::vec3(1.0f, 1.0f, 1.0f), 20.0f);
 
-  registry.view<Camera>().each([&](ecs::Entity ent, Camera& cam) {
-    std::cout << "Camera: " << cam.Front.x << std::endl;
-  });
-
   system_manager->addSystem(&camera_movement_system);
   system_manager->addSystem(&rotate_system);
 }
 
 void DemoApp::load() {}
-
-/*
-Material System Overhaul TODO:
-
- - Convert MaterialComp to store ordered map of name->TexOr and name->Uniform
- - Use ResourceHandle rather than raw pointers.
- - Add TextureHandle to texture inputs on materials.
- - Figure out how to get the texture binding dynamically.
-
- // These functions get the input, set the relevant 'use_tex' flag, fill the
-required value material_comp.setInput(string name, glm::vec3 val);
- material_comp.setInput(string name, TextureHandle tex);
-
- - Make constructing a material easier, use MaterialBuilder?
-
-
- class MaterialBuilder {
- public:
-        MaterialBuilder& addColourInput(string name) {
-                material_.colourInputs[name] = {(1,1,1), false, {}}
-                return *this;
-        }
-
-        MaterialComp build() {
-                return material_;
-        }
- private:
-        MaterialComp material_;
- }
-
- MaterialBuilder b;
- b.addColourInput("name")
- b.addColourInput("other name")
- b.addFloatInput("specular")
- b.addFloatInput("metallic").build()
-
- */

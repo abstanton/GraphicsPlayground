@@ -4,7 +4,6 @@
 
 #include <fstream>
 #include <glm/glm.hpp>
-#include <iostream>
 #include <optional>
 #include <sstream>
 #include <string>
