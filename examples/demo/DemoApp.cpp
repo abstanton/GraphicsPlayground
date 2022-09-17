@@ -1,22 +1,27 @@
 #include "DemoApp.h"
 
-#include "../../core/managers/ShaderManager.h"
+#include <core/managers/ShaderManager.h>
+
 #include "components/RotateComponent.h"
 
 void DemoApp::setup() {
-  resource_manager_.loadTexture("asphalt_alb.png", "asphalt_diff");
-  resource_manager_.loadTexture("asphalt_spec.png", "asphalt_rough");
-  resource_manager_.loadTexture("asphalt_norm.png", "asphalt_norm");
+  resource_manager_.loadTexture("textures\\asphalt_alb.png", "asphalt_diff");
+  resource_manager_.loadTexture("textures\\asphalt_spec.png", "asphalt_rough");
+  resource_manager_.loadTexture("textures\\asphalt_norm.png", "asphalt_norm");
 
-  resource_manager_.loadTexture("metal_plate_diff_1k.png", "metal_diff");
-  resource_manager_.loadTexture("metal_plate_rough_1k.png", "metal_rough");
-  resource_manager_.loadTexture("metal_plate_nor_gl_1k.png", "metal_norm");
-  resource_manager_.loadTexture("metal_plate_metal_1k.png", "metal_metal");
+  resource_manager_.loadTexture("textures\\metal_plate_diff_1k.png",
+                                "metal_diff");
+  resource_manager_.loadTexture("textures\\metal_plate_rough_1k.png",
+                                "metal_rough");
+  resource_manager_.loadTexture("textures\\metal_plate_nor_gl_1k.png",
+                                "metal_norm");
+  resource_manager_.loadTexture("textures\\metal_plate_metal_1k.png",
+                                "metal_metal");
 
   MeshRenderer monkey_component =
-      resource_manager_.loadObject("monkey.obj", "monkey")[0];
+      resource_manager_.loadObject("meshes\\monkey.obj", "monkey")[0];
   MeshRenderer cube_component =
-      resource_manager_.loadObject("cube.obj", "cube")[0];
+      resource_manager_.loadObject("meshes\\cube.obj", "cube")[0];
 
   Material asphalt_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);

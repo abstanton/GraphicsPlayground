@@ -1,9 +1,11 @@
 #include "RotateSystem.h"
 
+#include <components/MeshRenderer.h>
+
 #include <iostream>
 
-#include "../../../components/MeshRenderer.h"
 #include "../components/RotateComponent.h"
+
 void RotateSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   registry.view<MeshRenderer, Rotate>().each(
       [&](ecs::Entity ent, MeshRenderer& mr, Rotate& rot) {

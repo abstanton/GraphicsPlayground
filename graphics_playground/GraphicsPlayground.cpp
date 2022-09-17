@@ -38,6 +38,8 @@ void GraphicsPlayground::processInput(GLFWwindow* window, Camera& camera) {
 }
 
 void GraphicsPlayground::run() {
+  // TODO: Refactor resolution into window, add renderer resize callback to
+  // window resize callback
   Renderer renderer(1920, 1280, glm::vec3(0.2, 0.2, 0.2));
   RenderSystem render_system(&renderer);
   system_manager->addSystem(&render_system);
