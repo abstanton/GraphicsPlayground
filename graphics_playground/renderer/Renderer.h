@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 
+#include "../Material.h"
 #include "../components/Camera.h"
 #include "../components/DirectionLight.h"
 #include "../components/MeshRenderer.h"
@@ -88,4 +89,6 @@ class Renderer {
                       std::vector<PointLight> point_lights,
                       std::vector<DirectionLight> direction_lights);
   void drawMainPass(std::vector<MeshRenderer> mesh_renderers);
+
+  void setShaderInputsForMaterial(const Material& mat, gpu::Shader* shader);
 };

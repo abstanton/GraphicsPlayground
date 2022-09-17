@@ -1,44 +1,10 @@
 #include "ResourceManager.h"
+
+#include "ShaderManager.h"
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #endif
-
-std::optional<Texture*> ResourceManager::loadTextureResource(
-    const string& filepath) {
-  int width, height, channels;
-  unsigned char* data =
-      stbi_load(filepath.c_str(), &width, &height, &channels, 0);
-  if (data) {
-    UUIDGenerator& generator = UUIDGenerator::get();
-    unsigned int id = generator.getUUID();
-    TextureFormat format;
-    // TODO: handle all channels
-    switch (channels) {
-      case 1:
-        format = TextureFormat::R8;
-        break;
-      case 2:
-      case 3:
-        format = TextureFormat::RGB8;
-        break;
-      case 4:
-        format = TextureFormat::RGBA8;
-        break;
-      default:
-        format = TextureFormat::RGB8;
-    }
-
-    auto texture = std::make_shared<Texture>(data, width, height, format);
-    texture->path = filepath;
-    texture->id = id;
-    loaded_resources_.push_back(texture);
-    return texture.get();
-  } else {
-    std::cout << "Failed to load texture" << std::endl;
-    return {};
-  }
-}
 
 bool ResourceManager::loadTexture(const char* filepath, const char* name) {
   int width, height, channels;
@@ -75,6 +41,20 @@ bool ResourceManager::loadTexture(const char* filepath, const char* name) {
   }
 }
 
+std::optional<Texture*> ResourceManager::getTexture(string name) {
+  if (loaded_textures_.find(name) == loaded_textures_.end()) {
+    return {};
+  }
+  return &loaded_textures_[name];
+}
+
+std::optional<Mesh*> ResourceManager::getMesh(string name) {
+  if (loaded_meshes_.find(name) == loaded_meshes_.end()) {
+    return {};
+  }
+  return &loaded_meshes_[name];
+}
+
 static glm::vec3 assimpToGlmVec3(aiVector3D assimp_vec) {
   return glm::vec3(assimp_vec.x, assimp_vec.y, assimp_vec.z);
 }
@@ -88,12 +68,14 @@ void ResourceManager::processNode(const aiScene* scene, aiNode* node,
                                   const char* base_name) {
   UUIDGenerator& generator = UUIDGenerator::get();
   for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-    Mesh mesh = processMesh(base_name, scene->mMeshes[node->mMeshes[i]]);
+    Mesh mesh = processMesh(scene->mMeshes[node->mMeshes[i]]);
     mesh.id = generator.getUUID();
     mesh.path = scene->mMeshes[node->mMeshes[i]]->mName.C_Str();
 
-    loaded_meshes_.emplace(
-        string(base_name) + std::to_string(mesh_renderers_out.size()), mesh);
+    std::string mesh_name =
+        string(base_name) + std::to_string(mesh_renderers_out.size());
+
+    loaded_meshes_.emplace(mesh_name, mesh);
 
     std::shared_ptr<Mesh> mesh_ptr = std::make_shared<Mesh>(mesh);
     loaded_resources_.push_back(mesh_ptr);
@@ -105,15 +87,17 @@ void ResourceManager::processNode(const aiScene* scene, aiNode* node,
     transform.position = assimpToGlmVec3(position);
     transform.scale = assimpToGlmVec3(scale);
     transform.euler = assimpToGlmVec3(rotation);
-    mesh_renderers_out.push_back(
-        MeshRenderer(mesh_ptr.get(), default_material_, transform));
+    mesh_renderers_out.push_back(MeshRenderer(
+        mesh_name,
+        ShaderManager::get().getMaterialForBuiltin(BuiltinShader::DEFAULT),
+        transform));
   }
   for (unsigned int i = 0; i < node->mNumChildren; i++) {
-    processNode(scene, node->mChildren[i], mesh_renderers_out, "");
+    processNode(scene, node->mChildren[i], mesh_renderers_out, base_name);
   }
 }
 
-Mesh ResourceManager::processMesh(const char* base_name, aiMesh* mesh) {
+Mesh ResourceManager::processMesh(aiMesh* mesh) {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
 
@@ -142,8 +126,8 @@ Mesh ResourceManager::processMesh(const char* base_name, aiMesh* mesh) {
 }
 
 // TODO return SceneNode or equivalent (capable of having children)
-std::optional<MeshRenderer> ResourceManager::loadObjectResource(
-    const string& filepath) {
+std::vector<MeshRenderer> ResourceManager::loadObject(const char* filepath,
+                                                      const char* base_name) {
   const aiScene* scene =
       importer_.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs |
                                        aiProcess_CalcTangentSpace);
@@ -151,20 +135,7 @@ std::optional<MeshRenderer> ResourceManager::loadObjectResource(
     return {};
   }
   std::vector<MeshRenderer> mesh_renderers;
-  processNode(scene, scene->mRootNode, mesh_renderers, "");
-  return mesh_renderers[0];
-}
-
-// TODO return SceneNode or equivalent (capable of having children)
-bool ResourceManager::loadObject(const char* filepath, const char* base_name) {
-  const aiScene* scene =
-      importer_.ReadFile(filepath, aiProcess_Triangulate | aiProcess_FlipUVs |
-                                       aiProcess_CalcTangentSpace);
-  if (scene == nullptr) {
-    return false;
-  }
-  std::vector<MeshRenderer> mesh_renderers;
   processNode(scene, scene->mRootNode, mesh_renderers, base_name);
 
-  return true;
+  return mesh_renderers;
 }

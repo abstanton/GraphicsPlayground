@@ -1,75 +1,42 @@
 #include "DemoApp.h"
 
-#include "../../DefaultMaterial.h"
-#include "../../EmissiveMaterial.h"
-#include "../../PBRMaterial.h"
 #include "../../core/managers/ShaderManager.h"
 #include "components/RotateComponent.h"
 
 void DemoApp::setup() {
-  std::shared_ptr<gpu::Shader> pbr_shader = std::make_shared<gpu::GlShader>(
-      gpu::GlShader::fromFilepaths("shaders/defaultVS.vs", "shaders/pbrFS.fs")
-          .value());
-  std::shared_ptr<gpu::Shader> light_shader = std::make_shared<gpu::GlShader>(
-      gpu::GlShader::fromFilepaths("shaders/defaultVS.vs", "shaders/lightFS.fs")
-          .value());
-  std::shared_ptr<gpu::Shader> default_shader = std::make_shared<gpu::GlShader>(
-      gpu::GlShader::fromFilepaths("shaders/defaultVS.vs",
-                                   "shaders/defaultFS.fs")
-          .value());
+  resource_manager_.loadTexture("asphalt_alb.png", "asphalt_diff");
+  resource_manager_.loadTexture("asphalt_spec.png", "asphalt_rough");
+  resource_manager_.loadTexture("asphalt_norm.png", "asphalt_norm");
 
-  ShaderManager& shader_manager = ShaderManager::get();
-
-  pbr_shader.reset(shader_manager.getShader("pbr"));
-
-  std::shared_ptr<DefaultMaterial> default_material =
-      std::make_shared<DefaultMaterial>(default_shader,
-                                        glm::vec3(0.2, 1.0, 1.0));
-
-  Texture* asphalt_alb_texture =
-      resource_manager_.loadTextureResource("asphalt_alb.png").value();
-  Texture* asphalt_roughness_texture =
-      resource_manager_.loadTextureResource("asphalt_spec.png").value();
-  Texture* asphalt_normal_texture =
-      resource_manager_.loadTextureResource("asphalt_norm.png").value();
-
-  Texture* metal_plate_alb =
-      resource_manager_.loadTextureResource("metal_plate_diff_1k.png").value();
-  Texture* metal_plate_rough =
-      resource_manager_.loadTextureResource("metal_plate_rough_1k.png").value();
-  Texture* metal_plate_norm =
-      resource_manager_.loadTextureResource("metal_plate_nor_gl_1k.png")
-          .value();
-  Texture* metal_plate_metal =
-      resource_manager_.loadTextureResource("metal_plate_metal_1k.png").value();
-
-  std::shared_ptr<Material> metal_plate_material =
-      std::make_shared<PBRMaterial>(pbr_shader, metal_plate_alb,
-                                    metal_plate_rough, metal_plate_norm,
-                                    metal_plate_metal);
-  metal_plate_material->tex_scale = 5.0f;
+  resource_manager_.loadTexture("metal_plate_diff_1k.png", "metal_diff");
+  resource_manager_.loadTexture("metal_plate_rough_1k.png", "metal_rough");
+  resource_manager_.loadTexture("metal_plate_nor_gl_1k.png", "metal_norm");
+  resource_manager_.loadTexture("metal_plate_metal_1k.png", "metal_metal");
 
   MeshRenderer monkey_component =
-      resource_manager_.loadObjectResource("monkey.obj").value();
+      resource_manager_.loadObject("monkey.obj", "monkey")[0];
   MeshRenderer cube_component =
-      resource_manager_.loadObjectResource("cube.obj").value();
+      resource_manager_.loadObject("cube.obj", "cube")[0];
 
-  std::cout << "Monkey ID: " << monkey_component.mesh_->id << std::endl;
-  std::cout << "Cube ID: " << cube_component.mesh_->id << std::endl;
+  Material asphalt_material_comp =
+      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+  asphalt_material_comp.setColourInput("diffuse", "asphalt_diff", {10, 10});
+  asphalt_material_comp.setColourInput("normal", glm::vec3(0, 0, 1.0f));
+  asphalt_material_comp.setFloatInput("roughness", 1.0);
+  asphalt_material_comp.setFloatInput("metalness", 0);
 
-  MaterialComp pbr_material =
-      shader_manager.getMaterialForBuiltin(BuiltinShader::PBR);
+  Material metal_material =
+      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+  metal_material.setColourInput("diffuse", "metal_diff", {5, 5});
+  metal_material.setColourInput("normal", "metal_norm", {5, 5});
+  metal_material.setFloatInput("roughness", "metal_rough", {5, 5});
+  metal_material.setFloatInput("metalness", "metal_metal", {5, 5});
 
-  std::shared_ptr<PBRMaterial> asphalt_material = std::make_shared<PBRMaterial>(
-      pbr_shader, asphalt_alb_texture, asphalt_roughness_texture,
-      asphalt_normal_texture, asphalt_roughness_texture);
-  std::shared_ptr<PBRMaterial> asphalt_material_norm =
-      std::make_shared<PBRMaterial>(
-          pbr_shader, asphalt_normal_texture, asphalt_roughness_texture,
-          asphalt_normal_texture, asphalt_roughness_texture);
-  std::shared_ptr<EmissiveMaterial> emissive_material =
-      std::make_shared<EmissiveMaterial>(light_shader,
-                                         glm::vec3(1.0, 1.0, 1.0));
+  cube_component.material_comp_ = metal_material;
+
+  MeshRenderer new_mesh_comp(monkey_component.mesh_, asphalt_material_comp,
+                             monkey_component.transform_);
+  monkey_component = new_mesh_comp;
 
   auto camera_ent = registry.createEntity();
   Camera& camera =
@@ -78,7 +45,7 @@ void DemoApp::setup() {
   Transform transform;
   transform.position = glm::vec3(0, -3.0, 0);
   transform.scale = glm::vec3(10.0, 1.0, 10.0);
-  cube_component.material_ = metal_plate_material;
+  cube_component.material_comp_ = metal_material;
   cube_component.transform_ = transform;
   auto cube_0 = registry.createEntity();
   MeshRenderer& mr_0 =
@@ -104,7 +71,7 @@ void DemoApp::setup() {
       glm::vec3(1.3f, -2.0f, 2.5f),  glm::vec3(1.5f, 2.0f, 2.5f),
       glm::vec3(1.5f, 0.2f, 3.5f),   glm::vec3(-1.3f, 1.0f, 3.5f)};
 
-  monkey_component.material_ = asphalt_material;
+  monkey_component.material_comp_ = asphalt_material_comp;
   transform.position = glm::vec3(0.0, 0.5, 0.0);
   transform.scale = glm::vec3(1.2f);
   monkey_component.transform_ = transform;

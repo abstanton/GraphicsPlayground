@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+#include <iostream>
+
+#include "../core/managers/ResourceManager.h"
 #include "../core/managers/ShaderManager.h"
 
 Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
@@ -10,8 +13,7 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       gpu_camera_buffer_({}) {
   backend_ = gpu::Backend::get();
 
-  auto& shader_manager = ShaderManager::get();
-  shadow_shader_ = shader_manager.getShader("shadow");
+  shadow_shader_ = ShaderManager::get().getShader("shadow");
 
   camera_uniform_buffer_ =
       backend_->allocUniformBuffer(sizeof(GPUCameraBuffer));
@@ -113,7 +115,8 @@ void Renderer::drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
     for (auto mc : mesh_renderers) {
       shadow_shader_->setMat4("model", mc.transform_.getTransformation());
 
-      gpu::Batch* batch = retrieveMeshGPUBatch(mc.mesh_);
+      gpu::Batch* batch = retrieveMeshGPUBatch(
+          ResourceManager::get().getMesh(mc.mesh_).value());
       batch->draw();
     }
   }
@@ -124,22 +127,19 @@ void Renderer::drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
 void Renderer::drawMainPass(std::vector<MeshRenderer> mesh_renderers) {
   camera_uniform_buffer_->bind(0);
   lights_uniform_buffer_->bind(1);
-  for (auto mc : mesh_renderers) {
-    mc.material_->shader_->use();
 
-    const Material* material = mc.material_.get();
-    auto textures = material->getTextures();
-    for (int i = 0; i < textures.size(); i++) {
-      gpu::Texture* gpu_texture = retrieveGPUTexture(textures[i]);
-      gpu_texture->bind(i);
-    }
+  for (auto mc : mesh_renderers) {
+    gpu::Shader* shader =
+        ShaderManager::get().getShader(mc.material_comp_.shader_name);
+    shader->use();
+
+    setShaderInputsForMaterial(mc.material_comp_, shader);
     shadow_map_texture_->bind(10);
 
-    // TODO don't do this
-    mc.material_->shader_->setMat4("model", mc.transform_.getTransformation());
-    mc.material_->shader_->setFloat("tex_scale", mc.material_->tex_scale);
+    shader->setMat4("model", mc.transform_.getTransformation());
 
-    gpu::Batch* batch = retrieveMeshGPUBatch(mc.mesh_);
+    gpu::Batch* batch =
+        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh_).value());
 
     batch->draw();
   }
@@ -185,18 +185,13 @@ gpu::Batch* Renderer::retrieveMeshGPUBatch(const Mesh* mesh) {
   gpu::IndexBuffer* index_buffer = backend_->allocIndexBuffer();
 
   std::vector<gpu::VertexAttrib> vertex_attribs = {
-      {"pos", 0, 3, gpu::DataType::FLOAT,
-       false,  // TODO: What does this do?
-       sizeof(Vertex), (void*)0},
-      {"norm", 1, 3, gpu::DataType::FLOAT,
-       false,  // TODO: What does this do?
-       sizeof(Vertex), (void*)(offsetof(Vertex, norm))},
-      {"tang", 2, 3, gpu::DataType::FLOAT,
-       false,  // TODO: What does this do?
-       sizeof(Vertex), (void*)(offsetof(Vertex, tang))},
-      {"uv", 3, 2, gpu::DataType::FLOAT,
-       false,  // TODO: What does this do?
-       sizeof(Vertex), (void*)(offsetof(Vertex, uv))}};
+      {"pos", 0, 3, gpu::DataType::FLOAT, false, sizeof(Vertex), (void*)0},
+      {"norm", 1, 3, gpu::DataType::FLOAT, false, sizeof(Vertex),
+       (void*)(offsetof(Vertex, norm))},
+      {"tang", 2, 3, gpu::DataType::FLOAT, false, sizeof(Vertex),
+       (void*)(offsetof(Vertex, tang))},
+      {"uv", 3, 2, gpu::DataType::FLOAT, false, sizeof(Vertex),
+       (void*)(offsetof(Vertex, uv))}};
 
   vertex_buffer->uploadData(vertex_attribs, mesh->verts_.size(),
                             sizeof(Vertex) * mesh->verts_.size(),
@@ -209,4 +204,43 @@ gpu::Batch* Renderer::retrieveMeshGPUBatch(const Mesh* mesh) {
   batch_cache_[mesh->id] = batch;
 
   return batch;
+}
+
+void Renderer::setShaderInputsForMaterial(const Material& mat,
+                                          gpu::Shader* shader) {
+  for (auto&& [name, input] : mat.colour_inputs) {
+    if (input.use_tex) {
+      shader->setBool(name + "_use_tex", true);
+      shader->setVec2(name + "_scale", input.scale);
+      shader->bindTexture(
+          (name + "_tex").c_str(),
+          retrieveGPUTexture(
+              ResourceManager::get().getTexture(input.tex_name).value()));
+    } else {
+      shader->setBool(name + "_use_tex", false);
+      shader->setVec3(name + "_val", input.value);
+    }
+  }
+  for (auto&& [name, input] : mat.float_inputs) {
+    if (input.use_tex) {
+      shader->setBool(name + "_use_tex", true);
+      shader->setVec2(name + "_scale", input.scale);
+      shader->bindTexture(
+          (name + "_tex").c_str(),
+          retrieveGPUTexture(
+              ResourceManager::get().getTexture(input.tex_name).value()));
+    } else {
+      shader->setBool(name + "_use_tex", false);
+      shader->setFloat(name + "_val", input.value);
+    }
+  }
+  for (auto&& [name, input] : mat.float_uniforms) {
+    shader->setFloat(name + "_val", input.value);
+  }
+  for (auto&& [name, input] : mat.colour_uniforms) {
+    shader->setVec3(name + "_val", input.value);
+  }
+  for (auto&& [name, input] : mat.bool_uniforms) {
+    shader->setBool(name + "_val", input.value);
+  }
 }

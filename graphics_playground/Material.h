@@ -50,9 +50,8 @@ struct Uniform {
 
 using std::string;
 
-struct MaterialComp {
-  void setColourInput(string name, glm::vec3 value,
-                      glm::vec2 tex_scale = {1, 1}) {
+struct Material {
+  void setColourInput(string name, glm::vec3 value) {
     if (colour_inputs.find(name) == colour_inputs.end()) {
       return;
     }
@@ -67,7 +66,7 @@ struct MaterialComp {
     colour_inputs[name].setValue(texture_name, tex_scale);
   }
 
-  void setFloatInput(string name, float value, glm::vec2 tex_scale = {1, 1}) {
+  void setFloatInput(string name, float value) {
     if (float_inputs.find(name) == float_inputs.end()) {
       return;
     }
@@ -82,6 +81,7 @@ struct MaterialComp {
     float_inputs[name].setValue(texture_name, tex_scale);
   }
 
+  // TODO: encapsulate these
   std::map<string, TextureOr<glm::vec3>> colour_inputs;
   std::map<string, TextureOr<float>> float_inputs;
 
@@ -118,18 +118,13 @@ class MaterialBuilder {
     material_.bool_uniforms[name] = Uniform<bool>{};
     return *this;
   }
+  MaterialBuilder& setShaderName(string name) {
+    material_.shader_name = name;
+    return *this;
+  }
 
-  MaterialComp build() { return material_; }
+  Material build() { return material_; }
 
  private:
-  MaterialComp material_;
-};
-
-class Material {
- public:
-  float tex_scale = 1.0f;
-  void setModelMatrix(const glm::mat4 model) const;
-
-  virtual std::vector<const Texture*> getTextures() const = 0;
-  std::shared_ptr<gpu::Shader> shader_;
+  Material material_;
 };

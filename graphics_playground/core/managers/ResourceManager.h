@@ -18,10 +18,11 @@ using std::vector;
 
 class ResourceManager {
  public:
-  /*
-   * Load texture resource, return loaded resource pointer
-   */
-  std::optional<Texture*> loadTextureResource(const string& path);
+  static ResourceManager& get() {
+    static ResourceManager resource_manager = {};
+    return resource_manager;
+  }
+
   /*
    * Load Mesh resource, return loaded resource pointer
    */
@@ -29,11 +30,13 @@ class ResourceManager {
 
   bool loadTexture(const char* path, const char* name);
   bool loadMesh(const char* path, const char* name);
-  bool loadObject(const char* path, const char* base_name);
+  std::vector<MeshRenderer> loadObject(const char* path, const char* base_name);
+
+  std::optional<Texture*> getTexture(string tex_name);
+  std::optional<Mesh*> getMesh(string mesh_name);
   /*
    * Load Object resource, consisting of Mesh and Textures
    */
-  std::optional<MeshRenderer> loadObjectResource(const string& path);
   bool loadTextResource(const string& path);
 
  private:
@@ -43,9 +46,8 @@ class ResourceManager {
   map<string, Mesh> loaded_meshes_;
 
   Assimp::Importer importer_;
-  std::shared_ptr<DefaultMaterial> default_material_;
 
   void processNode(const aiScene* scene, aiNode* node,
                    std::vector<MeshRenderer>& meshes, const char* base_name);
-  Mesh processMesh(const char* base_name, aiMesh* mesh);
+  Mesh processMesh(aiMesh* mesh);
 };

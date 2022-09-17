@@ -1,4 +1,6 @@
-#version 330 core
+#version 460
+#extension GL_ARB_bindless_texture : require
+
 out vec4 FragColor;
             
 in vec2 uv;
@@ -38,24 +40,24 @@ layout(std140, binding = 1) uniform Lights {
     DirectionLight direction_lights[MAX_TOTAL_DIRECTION_LIGHTS];
 };
 
-uniform int diffuse_use_tex = 1;
-layout(binding = 0) uniform sampler2D diffuse_tex;
+uniform int diffuse_use_tex;
+layout(bindless_sampler) uniform sampler2D diffuse_tex;
 uniform vec3 diffuse_val;
 uniform vec2 diffuse_scale;
 
-uniform bool roughness_use_tex;
-layout(binding = 1) uniform sampler2D roughness_tex;
-uniform vec3 roughness_val;
+uniform int roughness_use_tex;
+layout(bindless_sampler) uniform sampler2D roughness_tex;
+uniform float roughness_val;
 uniform vec2 roughness_scale;
 
-uniform bool normal_use_tex;
-layout(binding = 2) uniform sampler2D normal_tex;
+uniform int normal_use_tex;
+layout(bindless_sampler) uniform sampler2D normal_tex;
 uniform vec3 normal_val;
 uniform vec2 normal_scale;
 
-uniform bool metalness_use_tex;
-layout(binding = 3) uniform sampler2D metalness_tex;
-uniform vec3 metalness_val;
+uniform int metalness_use_tex;
+layout(bindless_sampler) uniform sampler2D metalness_tex;
+uniform float metalness_val;
 uniform vec2 metalness_scale;
 
 layout(binding = 10) uniform sampler2D shadowMap;
@@ -139,14 +141,14 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
-    vec3 albedo = diffuse_use_tex ? vec3(texture(diffuse_tex, uv*tex_scale)) : diffuse_val;
-    float roughness = vec3(texture(roughness_tex, uv*tex_scale)).x;
+    vec3 albedo = diffuse_use_tex == 1? vec3(texture(diffuse_tex, uv*diffuse_scale)) : diffuse_val;
+    float roughness = roughness_use_tex == 1? vec3(texture(roughness_tex, uv*roughness_scale)).x : roughness_val;
 	
-    vec3 normal = texture(normal_tex, uv*tex_scale).rgb;
+    vec3 normal = normal_use_tex == 1? texture(normal_tex, uv*normal_scale).rgb : normal_val;
     normal = normal* 2.0 - 1.0;
     normal = normalize(TBN * normal);
     
-    float metallic = vec3(texture(metalness_tex, uv*tex_scale)).x;
+    float metallic = metalness_use_tex == 1? vec3(texture(metalness_tex, uv*metalness_scale)).x : metalness_val;
 
 	vec3 V = normalize(vec3(cam_position) - pos);    
     vec3 N = normal;

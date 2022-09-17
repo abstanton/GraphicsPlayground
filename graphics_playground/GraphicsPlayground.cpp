@@ -3,7 +3,8 @@
 #include "Material.h"
 #include "components/MeshRenderer.h"
 
-GraphicsPlayground::GraphicsPlayground() {
+GraphicsPlayground::GraphicsPlayground()
+    : resource_manager_(ResourceManager::get()) {
   system_manager = std::make_unique<SystemManager>(registry);
 
   window = std::make_unique<Window>(1920, 1280, "Graphics Playground");
