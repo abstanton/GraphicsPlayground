@@ -31,7 +31,7 @@ void DemoApp::setup() {
 
   auto camera_ent = registry.createEntity();
   Camera& camera =
-      registry.addComponent<Camera>(camera_ent, glm::vec3(0.0f, 0.0f, 3.0f));
+      registry.addComponent<Camera>(camera_ent, glm::vec3(-7.0f, 5.0f, -5.0f));
 
   Transform transform;
   transform.position = glm::vec3(0, -3.0, 0);

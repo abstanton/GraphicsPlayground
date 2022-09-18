@@ -2,8 +2,6 @@
 
 #include <components/MeshRenderer.h>
 
-#include <iostream>
-
 #include "../components/RotateComponent.h"
 
 void RotateSystem::onUpdate(ecs::Registry& registry, float delta_time) {
