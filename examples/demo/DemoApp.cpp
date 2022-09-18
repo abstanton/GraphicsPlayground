@@ -33,38 +33,25 @@ void DemoApp::setup() {
   Camera& camera =
       registry.addComponent<Camera>(camera_ent, glm::vec3(-7.0f, 5.0f, -5.0f));
 
-  Transform transform;
-  transform.position = glm::vec3(0, -3.0, 0);
-  transform.scale = glm::vec3(10.0, 1.0, 10.0);
   cube_component.material_comp_ = metal_material;
-  cube_component.transform_ = transform;
+  cube_component.transform_ = Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10});
   auto cube_0 = registry.createEntity();
   MeshRenderer& mr_0 =
       registry.addComponent<MeshRenderer>(cube_0, cube_component);
 
-  transform.position = glm::vec3(5, 0, 0);
-  transform.euler.z = pi<float>() / 2;
-  cube_component.transform_ = transform;
+  cube_component.transform_ =
+      Transform({5, 0, 0}, {0, 0, pi<float>() / 2}, {10, 1, 10});
   auto cube_1 = registry.createEntity();
   MeshRenderer& mr_1 =
       registry.addComponent<MeshRenderer>(cube_1, cube_component);
 
-  transform.position = glm::vec3(0, 0, 5);
-  transform.euler.x = pi<float>() / 2;
-  cube_component.transform_ = transform;
+  cube_component.transform_ =
+      Transform({0, 0, 5}, {pi<float>() / 2, 0, 0}, {10, 1, 10});
   auto cube_2 = registry.createEntity();
   registry.addComponent<MeshRenderer>(cube_2, cube_component);
 
-  glm::vec3 cube_positions[] = {
-      glm::vec3(0.0f, 0.0f, 5.0f),   glm::vec3(2.0f, 5.0f, -10.0f),
-      glm::vec3(-1.5f, -2.2f, 2.5f), glm::vec3(-3.8f, -2.0f, -7.3f),
-      glm::vec3(2.4f, -0.4f, 1.5f),  glm::vec3(-1.7f, 3.0f, -2.5f),
-      glm::vec3(1.3f, -2.0f, 2.5f),  glm::vec3(1.5f, 2.0f, 2.5f),
-      glm::vec3(1.5f, 0.2f, 3.5f),   glm::vec3(-1.3f, 1.0f, 3.5f)};
-
-  transform.position = glm::vec3(0.0, 0.5, 0.0);
-  transform.scale = glm::vec3(1.2f);
-  monkey_component.transform_ = transform;
+  monkey_component.transform_ =
+      Transform(glm::vec3(0, 0.5, 0), glm::vec3(0), glm::vec3(1.2f));
   auto monkey_ent = registry.createEntity();
   registry.addComponent<MeshRenderer>(monkey_ent, monkey_component);
   Rotate rotate_comp = {20, 20, 20};

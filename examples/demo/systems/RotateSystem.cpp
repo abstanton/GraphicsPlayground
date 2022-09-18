@@ -8,8 +8,8 @@ void RotateSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   registry.view<MeshRenderer, Rotate>().each(
       [&](ecs::Entity ent, MeshRenderer& mr, Rotate& rot) {
         float dt = 0.000178461f;
-        mr.transform_.euler.x += rot.rate_x * dt;
-        mr.transform_.euler.y += rot.rate_y * dt;
-        mr.transform_.euler.z += rot.rate_z * dt;
+        mr.transform_.setRotation(
+            mr.transform_.euler() +
+            (glm::vec3(rot.rate_x, rot.rate_y, rot.rate_z) * dt));
       });
 }

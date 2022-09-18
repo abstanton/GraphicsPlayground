@@ -85,9 +85,9 @@ void ResourceManager::processNode(const aiScene* scene, aiNode* node,
     aiVector3D position;
     aiVector3D rotation;
     node->mTransformation.Decompose(scale, rotation, position);
-    transform.position = assimpToGlmVec3(position);
-    transform.scale = assimpToGlmVec3(scale);
-    transform.euler = assimpToGlmVec3(rotation);
+    transform.setPosition(assimpToGlmVec3(position));
+    transform.setScale(assimpToGlmVec3(scale));
+    transform.setRotation(assimpToGlmVec3(rotation));
     mesh_renderers_out.push_back(MeshRenderer(
         mesh_name,
         ShaderManager::get().getMaterialForBuiltin(BuiltinShader::DEFAULT),

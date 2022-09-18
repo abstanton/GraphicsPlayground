@@ -111,7 +111,7 @@ void Renderer::drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     shadow_shader_->setMat4("lightSpaceMatrix", lightSpaceMatrix);
     for (auto mc : mesh_renderers) {
-      shadow_shader_->setMat4("model", mc.transform_.getTransformation());
+      shadow_shader_->setMat4("model", mc.transform_.transformation());
 
       gpu::Batch* batch = retrieveMeshGPUBatch(
           ResourceManager::get().getMesh(mc.mesh_).value());
@@ -134,7 +134,7 @@ void Renderer::drawMainPass(std::vector<MeshRenderer> mesh_renderers) {
     setShaderInputsForMaterial(mc.material_comp_, shader);
     shadow_map_texture_->bind(10);
 
-    shader->setMat4("model", mc.transform_.getTransformation());
+    shader->setMat4("model", mc.transform_.transformation());
 
     gpu::Batch* batch =
         retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh_).value());
