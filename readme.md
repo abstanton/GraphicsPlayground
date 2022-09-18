@@ -2,12 +2,16 @@
 This is a WIP personal project started with the goal to learn real-time graphics programming
 and improve my C++ along the way.
 
+![image](https://user-images.githubusercontent.com/23246639/190881253-1ff93c24-c06d-41e5-b0ab-97ccb2edfc5c.png)
+Demo image
+
 ## Current Progress
 - GPU abstraction
 - Texture, Shader, Mesh loading
 - Entity Component System 
 - Materal system for abstracting shader inputs
-- PBR shading with shadow maps for directional lights
+- Forward renderer with PBR shading
+- Shadow maps for directional lights
 - Point lights
 - Texture tiling
 
