@@ -5,10 +5,6 @@
 #include "components/RotateComponent.h"
 
 void DemoApp::setup() {
-  resource_manager_.loadTexture("textures\\asphalt_alb.png", "asphalt_diff");
-  resource_manager_.loadTexture("textures\\asphalt_spec.png", "asphalt_rough");
-  resource_manager_.loadTexture("textures\\asphalt_norm.png", "asphalt_norm");
-
   resource_manager_.loadTexture("textures\\metal_plate_diff_1k.png",
                                 "metal_diff");
   resource_manager_.loadTexture("textures\\metal_plate_rough_1k.png",
@@ -23,13 +19,6 @@ void DemoApp::setup() {
   MeshRenderer cube_component =
       resource_manager_.loadObject("meshes\\cube.obj", "cube")[0];
 
-  Material asphalt_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
-  asphalt_material.setColourInput("diffuse", "asphalt_diff", {10, 10});
-  asphalt_material.setColourInput("normal", "asphalt_norm", {10, 10});
-  asphalt_material.setFloatInput("roughness", 1.0);
-  asphalt_material.setFloatInput("metalness", 0);
-
   Material metal_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
   metal_material.setColourInput("diffuse", "metal_diff", {5, 5});
@@ -38,7 +27,7 @@ void DemoApp::setup() {
   metal_material.setFloatInput("metalness", "metal_metal", {5, 5});
 
   cube_component.material_comp_ = metal_material;
-  monkey_component.material_comp_ = asphalt_material;
+  monkey_component.material_comp_ = metal_material;
 
   auto camera_ent = registry.createEntity();
   Camera& camera =
