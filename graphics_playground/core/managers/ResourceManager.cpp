@@ -88,10 +88,10 @@ void ResourceManager::processNode(const aiScene* scene, aiNode* node,
     transform.setPosition(assimpToGlmVec3(position));
     transform.setScale(assimpToGlmVec3(scale));
     transform.setRotation(assimpToGlmVec3(rotation));
+    // Refactor to return entities so that they can have transforms
     mesh_renderers_out.push_back(MeshRenderer(
         mesh_name,
-        ShaderManager::get().getMaterialForBuiltin(BuiltinShader::DEFAULT),
-        transform));
+        ShaderManager::get().getMaterialForBuiltin(BuiltinShader::DEFAULT)));
   }
   for (unsigned int i = 0; i < node->mNumChildren; i++) {
     processNode(scene, node->mChildren[i], mesh_renderers_out, base_name);

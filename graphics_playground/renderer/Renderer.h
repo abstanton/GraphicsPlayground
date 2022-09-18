@@ -14,7 +14,9 @@
 #define SHADOW_MAP_RESOLUTION 1024
 #define MAX_DIRECTION_SHADOWS 10
 
-enum class RenderPass { SHADOW_MAP, DRAW };
+using MeshPair = std::pair<MeshRenderer, Transform>;
+using PointPair = std::pair<PointLight, Transform>;
+using DirectionPair = std::pair<DirectionLight, Transform>;
 
 struct GPUPointLight {
   glm::vec3 position;
@@ -55,7 +57,7 @@ struct GPUCameraBuffer {
 
 class Renderer {
  public:
-  void draw(Camera camera, std::vector<MeshRenderer> mesh_renderers,
+  void draw(Camera camera, std::vector<MeshPair> mesh_renderers,
             std::vector<PointLight> point_lights,
             std::vector<DirectionLight> direction_lights);
 
@@ -86,10 +88,10 @@ class Renderer {
 
   void begin(Camera camera, std::vector<PointLight> point_lights,
              std::vector<DirectionLight> direction_lights);
-  void drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
+  void drawShadowPass(std::vector<MeshPair> mesh_renderers,
                       std::vector<PointLight> point_lights,
                       std::vector<DirectionLight> direction_lights);
-  void drawMainPass(std::vector<MeshRenderer> mesh_renderers);
+  void drawMainPass(std::vector<MeshPair> mesh_renderers);
 
   void setShaderInputsForMaterial(const Material& mat, gpu::Shader* shader);
 };

@@ -34,28 +34,29 @@ void DemoApp::setup() {
       registry.addComponent<Camera>(camera_ent, glm::vec3(-7.0f, 5.0f, -5.0f));
 
   cube_component.material_comp_ = metal_material;
-  cube_component.transform_ = Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10});
   auto cube_0 = registry.createEntity();
+  registry.addComponent<Transform>(
+      cube_0, Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10}));
   MeshRenderer& mr_0 =
       registry.addComponent<MeshRenderer>(cube_0, cube_component);
 
-  cube_component.transform_ =
-      Transform({5, 0, 0}, {0, 0, pi<float>() / 2}, {10, 1, 10});
   auto cube_1 = registry.createEntity();
+  registry.addComponent<Transform>(
+      cube_1, Transform({5, 0, 0}, {0, 0, pi<float>() / 2}, {10, 1, 10}));
   MeshRenderer& mr_1 =
       registry.addComponent<MeshRenderer>(cube_1, cube_component);
 
-  cube_component.transform_ =
-      Transform({0, 0, 5}, {pi<float>() / 2, 0, 0}, {10, 1, 10});
   auto cube_2 = registry.createEntity();
+  registry.addComponent<Transform>(
+      cube_2, Transform({0, 0, 5}, {pi<float>() / 2, 0, 0}, {10, 1, 10}));
   registry.addComponent<MeshRenderer>(cube_2, cube_component);
 
-  monkey_component.transform_ =
-      Transform(glm::vec3(0, 0.5, 0), glm::vec3(0), glm::vec3(1.2f));
   auto monkey_ent = registry.createEntity();
+  registry.addComponent<Transform>(
+      monkey_ent,
+      Transform(glm::vec3(0, 0.5, 0), glm::vec3(0), glm::vec3(1.2f)));
   registry.addComponent<MeshRenderer>(monkey_ent, monkey_component);
-  Rotate rotate_comp = {20, 20, 20};
-  registry.addComponent<Rotate>(monkey_ent, rotate_comp);
+  registry.addComponent<Rotate>(monkey_ent, {20, 20, 20});
 
   auto light_0 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_0, glm::vec3(-2.5f, 6.0f, 1.0f),

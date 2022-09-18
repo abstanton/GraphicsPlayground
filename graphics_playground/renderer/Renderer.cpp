@@ -38,13 +38,13 @@ Renderer::~Renderer() {
   delete camera_uniform_buffer_;
 }
 
-void Renderer::draw(Camera camera, std::vector<MeshRenderer> mesh_renderers,
+void Renderer::draw(Camera camera, std::vector<MeshPair> mesh_pairs,
                     std::vector<PointLight> point_lights,
                     std::vector<DirectionLight> direction_lights) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   begin(camera, point_lights, direction_lights);
-  drawShadowPass(mesh_renderers, point_lights, direction_lights);
-  drawMainPass(mesh_renderers);
+  drawShadowPass(mesh_pairs, point_lights, direction_lights);
+  drawMainPass(mesh_pairs);
 }
 
 void Renderer::begin(Camera camera, std::vector<PointLight> point_lights,
@@ -92,7 +92,7 @@ void Renderer::begin(Camera camera, std::vector<PointLight> point_lights,
   camera_uniform_buffer_->uploadData(&gpu_camera_buffer_);
 }
 
-void Renderer::drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
+void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
                               std::vector<PointLight> point_lights,
                               std::vector<DirectionLight> direction_lights) {
   shadow_frame_buffer_->bind();
@@ -110,8 +110,8 @@ void Renderer::drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
                     glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     shadow_shader_->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-    for (auto mc : mesh_renderers) {
-      shadow_shader_->setMat4("model", mc.transform_.transformation());
+    for (auto&& [mc, transform] : mesh_renderers) {
+      shadow_shader_->setMat4("model", transform.transformation());
 
       gpu::Batch* batch = retrieveMeshGPUBatch(
           ResourceManager::get().getMesh(mc.mesh_).value());
@@ -122,11 +122,11 @@ void Renderer::drawShadowPass(std::vector<MeshRenderer> mesh_renderers,
   backend_->setViewport(0, 0, scr_width_, scr_height_);
 }
 
-void Renderer::drawMainPass(std::vector<MeshRenderer> mesh_renderers) {
+void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   camera_uniform_buffer_->bind(0);
   lights_uniform_buffer_->bind(1);
 
-  for (auto mc : mesh_renderers) {
+  for (auto&& [mc, transform] : mesh_renderers) {
     gpu::Shader* shader =
         ShaderManager::get().getShader(mc.material_comp_.shader_name);
     shader->use();
@@ -134,7 +134,7 @@ void Renderer::drawMainPass(std::vector<MeshRenderer> mesh_renderers) {
     setShaderInputsForMaterial(mc.material_comp_, shader);
     shadow_map_texture_->bind(10);
 
-    shader->setMat4("model", mc.transform_.transformation());
+    shader->setMat4("model", transform.transformation());
 
     gpu::Batch* batch =
         retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh_).value());
