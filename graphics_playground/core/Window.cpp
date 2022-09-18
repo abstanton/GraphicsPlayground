@@ -39,3 +39,41 @@ void Window::setMouseMovementCallback(MouseMoveCallback func) {
 void Window::setScrollOffsetCallback(ScrollOffsetCallback func) {
   scroll_callback_ = func;
 }
+
+KeyState Window::processGlfwKey(int glfw_key) const {
+  int glfw_state = glfwGetKey(window_, glfw_key);
+  switch (glfw_state) {
+    case GLFW_PRESS:
+      return KeyState::DOWN;
+    default:
+      return KeyState::UP;
+  }
+}
+
+KeyState Window::getKeyState(Key key) const {
+  int glfw_key;
+  switch (key) {
+    case Key::A:
+      glfw_key = GLFW_KEY_A;
+      break;
+    case Key::D:
+      glfw_key = GLFW_KEY_D;
+      break;
+    case Key::S:
+      glfw_key = GLFW_KEY_S;
+      break;
+    case Key::W:
+      glfw_key = GLFW_KEY_W;
+      break;
+    case Key::SPACE:
+      glfw_key = GLFW_KEY_SPACE;
+      break;
+    case Key::L_SHIFT:
+      glfw_key = GLFW_KEY_LEFT_SHIFT;
+      break;
+    // Default to enter, seems almost reasonable
+    default:
+      glfw_key = GLFW_KEY_ENTER;
+  }
+  return processGlfwKey(glfw_key);
+}

@@ -11,6 +11,7 @@ GraphicsPlayground::GraphicsPlayground()
 
   window = std::make_unique<Window>(1920, 1280, "Graphics Playground");
   InputManager& input_manager = InputManager::get();
+  input_manager.setWindow(window.get());
   window->setMouseMovementCallback(
       [&](double x, double y) { input_manager.mouseMoveCallback(x, y); });
   window->setScrollOffsetCallback(
