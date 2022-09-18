@@ -10,7 +10,8 @@ Demo image
 - Texture, Shader, Mesh loading
 - Entity Component System 
 - Materal system for abstracting shader inputs
-- PBR shading with shadow maps for directional lights
+- Forward renderer with PBR shading
+- Shadow maps for directional lights
 - Point lights
 - Texture tiling
 
