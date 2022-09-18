@@ -26,7 +26,6 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
       glBindTexture(GL_TEXTURE_1D, 0);
       break;
     case TextureType::TEXTURE_2D:
-    case TextureType::TEXTURE_2D_ARRAY:
       glBindTexture(GL_TEXTURE_2D, id_);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -36,6 +35,19 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
       glTexImage2D(GL_TEXTURE_2D, 0, gl_format, width, height, 0, gl_format,
                    gl_data_type, data);
       glBindTexture(GL_TEXTURE_2D, 0);
+      break;
+    case TextureType::TEXTURE_2D_ARRAY:
+      // TODO: currently don't support uploading data for texture array
+      glBindTexture(GL_TEXTURE_2D_ARRAY, id_);
+      glTexStorage3D(GL_TEXTURE_2D_ARRAY, 0, gl_format, width, height, levels);
+      for (int i = 0; i < levels; i++) {
+        glTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, width, height, gl_format,
+                        gl_data_type, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      }
       break;
     case TextureType::TEXTURE_3D:
     case TextureType::TEXTURE_3D_ARRAY:
