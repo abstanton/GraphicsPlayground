@@ -10,6 +10,9 @@
 #include "GPUVertexBuffer.h"
 
 namespace gpu {
+
+enum class ClearType { ALL, DEPTH, COLOR };
+
 class Backend {
  public:
   static Backend* get();
@@ -34,8 +37,8 @@ class Backend {
 
   virtual void setViewport(int x, int y, int width, int height) = 0;
   virtual void unbindFramebuffer() = 0;
-  // virtual void useShader(Shader shader) = 0;
-  // virtual void setShaderUniform(std::string name, float value) = 0;
-  // virtual void setShaderUniform(std::string name, glm::mat4 value) = 0;
+
+  virtual void clear(ClearType) = 0;
+  virtual void setClearColor(float r, float g, float b, float a) = 0;
 };
 }  // namespace gpu

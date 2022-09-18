@@ -17,7 +17,7 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       backend_->allocUniformBuffer(sizeof(GPUCameraBuffer));
   lights_uniform_buffer_ = backend_->allocUniformBuffer(sizeof(GPULightBuffer));
 
-  glClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
+  backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
 
   shadow_frame_buffer_ = backend_->allocFrameBuffer();
   shadow_map_texture_ = backend_->generateTexture(
@@ -41,7 +41,7 @@ Renderer::~Renderer() {
 void Renderer::draw(Camera camera, std::vector<MeshPair> mesh_pairs,
                     std::vector<PointLight> point_lights,
                     std::vector<DirectionLight> direction_lights) {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  backend_->clear(gpu::ClearType::ALL);
   begin(camera, point_lights, direction_lights);
   drawShadowPass(mesh_pairs, point_lights, direction_lights);
   drawMainPass(mesh_pairs);
@@ -96,7 +96,7 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
                               std::vector<PointLight> point_lights,
                               std::vector<DirectionLight> direction_lights) {
   shadow_frame_buffer_->bind();
-  glClear(GL_DEPTH_BUFFER_BIT);
+  backend_->clear(gpu::ClearType::DEPTH);
   shadow_shader_->use();
 
   for (int i = 0; i < direction_lights.size(); i++) {

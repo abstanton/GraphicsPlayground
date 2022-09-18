@@ -33,5 +33,23 @@ class GlBackend : public Backend {
 
   void setViewport(int x, int y, int width, int height) override;
   void unbindFramebuffer() override;
+
+  void clear(ClearType type) override {
+    switch (type) {
+      case ClearType::COLOR:
+        glClear(GL_COLOR_BUFFER_BIT);
+        break;
+      case ClearType::DEPTH:
+        glClear(GL_DEPTH_BUFFER_BIT);
+        break;
+      default:
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        break;
+    }
+  }
+
+  void setClearColor(float r, float g, float b, float a) {
+    glClearColor(r, g, b, a);
+  }
 };
 }  // namespace gpu
