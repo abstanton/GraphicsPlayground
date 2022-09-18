@@ -13,5 +13,6 @@ class UUIDGenerator {
   }
 
  private:
+  UUIDGenerator() {}
   unsigned int counter_;
 };

@@ -16,7 +16,6 @@ enum class BuiltinShader {
 
 class ShaderManager {
  public:
-  ShaderManager();
   static ShaderManager& get() {
     static ShaderManager shader_manager = {};
     return shader_manager;
@@ -29,6 +28,8 @@ class ShaderManager {
                         string shader_name);
 
  private:
+  ShaderManager();
+
   gpu::Shader* compileFromFiles(const char* vs_filename,
                                 const char* fs_filename) const;
 

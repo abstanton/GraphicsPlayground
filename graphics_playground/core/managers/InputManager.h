@@ -70,6 +70,8 @@ public:
 	glm::vec2 getScrollOffset();
 
 private:
+	InputManager() {}
+
 	bool first_mouse_movement = true;
 	double last_mouse_pos[2] = {0,0};
 

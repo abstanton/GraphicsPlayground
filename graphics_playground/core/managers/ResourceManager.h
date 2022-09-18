@@ -40,6 +40,8 @@ class ResourceManager {
   bool loadTextResource(const string& path);
 
  private:
+  ResourceManager() {}
+
   vector<std::shared_ptr<IResource>> loaded_resources_;
 
   map<string, Texture> loaded_textures_;
