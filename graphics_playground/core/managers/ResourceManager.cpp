@@ -1,5 +1,7 @@
 #include "ResourceManager.h"
 
+#include <iostream>
+
 #include "ShaderManager.h"
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -34,7 +36,6 @@ bool ResourceManager::loadTexture(const char* filepath, const char* name) {
     texture.id = id;
     loaded_textures_.emplace(name, texture);
     return true;
-    ;
   } else {
     std::cout << "Failed to load texture" << std::endl;
     return false;

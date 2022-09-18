@@ -18,7 +18,7 @@ class GlShader : public Shader {
       const std::string& fragmentShaderPath);
 
   GlShader(const char* vertexSource, const char* fragmentSource);
-  void use() const;
+  void use() const override;
   void bindTexture(const char* name,
                    const gpu::Texture* texture) const override;
   void setBool(const std::string& name, const bool value) const override;

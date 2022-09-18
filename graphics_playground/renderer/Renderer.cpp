@@ -155,6 +155,7 @@ gpu::Texture* Renderer::retrieveGPUTexture(const Texture* texture) {
     case TextureFormat::R:
       gpu_texture_format = gpu::TextureFormat::R;
       gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
+      break;
     case TextureFormat::R8:
       gpu_texture_format = gpu::TextureFormat::R;
       gpu_data_type = gpu::DataType::UNSIGNED_BYTE;

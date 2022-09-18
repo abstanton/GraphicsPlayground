@@ -1,20 +1,17 @@
 #pragma once
-#include <iostream>
 
-class UUIDGenerator
-{
-public:
-	static UUIDGenerator& get() {
-		static UUIDGenerator generator;
-		return generator;
-	}
+class UUIDGenerator {
+ public:
+  static UUIDGenerator& get() {
+    static UUIDGenerator generator;
+    return generator;
+  }
 
-	unsigned int getUUID() {
-		counter_++;
-		return counter_;
-	}
+  unsigned int getUUID() {
+    counter_++;
+    return counter_;
+  }
 
-private:
-	unsigned int counter_;
+ private:
+  unsigned int counter_;
 };
-

@@ -1,5 +1,7 @@
 #include "GraphicsPlayground.h"
 
+#include <iostream>
+
 #include "components/MeshRenderer.h"
 #include "resources/Material.h"
 
