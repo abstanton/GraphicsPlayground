@@ -41,14 +41,14 @@ void DemoApp::setup() {
       registry.addComponent<MeshRenderer>(cube_0, cube_component);
 
   auto cube_1 = registry.createEntity();
-  registry.addComponent<Transform>(
-      cube_1, Transform({5, 0, 0}, {0, 0, pi<float>() / 2}, {10, 1, 10}));
-  MeshRenderer& mr_1 =
-      registry.addComponent<MeshRenderer>(cube_1, cube_component);
+  auto&& [mr_1, tr_1] = registry.addComponent<MeshRenderer, Transform>(
+      cube_1, cube_component,
+      Transform({5, 0, 0}, {0, 0, pi<float>() / 2}, {10, 1, 10}));
 
   auto cube_2 = registry.createEntity();
-  registry.addComponent<Transform>(
-      cube_2, Transform({0, 0, 5}, {pi<float>() / 2, 0, 0}, {10, 1, 10}));
+  registry.addComponent<Transform>(cube_2, glm::vec3(0, 0, 5),
+                                   glm::vec3(pi<float>() / 2, 0, 0),
+                                   glm::vec3(10, 1, 10));
   registry.addComponent<MeshRenderer>(cube_2, cube_component);
 
   auto monkey_ent = registry.createEntity();

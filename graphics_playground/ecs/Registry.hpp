@@ -39,12 +39,24 @@ class Registry {
     return component_manager_.addComponent<T>(entity, component);
   }
 
+  template <typename... Components, typename = typename std::enable_if<
+                                        sizeof...(Components) >= 2>::type>
+  std::tuple<Components&...> addComponent(Entity entity) {
+    return std::forward_as_tuple(addComponent<Component>(entity)...);
+  }
+
   template <typename T>
   T& addComponent(Entity entity, T component) {
     if (!component_manager_.isComponentRegistered<T>()) {
       component_manager_.registerComponent<T>();
     }
     return component_manager_.addComponent<T>(entity, component);
+  }
+
+  template <typename... Components, typename = typename std::enable_if<
+                                        sizeof...(Components) >= 2>::type>
+  std::tuple<Components&...> addComponent(Entity entity, Components... comps) {
+    return std::forward_as_tuple(addComponent<Components>(entity, comps)...);
   }
 
   template <typename T, typename... Args>
