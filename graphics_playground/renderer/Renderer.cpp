@@ -75,7 +75,7 @@ void Renderer::begin(Camera camera, std::vector<PointLight> point_lights,
     direction_light.is_shadowed = 1;
     direction_light.colour = direction_lights[i].colour;
     direction_light.direction = direction_lights[i].direction;
-    float near_plane = 1.0f, far_plane = 10.0f;
+    float near_plane = 1.0f, far_plane = 20.0f;
     glm::mat4 light_projection =
         glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     glm::mat4 light_view =
@@ -105,7 +105,7 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
         shadow_map_texture_, gpu::TextureAttachmentType::DepthAttachment, i, 0);
     backend_->clear(gpu::ClearType::DEPTH);
 
-    float near_plane = 1.0f, far_plane = 10.0f;
+    float near_plane = 1.0f, far_plane = 20.0f;
     glm::mat4 lightProjection =
         glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     glm::mat4 lightView =

@@ -21,42 +21,33 @@ void DemoApp::setup() {
 
   Material metal_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
-  metal_material.setColourInput("diffuse", "metal_diff", {5, 5});
-  metal_material.setColourInput("normal", "metal_norm", {5, 5});
-  metal_material.setFloatInput("roughness", "metal_rough", {5, 5});
-  metal_material.setFloatInput("metalness", "metal_metal", {5, 5});
+  metal_material.setColourInput("diffuse", "metal_diff", {1, 1});
+  metal_material.setColourInput("normal", "metal_norm", {1, 1});
+  metal_material.setFloatInput("roughness", "metal_rough", {1, 1});
+  metal_material.setFloatInput("metalness", "metal_metal", {1, 1});
 
-  cube_component.material_comp_ = metal_material;
+  Material blank_material =
+      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+
+  cube_component.material_comp_ = blank_material;
   monkey_component.material_comp_ = metal_material;
 
   auto camera_ent = registry.createEntity();
   Camera& camera =
       registry.addComponent<Camera>(camera_ent, glm::vec3(-7.0f, 5.0f, -5.0f));
 
-  cube_component.material_comp_ = metal_material;
   auto cube_0 = registry.createEntity();
   registry.addComponent<Transform>(
       cube_0, Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10}));
   MeshRenderer& mr_0 =
       registry.addComponent<MeshRenderer>(cube_0, cube_component);
 
-  auto cube_1 = registry.createEntity();
-  auto&& [mr_1, tr_1] = registry.addComponent<MeshRenderer, Transform>(
-      cube_1, cube_component,
-      Transform({5, 0, 0}, {0, 0, pi<float>() / 2}, {10, 1, 10}));
-
-  auto cube_2 = registry.createEntity();
-  registry.addComponent<Transform>(cube_2, glm::vec3(0, 0, 5),
-                                   glm::vec3(pi<float>() / 2, 0, 0),
-                                   glm::vec3(10, 1, 10));
-  registry.addComponent<MeshRenderer>(cube_2, cube_component);
-
   auto monkey_ent = registry.createEntity();
   registry.addComponent<Transform>(
       monkey_ent,
-      Transform(glm::vec3(0, 0.5, 0), glm::vec3(0), glm::vec3(1.2f)));
+      Transform(glm::vec3(0, 3.5, 0), glm::vec3(0), glm::vec3(2.0f)));
   registry.addComponent<MeshRenderer>(monkey_ent, monkey_component);
-  registry.addComponent<Rotate>(monkey_ent, {20, 0, 0});
+  registry.addComponent<Rotate>(monkey_ent, {2, 0, 0.5});
 
   auto light_0 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_0, glm::vec3(-2.5f, 6.0f, 1.0f),
@@ -68,7 +59,17 @@ void DemoApp::setup() {
   registry.addComponent<DirectionLight>(light_2, glm::vec3(0.0f, 6.0f, -2.5f),
                                         glm::vec3(1.0f, 1.0f, 1.0f), 20.0f);
 
-  registry.createEntity<PointLight>(PointLight({0, 3, 0}, {1, 0, 1}, 100.0f));
+  MeshRenderer cube_mesh = mr_0;
+  cube_mesh.material_comp_ = metal_material;
+  for (float i = 0; i < 5; i++) {
+    for (float j = 0; j < 5; j++) {
+      registry.createEntity<MeshRenderer, Transform, Rotate>(
+          cube_mesh,
+          Transform({-(i - 2) * 2.5, -0.2, -(j - 2) * 2.5}, {0, 0, 0},
+                    {0.5, 0.5, 0.5}),
+          {(i / 10), 0, j / 10});
+    }
+  }
 
   system_manager->addSystem(&camera_movement_system);
   system_manager->addSystem(&rotate_system);

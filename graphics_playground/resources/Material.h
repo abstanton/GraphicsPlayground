@@ -35,6 +35,9 @@ struct TextureOr {
     tex_name = tex;
     scale = tex_scale;
   }
+
+  TextureOr() {}
+  TextureOr(T val) : value(val) {}
 };
 
 /*
@@ -99,11 +102,11 @@ class MaterialBuilder {
   MaterialBuilder() {}
 
   MaterialBuilder& addColourInput(string name) {
-    material_.colour_inputs[name] = TextureOr<glm::vec3>{};
+    material_.colour_inputs[name] = TextureOr<glm::vec3>({1, 1, 1});
     return *this;
   }
   MaterialBuilder& addFloatInput(string name) {
-    material_.float_inputs[name] = TextureOr<float>{};
+    material_.float_inputs[name] = TextureOr<float>(1.0f);
     return *this;
   }
   MaterialBuilder& addColourUniform(string name) {

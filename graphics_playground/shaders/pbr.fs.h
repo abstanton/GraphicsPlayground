@@ -147,7 +147,7 @@ void main()
         normal = normalize(TBN * normal);
     }
     else {
-        normal = normalize(TBN * normal_val);;
+        normal = norm;
     }
     
     float metallic = metalness_use_tex == 1? vec3(texture(metalness_tex, uv*metalness_scale)).x : metalness_val;
