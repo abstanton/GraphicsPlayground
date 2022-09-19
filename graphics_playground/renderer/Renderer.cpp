@@ -126,7 +126,7 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
 }
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
-  // backend_->clear(gpu::ClearType::ALL);
+  backend_->clear(gpu::ClearType::ALL);
   camera_uniform_buffer_->bind(0);
   lights_uniform_buffer_->bind(1);
 

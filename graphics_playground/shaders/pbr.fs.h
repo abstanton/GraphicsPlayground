@@ -165,7 +165,7 @@ void main()
 
         float distance = length(position - pos);
         float attenuation = 1/(distance*distance);
-        vec3 radiance = colour * attenuation;
+        vec3 radiance = colour * attenuation * light.intensity;
 
         vec3 L = normalize(position - pos);
         vec3 H = normalize(V + L);

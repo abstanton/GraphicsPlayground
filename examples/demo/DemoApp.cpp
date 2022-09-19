@@ -56,7 +56,7 @@ void DemoApp::setup() {
       monkey_ent,
       Transform(glm::vec3(0, 0.5, 0), glm::vec3(0), glm::vec3(1.2f)));
   registry.addComponent<MeshRenderer>(monkey_ent, monkey_component);
-  registry.addComponent<Rotate>(monkey_ent, {20, 20, 20});
+  registry.addComponent<Rotate>(monkey_ent, {20, 0, 0});
 
   auto light_0 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_0, glm::vec3(-2.5f, 6.0f, 1.0f),
@@ -67,6 +67,8 @@ void DemoApp::setup() {
   auto light_2 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_2, glm::vec3(0.0f, 6.0f, -2.5f),
                                         glm::vec3(1.0f, 1.0f, 1.0f), 20.0f);
+
+  registry.createEntity<PointLight>(PointLight({0, 3, 0}, {1, 0, 1}, 100.0f));
 
   system_manager->addSystem(&camera_movement_system);
   system_manager->addSystem(&rotate_system);

@@ -25,21 +25,6 @@ GraphicsPlayground::GraphicsPlayground()
   glEnable(GL_DEPTH_TEST);
 }
 
-void GraphicsPlayground::processInput(GLFWwindow* window, Camera& camera) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
-
-  camera.Sprint = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    camera.processKeyboard(FORWARD, delta_time);
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    camera.processKeyboard(BACKWARD, delta_time);
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    camera.processKeyboard(LEFT, delta_time);
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    camera.processKeyboard(RIGHT, delta_time);
-}
-
 void GraphicsPlayground::run() {
   // TODO: Refactor resolution into window, add renderer resize callback to
   // window resize callback

@@ -19,6 +19,8 @@ void RenderSystem::onRender(ecs::Registry& registry) {
         mesh_renderers.push_back({mr, t});
       });
   std::vector<PointLight> point_lights;
+  registry.view<PointLight>().each(
+      [&](ecs::Entity, PointLight& pc) { point_lights.push_back(pc); });
   std::vector<DirectionLight> direction_lights;
   registry.view<DirectionLight>().each(
       [&](ecs::Entity, DirectionLight& dr) { direction_lights.push_back(dr); });

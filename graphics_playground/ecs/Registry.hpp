@@ -24,6 +24,14 @@ class Registry {
     return entity;
   }
 
+  template <typename... Components>
+  std::tuple<Entity, Components&...> createEntity(Components... comps) {
+    Entity entity = createEntity();
+    std::tuple<Components&...> comps_tuple =
+        addComponent<Components...>(entity, comps...);
+    return std::tuple_cat(std::make_tuple(entity), comps_tuple);
+  }
+
   void destroyEntity(Entity entity) {
     entity_manager_.destroyEntity(entity);
     component_manager_.entityDestroyed(entity);

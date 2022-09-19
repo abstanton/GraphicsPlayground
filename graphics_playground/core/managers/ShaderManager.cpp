@@ -12,8 +12,6 @@
 #include "../../shaders/shadow.vs.h"
 
 ShaderManager::ShaderManager() {
-  /* Load all default shaders. */
-  /* TODO: clean this up. */
   std::cout << "Loading builtin shaders" << std::endl;
   gpu::Backend* backend = gpu::Backend::get();
   builtin_shaders_["default"] = backend->compileShaderProgram(def_vs, def_fs);

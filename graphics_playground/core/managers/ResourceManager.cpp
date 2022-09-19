@@ -21,6 +21,7 @@ bool ResourceManager::loadTexture(const char* filepath, const char* name) {
         format = TextureFormat::R;
         break;
       case 2:
+        format = TextureFormat::RG8;
       case 3:
         format = TextureFormat::RGB8;
         break;

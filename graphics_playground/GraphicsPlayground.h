@@ -25,7 +25,4 @@ class GraphicsPlayground {
   ResourceManager& resource_manager_;
 
   ecs::Registry registry;
-
-  // TODO: Improve
-  void processInput(GLFWwindow* window, Camera& camera);
 };
