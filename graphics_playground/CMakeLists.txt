@@ -11,9 +11,9 @@ find_package(glfw3 3.3 REQUIRED)
 find_package(assimp REQUIRED)
 find_package(glm REQUIRED)
 
-add_library(graphics_playground ${SOURCES} "glad.c")
+add_library(graphics_playground ${SOURCES} "extern/glad/glad.c")
 
-target_include_directories(graphics_playground PUBLIC "C:\\OpenGL\\include")
+target_include_directories(graphics_playground PUBLIC "extern")
 target_link_libraries(graphics_playground glfw)
 target_link_libraries(graphics_playground assimp::assimp)
 target_link_libraries(graphics_playground glm::glm)
