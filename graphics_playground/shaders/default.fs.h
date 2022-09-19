@@ -32,16 +32,16 @@ layout(std140, binding = 1) uniform Lights {
     vec4 ambientLight;
     int numPointLights;
     int numDirectionLights;
-    vec3 padding;
     PointLight point_lights[MAX_TOTAL_POINT_LIGHTS];
     DirectionLight direction_lights[MAX_TOTAL_DIRECTION_LIGHTS];
 };
 
 uniform vec3 colour;
 
+layout(binding = 10) uniform sampler2DArray shadow_map;
 void main()
 {
-    vec3 diffuseCol = vec3(0.0,0.0,0.0);
+    vec3 diffuseCol = vec3(0.0, 0.0, 0.0);
     vec3 specularCol = vec3(0.0,0.0,0.0);    
      
     vec3 normal = normalize(norm);
@@ -84,4 +84,5 @@ void main()
    
     vec3 result = (vec3(ambientLight) + diffuseCol + specularCol) * colour;
     FragColor = vec4(result, 1.0f);
+    //FragColor = vec4(1.0f);
 })";

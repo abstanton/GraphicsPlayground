@@ -92,7 +92,10 @@ bool ShaderManager::addShaderProgram(const char* vs_filename,
   return false;
 }
 
-Material genDefaultMaterial() { return Material{}; }
+Material genDefaultMaterial() {
+  MaterialBuilder builder;
+  return builder.addColourInput("colour").setShaderName("default").build();
+}
 Material genEmissiveMaterial() { return Material{}; }
 Material genPBRMaterial() {
   MaterialBuilder builder;

@@ -62,10 +62,7 @@ layout(bindless_sampler) uniform sampler2D metalness_tex;
 uniform float metalness_val;
 uniform vec2 metalness_scale;
 
-layout(binding = 10) uniform sampler2D shadowMap;
-
-uniform mat4 lightSpaceMatrix;
-uniform float tex_scale = 1.0f;
+layout(binding = 10) uniform sampler2DArray shadowMap;
 
 const float PI = 3.14159265359;
 
@@ -75,8 +72,6 @@ float ShadowCalculation(vec4 fragPosLightSpace, float i)
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 
     projCoords = projCoords * 0.5 + 0.5;
-    projCoords.x /= MAX_TOTAL_DIRECTION_SHADOWS;
-    projCoords.x += i/MAX_TOTAL_DIRECTION_SHADOWS;
   
     float currentDepth = projCoords.z;
 
@@ -84,20 +79,19 @@ float ShadowCalculation(vec4 fragPosLightSpace, float i)
    
 	float shadow = 0.0;
 	
-    vec2 texelSize = vec2(1)/textureSize(shadowMap, 0);
+    vec2 texelSize = vec2(1)/textureSize(shadowMap, 0).xy;
 
     for(int x = -2; x <= 2; ++x)
     {
         for(int y = -2; y <= 2; ++y)
         {
-            float pcfDepth = texture(shadowMap, projCoords.xy + (vec2(x, y) * texelSize)).r; 
+            float pcfDepth = texture(shadowMap, vec3(projCoords.xy + (vec2(x, y) * texelSize), i)).r; 
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
         }    
     }
     shadow = clamp(shadow / 25.0, 0.0, 1.0);
 	if(projCoords.z > 1.0)
         shadow = 0.0;
-    
     return shadow;
 }
 
@@ -146,9 +140,15 @@ void main()
     vec3 albedo = diffuse_use_tex == 1? vec3(texture(diffuse_tex, uv*diffuse_scale)) : diffuse_val;
     float roughness = roughness_use_tex == 1? vec3(texture(roughness_tex, uv*roughness_scale)).x : roughness_val;
 	
-    vec3 normal = normal_use_tex == 1? texture(normal_tex, uv*normal_scale).rgb : normal_val;
-    normal = normal* 2.0 - 1.0;
-    normal = normalize(TBN * normal);
+    vec3 normal;
+    if (normal_use_tex == 1) {
+        normal = texture(normal_tex, uv*normal_scale).rgb;
+        normal = normal* 2.0 - 1.0;
+        normal = normalize(TBN * normal);
+    }
+    else {
+        normal = normalize(TBN * normal_val);;
+    }
     
     float metallic = metalness_use_tex == 1? vec3(texture(metalness_tex, uv*metalness_scale)).x : metalness_val;
 

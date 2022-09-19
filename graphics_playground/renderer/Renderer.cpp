@@ -21,11 +21,9 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
 
   shadow_frame_buffer_ = backend_->allocFrameBuffer();
   shadow_map_texture_ = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH,
-      gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION * MAX_DIRECTION_SHADOWS,
-      SHADOW_MAP_RESOLUTION, 0, 0, 0, nullptr);
-  shadow_frame_buffer_->attachTexture(
-      shadow_map_texture_, gpu::TextureAttachmentType::DepthAttachment, 0, 0);
+      gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH,
+      gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
+      MAX_DIRECTION_SHADOWS, nullptr);
 }
 
 Renderer::~Renderer() {
@@ -96,12 +94,17 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
                               std::vector<PointLight> point_lights,
                               std::vector<DirectionLight> direction_lights) {
   shadow_frame_buffer_->bind();
-  backend_->clear(gpu::ClearType::DEPTH);
+  backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
   shadow_shader_->use();
 
   for (int i = 0; i < direction_lights.size(); i++) {
-    backend_->setViewport(i * SHADOW_MAP_RESOLUTION, 0, SHADOW_MAP_RESOLUTION,
-                          SHADOW_MAP_RESOLUTION);
+    if (i >= MAX_DIRECTION_SHADOWS) {
+      break;
+    }
+    shadow_frame_buffer_->attachTexture(
+        shadow_map_texture_, gpu::TextureAttachmentType::DepthAttachment, i, 0);
+    backend_->clear(gpu::ClearType::DEPTH);
+
     float near_plane = 1.0f, far_plane = 10.0f;
     glm::mat4 lightProjection =
         glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
@@ -123,6 +126,7 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
 }
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
+  // backend_->clear(gpu::ClearType::ALL);
   camera_uniform_buffer_->bind(0);
   lights_uniform_buffer_->bind(1);
 
@@ -130,7 +134,6 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     gpu::Shader* shader =
         ShaderManager::get().getShader(mc.material_comp_.shader_name);
     shader->use();
-
     setShaderInputsForMaterial(mc.material_comp_, shader);
     shadow_map_texture_->bind(10);
 
@@ -249,12 +252,12 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
     }
   }
   for (auto&& [name, input] : mat.float_uniforms) {
-    shader->setFloat(name + "_val", input.value);
+    shader->setFloat(name, input.value);
   }
   for (auto&& [name, input] : mat.colour_uniforms) {
-    shader->setVec3(name + "_val", input.value);
+    shader->setVec3(name, input.value);
   }
   for (auto&& [name, input] : mat.bool_uniforms) {
-    shader->setBool(name + "_val", input.value);
+    shader->setBool(name, input.value);
   }
 }

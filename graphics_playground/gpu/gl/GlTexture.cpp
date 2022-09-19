@@ -14,8 +14,9 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
   GLenum gl_format = textureFormatToGlFormat(format);
   GLenum gl_data_type = dataTypeToGlDataType(data_type);
 
-  // TODO: Support texture arrays
   float border_col[] = {0, 0, 0, 0};
+  bool create_handle = true;
+  float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
   switch (type) {
     case TextureType::TEXTURE_1D:
@@ -37,17 +38,25 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
       glBindTexture(GL_TEXTURE_2D, 0);
       break;
     case TextureType::TEXTURE_2D_ARRAY:
+      create_handle = false;
       // TODO: currently don't support uploading data for texture array
       glBindTexture(GL_TEXTURE_2D_ARRAY, id_);
-      glTexStorage3D(GL_TEXTURE_2D_ARRAY, 0, gl_format, width, height, levels);
-      for (int i = 0; i < levels; i++) {
-        glTexSubImage2D(GL_TEXTURE_2D, i, 0, 0, width, height, gl_format,
-                        gl_data_type, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      }
+      // TODO: this is a messy way to use DEPTH_COMPONENT32F rather than raw
+      // DEPTH_COMPONENT
+      gl_format =
+          gl_format == GL_DEPTH_COMPONENT ? GL_DEPTH_COMPONENT32F : gl_format;
+      glTexStorage3D(GL_TEXTURE_2D_ARRAY, mips, gl_format, width, height,
+                     levels);
+
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
+                      GL_CLAMP_TO_BORDER);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
+                      GL_CLAMP_TO_BORDER);
+      glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR,
+                       borderColor);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
       break;
     case TextureType::TEXTURE_3D:
     case TextureType::TEXTURE_3D_ARRAY:
@@ -57,8 +66,10 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
       glBindTexture(GL_TEXTURE_3D, 0);
       break;
   }
-  handle_ = glGetTextureHandleARB(id_);
-  glMakeTextureHandleResidentARB(handle_);
+  if (create_handle) {
+    handle_ = glGetTextureHandleARB(id_);
+    glMakeTextureHandleResidentARB(handle_);
+  }
 }
 
 void GlTexture::bind(int slot) {
@@ -69,8 +80,10 @@ void GlTexture::bind(int slot) {
       glBindTexture(GL_TEXTURE_1D, id_);
       break;
     case TextureType::TEXTURE_2D:
-    case TextureType::TEXTURE_2D_ARRAY:
       glBindTexture(GL_TEXTURE_2D, id_);
+      break;
+    case TextureType::TEXTURE_2D_ARRAY:
+      glBindTexture(GL_TEXTURE_2D_ARRAY, id_);
       break;
     case TextureType::TEXTURE_3D:
     case TextureType::TEXTURE_3D_ARRAY:
