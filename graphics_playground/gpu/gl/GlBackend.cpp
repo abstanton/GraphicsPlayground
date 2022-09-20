@@ -16,6 +16,7 @@ GlBackend::GlBackend() {
   // glDebugMessageCallback(MessageCallback, 0);
 }
 
+FrameBuffer* GlBackend::defaultFrameBuffer() { return new GlFrameBuffer(0); }
 FrameBuffer* GlBackend::allocFrameBuffer() { return new GlFrameBuffer(); }
 
 UniformBuffer* GlBackend::allocUniformBuffer(size_t size) {

@@ -23,6 +23,7 @@ class Backend {
                                    unsigned int mips, unsigned int levels,
                                    const void* data) = 0;
 
+  virtual FrameBuffer* defaultFrameBuffer() = 0;
   virtual FrameBuffer* allocFrameBuffer() = 0;
   virtual UniformBuffer* allocUniformBuffer(size_t size) = 0;
   virtual IndexBuffer* allocIndexBuffer() = 0;

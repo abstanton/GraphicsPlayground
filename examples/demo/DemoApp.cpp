@@ -28,6 +28,7 @@ void DemoApp::setup() {
 
   Material blank_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+  // Material metal_material = blank_material;
 
   cube_component.material_comp_ = blank_material;
   monkey_component.material_comp_ = metal_material;

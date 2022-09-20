@@ -14,6 +14,7 @@ class GlBackend : public Backend {
  public:
   GlBackend();
 
+  FrameBuffer* defaultFrameBuffer() override;
   UniformBuffer* allocUniformBuffer(size_t size) override;
   FrameBuffer* allocFrameBuffer() override;
   IndexBuffer* allocIndexBuffer() override;

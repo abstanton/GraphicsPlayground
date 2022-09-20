@@ -10,20 +10,32 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       gpu_light_buffer_({}),
       gpu_camera_buffer_({}) {
   backend_ = gpu::Backend::get();
+  backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
 
   shadow_shader_ = ShaderManager::get().getShader("shadow");
+  screen_quad_shader_ = ShaderManager::get().getShader("quad");
+  depth_shader_ = ShaderManager::get().getShader("depth");
 
   camera_uniform_buffer_ =
       backend_->allocUniformBuffer(sizeof(GPUCameraBuffer));
   lights_uniform_buffer_ = backend_->allocUniformBuffer(sizeof(GPULightBuffer));
 
-  backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
-
   shadow_frame_buffer_ = backend_->allocFrameBuffer();
+  colour_frame_buffer_ = backend_->allocFrameBuffer();
+  default_frame_buffer_ = backend_->defaultFrameBuffer();
+
   shadow_map_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH,
       gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
       MAX_DIRECTION_SHADOWS, nullptr);
+  depth_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
+  colour_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB,
+      gpu::DataType::UNSIGNED_BYTE, scr_width_, scr_height_, 1, 1, 1, nullptr);
+
+  quad_batch_ = getScreenQuadBatch();
 }
 
 Renderer::~Renderer() {
@@ -97,6 +109,12 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
   backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
   shadow_shader_->use();
 
+  // TODO: Investigate how to abstract this
+  glDepthMask(GL_TRUE);
+  glColorMask(0, 0, 0, 0);
+  glDepthFunc(GL_LESS);
+  glEnable(GL_DEPTH_TEST);
+
   for (int i = 0; i < direction_lights.size(); i++) {
     if (i >= MAX_DIRECTION_SHADOWS) {
       break;
@@ -121,14 +139,47 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
       batch->draw();
     }
   }
-  shadow_frame_buffer_->unbind();
-  backend_->setViewport(0, 0, scr_width_, scr_height_);
 }
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
-  backend_->clear(gpu::ClearType::ALL);
+  colour_frame_buffer_->bind();
+  colour_frame_buffer_->attachTexture(
+      depth_texture_, gpu::TextureAttachmentType::DepthAttachment, 0, 0);
+
+  backend_->setViewport(0, 0, scr_width_, scr_height_);
+
+  depth_shader_->use();
+  camera_uniform_buffer_->bind(0);
+
+  // TODO: Refactor this
+  glDepthMask(GL_TRUE);
+  glColorMask(0, 0, 0, 0);
+  glDepthFunc(GL_LESS);
+  glEnable(GL_DEPTH_TEST);
+
+  backend_->clear(gpu::ClearType::DEPTH);
+
+  for (auto&& [mc, transform] : mesh_renderers) {
+    depth_shader_->setMat4("model", transform.transformation());
+
+    gpu::Batch* batch =
+        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh_).value());
+
+    batch->draw();
+  }
+
+  colour_frame_buffer_->attachTexture(
+      colour_texture_, gpu::TextureAttachmentType::ColorAttachement, 0, 0);
+
   camera_uniform_buffer_->bind(0);
   lights_uniform_buffer_->bind(1);
+
+  // TODO: Refactor this
+  glDepthMask(GL_FALSE);
+  glColorMask(1, 1, 1, 1);
+  glDepthFunc(GL_LEQUAL);
+
+  backend_->clear(gpu::ClearType::COLOR);
 
   for (auto&& [mc, transform] : mesh_renderers) {
     gpu::Shader* shader =
@@ -144,6 +195,28 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
 
     batch->draw();
   }
+
+  default_frame_buffer_->bind();
+  screen_quad_shader_->use();
+  colour_texture_->bind(0);
+  quad_batch_->draw();
+}
+
+gpu::Batch* Renderer::getScreenQuadBatch() {
+  float quadVertices[] = {// positions   // texCoords
+                          -1.0f, 1.0f, 0.0f, 1.0f,  -1.0f, -1.0f,
+                          0.0f,  0.0f, 1.0f, -1.0f, 1.0f,  0.0f,
+
+                          -1.0f, 1.0f, 0.0f, 1.0f,  1.0f,  -1.0f,
+                          1.0f,  0.0f, 1.0f, 1.0f,  1.0f,  1.0f};
+
+  std::vector<gpu::VertexAttrib> attribs = {
+      {"pos", 0, 2, gpu::DataType::FLOAT, false, 4 * sizeof(float), (void*)0},
+      {"uv", 1, 2, gpu::DataType::FLOAT, false, 4 * sizeof(float),
+       (void*)(2 * sizeof(float))}};
+  gpu::VertexBuffer* vert_buffer = backend_->allocVertexBuffer();
+  vert_buffer->uploadData(attribs, 6, sizeof(quadVertices), quadVertices);
+  return backend_->allocBatch(vert_buffer);
 }
 
 gpu::Texture* Renderer::retrieveGPUTexture(const Texture* texture) {

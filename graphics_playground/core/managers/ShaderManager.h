@@ -9,9 +9,11 @@ using std::string;
 
 enum class BuiltinShader {
   DEFAULT,
+  DEPTH,
   EMISSIVE,
   PBR,
   SHADOW,
+  QUAD
 };
 
 class ShaderManager {

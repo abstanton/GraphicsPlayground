@@ -66,6 +66,23 @@ class Renderer {
 
  private:
   gpu::Shader* shadow_shader_;
+  gpu::Shader* screen_quad_shader_;
+  gpu::Shader* depth_shader_;
+
+  gpu::Texture* shadow_map_texture_;
+  gpu::Texture* depth_texture_;
+  gpu::Texture* colour_texture_;
+
+  gpu::FrameBuffer* shadow_frame_buffer_;
+  gpu::FrameBuffer* default_frame_buffer_;
+  gpu::FrameBuffer* colour_frame_buffer_;
+
+  gpu::UniformBuffer* camera_uniform_buffer_;
+  gpu::UniformBuffer* lights_uniform_buffer_;
+
+  gpu::Batch* quad_batch_;
+
+  gpu::Backend* backend_;
 
   GPULightBuffer gpu_light_buffer_;
   GPUCameraBuffer gpu_camera_buffer_;
@@ -75,13 +92,6 @@ class Renderer {
 
   gpu::Texture* retrieveGPUTexture(const Texture* texture);
   gpu::Batch* retrieveMeshGPUBatch(const Mesh* mesh);
-
-  gpu::Backend* backend_;
-  gpu::Texture* shadow_map_texture_;
-  gpu::FrameBuffer* shadow_frame_buffer_;
-
-  gpu::UniformBuffer* lights_uniform_buffer_;
-  gpu::UniformBuffer* camera_uniform_buffer_;
 
   std::unordered_map<unsigned int, gpu::Texture*> texture_cache_;
   std::unordered_map<unsigned int, gpu::Batch*> batch_cache_;
@@ -94,4 +104,6 @@ class Renderer {
   void drawMainPass(std::vector<MeshPair> mesh_renderers);
 
   void setShaderInputsForMaterial(const Material& mat, gpu::Shader* shader);
+
+  gpu::Batch* getScreenQuadBatch();
 };

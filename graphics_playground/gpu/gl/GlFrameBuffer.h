@@ -8,6 +8,7 @@ namespace gpu {
 class GlFrameBuffer : public FrameBuffer {
  public:
   GlFrameBuffer();
+  GlFrameBuffer(GLuint id) : id_(id) {}
   void attachTexture(Texture* texture, TextureAttachmentType attachment_type,
                      int level, int mip) override;
   void bind() override;
