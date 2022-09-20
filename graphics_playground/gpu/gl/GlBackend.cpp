@@ -12,8 +12,8 @@ static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
 
 GlBackend::GlBackend() {
   // During init, enable debug output
-  // glEnable(GL_DEBUG_OUTPUT);
-  // glDebugMessageCallback(MessageCallback, 0);
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(MessageCallback, 0);
 }
 
 FrameBuffer* GlBackend::defaultFrameBuffer() { return new GlFrameBuffer(0); }

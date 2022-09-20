@@ -32,8 +32,8 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
   colour_texture_ = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB,
-      gpu::DataType::UNSIGNED_BYTE, scr_width_, scr_height_, 1, 1, 1, nullptr);
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
 
   quad_batch_ = getScreenQuadBatch();
 }
@@ -187,6 +187,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     shader->use();
     setShaderInputsForMaterial(mc.material_comp_, shader);
     shadow_map_texture_->bind(10);
+    depth_texture_->bind(11);
 
     shader->setMat4("model", transform.transformation());
 
@@ -199,6 +200,8 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   default_frame_buffer_->bind();
   screen_quad_shader_->use();
   colour_texture_->bind(0);
+  depth_texture_->bind(1);
+  // TODO: Set exposure from camera exposure
   quad_batch_->draw();
 }
 

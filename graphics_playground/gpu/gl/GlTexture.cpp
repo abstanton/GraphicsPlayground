@@ -33,8 +33,9 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
       glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_col);
-      glTexImage2D(GL_TEXTURE_2D, 0, gl_format, width, height, 0, gl_format,
-                   gl_data_type, data);
+      glTexImage2D(GL_TEXTURE_2D, 0, gl_format, width, height, 0,
+                   gl_format == GL_RGBA16F ? GL_RGBA : gl_format, gl_data_type,
+                   data);
       glBindTexture(GL_TEXTURE_2D, 0);
       break;
     case TextureType::TEXTURE_2D_ARRAY:

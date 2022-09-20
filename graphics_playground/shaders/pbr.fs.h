@@ -62,7 +62,8 @@ layout(bindless_sampler) uniform sampler2D metalness_tex;
 uniform float metalness_val;
 uniform vec2 metalness_scale;
 
-layout(binding = 10) uniform sampler2DArray shadowMap;
+layout(binding = 10) uniform sampler2DArray shadow_map_array;
+layout(binding = 11) uniform sampler2D depth_map;
 
 const float PI = 3.14159265359;
 
@@ -79,13 +80,13 @@ float ShadowCalculation(vec4 fragPosLightSpace, float i)
    
 	float shadow = 0.0;
 	
-    vec2 texelSize = vec2(1)/textureSize(shadowMap, 0).xy;
+    vec2 texelSize = vec2(1)/textureSize(shadow_map_array, 0).xy;
 
     for(int x = -2; x <= 2; ++x)
     {
         for(int y = -2; y <= 2; ++y)
         {
-            float pcfDepth = texture(shadowMap, vec3(projCoords.xy + (vec2(x, y) * texelSize), i)).r; 
+            float pcfDepth = texture(shadow_map_array, vec3(projCoords.xy + (vec2(x, y) * texelSize), i)).r; 
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
         }    
     }
@@ -217,10 +218,7 @@ void main()
     }
 
 	vec3 ambient = vec3(0.03) * albedo * vec3(ambientLight);
-    vec3 color = ambient + Lo;
-	
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2));  
+    vec3 color = ambient + Lo; 
    
     FragColor = vec4(color, 1.0);
 })";
