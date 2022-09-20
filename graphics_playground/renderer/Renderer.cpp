@@ -25,11 +25,11 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   default_frame_buffer_ = backend_->defaultFrameBuffer();
 
   shadow_map_texture_ = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH,
+      gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
       MAX_DIRECTION_SHADOWS, nullptr);
   depth_texture_ = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH,
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
   colour_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
@@ -305,7 +305,7 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
     if (input.use_tex) {
       shader->setBool(name + "_use_tex", true);
       shader->setVec2(name + "_scale", input.scale);
-      shader->bindTexture(
+      shader->setTexture(
           (name + "_tex").c_str(),
           retrieveGPUTexture(
               ResourceManager::get().getTexture(input.tex_name).value()));
@@ -318,7 +318,7 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
     if (input.use_tex) {
       shader->setBool(name + "_use_tex", true);
       shader->setVec2(name + "_scale", input.scale);
-      shader->bindTexture(
+      shader->setTexture(
           (name + "_tex").c_str(),
           retrieveGPUTexture(
               ResourceManager::get().getTexture(input.tex_name).value()));

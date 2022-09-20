@@ -4,10 +4,14 @@
 #include "../GPUTypes.h"
 
 namespace gpu {
-inline GLenum textureFormatToGlFormat(TextureFormat format) {
+inline GLenum textureFormatToGlInternalFormat(TextureFormat format) {
   switch (format) {
     case TextureFormat::DEPTH:
       return GL_DEPTH_COMPONENT;
+    case TextureFormat::DEPTH_24:
+      return GL_DEPTH_COMPONENT24;
+    case TextureFormat::DEPTH_32:
+      return GL_DEPTH_COMPONENT32F;
     case TextureFormat::R:
       return GL_RED;
     case TextureFormat::RGB:
@@ -26,6 +30,29 @@ inline GLenum textureFormatToGlFormat(TextureFormat format) {
       return GL_R16F;
     case TextureFormat::R_32F:
       return GL_R32F;
+    default:
+      return -1;
+  }
+}
+
+inline GLenum textureFormatToGlFormat(TextureFormat format) {
+  switch (format) {
+    case TextureFormat::DEPTH:
+    case TextureFormat::DEPTH_24:
+    case TextureFormat::DEPTH_32:
+      return GL_DEPTH_COMPONENT;
+    case TextureFormat::R_16F:
+    case TextureFormat::R_32F:
+    case TextureFormat::R:
+      return GL_RED;
+    case TextureFormat::RGBA:
+    case TextureFormat::RGBA_16F:
+    case TextureFormat::RGBA_32F:
+      return GL_RGBA;
+    case TextureFormat::RGB:
+    case TextureFormat::RGB_16F:
+    case TextureFormat::RGB_32F:
+      return GL_RGB;
     default:
       return -1;
   }

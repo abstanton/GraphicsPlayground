@@ -8,8 +8,8 @@ namespace gpu {
 class Shader {
  public:
   virtual void use() const = 0;
-  virtual void bindTexture(const char* name,
-                           const gpu::Texture* texture) const = 0;
+  virtual void setTexture(const char* name,
+                          const gpu::Texture* texture) const = 0;
   virtual void setBool(const std::string& name, const bool value) const = 0;
   virtual void setInt(const std::string& name, const int value) const = 0;
   virtual void setFloat(const std::string& name, const float value) const = 0;

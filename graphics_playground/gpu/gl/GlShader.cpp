@@ -83,8 +83,7 @@ GlShader::GlShader(const char* vertexSource, const char* fragmentSource) {
 
 void GlShader::use() const { glUseProgram(shaderProgram_); }
 
-void GlShader::bindTexture(const char* name,
-                           const gpu::Texture* texture) const {
+void GlShader::setTexture(const char* name, const gpu::Texture* texture) const {
   const GlTexture* gl_texture = static_cast<GlTexture const*>(texture);
   GLint loc = glGetUniformLocation(shaderProgram_, name);
   glUniformHandleui64ARB(loc, gl_texture->handle_);

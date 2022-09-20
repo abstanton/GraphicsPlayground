@@ -7,15 +7,15 @@ namespace gpu {
 GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
                      unsigned int width, unsigned int height,
                      unsigned int depth, unsigned int mips, unsigned int levels,
-                     const void* data)
+                     const void* data, bool create_handle)
     : Texture(type, format, data_type, width, height, depth, mips, levels) {
   glGenTextures(1, &id_);
 
   GLenum gl_format = textureFormatToGlFormat(format);
+  GLenum gl_internal_format = textureFormatToGlInternalFormat(format);
   GLenum gl_data_type = dataTypeToGlDataType(data_type);
 
   float border_col[] = {0, 0, 0, 0};
-  bool create_handle = true;
   float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
   switch (type) {
@@ -33,21 +33,16 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
       glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_col);
-      glTexImage2D(GL_TEXTURE_2D, 0, gl_format, width, height, 0,
-                   gl_format == GL_RGBA16F ? GL_RGBA : gl_format, gl_data_type,
-                   data);
+      glTexImage2D(GL_TEXTURE_2D, 0, gl_internal_format, width, height, 0,
+                   gl_format, gl_data_type, data);
       glBindTexture(GL_TEXTURE_2D, 0);
       break;
     case TextureType::TEXTURE_2D_ARRAY:
       create_handle = false;
       // TODO: currently don't support uploading data for texture array
       glBindTexture(GL_TEXTURE_2D_ARRAY, id_);
-      // TODO: this is a messy way to use DEPTH_COMPONENT32F rather than raw
-      // DEPTH_COMPONENT
-      gl_format =
-          gl_format == GL_DEPTH_COMPONENT ? GL_DEPTH_COMPONENT32F : gl_format;
-      glTexStorage3D(GL_TEXTURE_2D_ARRAY, mips, gl_format, width, height,
-                     levels);
+      glTexStorage3D(GL_TEXTURE_2D_ARRAY, mips, gl_internal_format, width,
+                     height, levels);
 
       glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -95,7 +90,7 @@ void GlTexture::bind(int slot) {
 
 void GlTexture::generateMipmap() {
   bind(0);
-  glGenerateMipmap(textureFormatToGlFormat(format));
+  glGenerateMipmap(textureFormatToGlInternalFormat(format));
 }
 
 GlTexture::~GlTexture() { glDeleteTextures(1, &id_); }
