@@ -45,12 +45,6 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
       gpu::TextureWrapping::CLAMP_TO_BORDER);
-  pos_texture_ = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_32F,
-      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
-      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
-      gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER);
   colour_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
@@ -175,8 +169,6 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
       colour_texture_, gpu::TextureAttachmentType::ColorAttachment0, 0, 0);
   colour_frame_buffer_->attachTexture(
       normal_texture_, gpu::TextureAttachmentType::ColorAttachment1, 0, 0);
-  colour_frame_buffer_->attachTexture(
-      pos_texture_, gpu::TextureAttachmentType::ColorAttachment2, 0, 0);
   colour_frame_buffer_->bind();
 
   backend_->setViewport(0, 0, scr_width_, scr_height_);
@@ -230,7 +222,6 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   colour_texture_->bind(0);
   depth_texture_->bind(1);
   normal_texture_->bind(2);
-  pos_texture_->bind(3);
   ssao_noise_texture_->bind(5);
   screen_quad_shader_->setVec3Arr("samples", ssao_samples_.data(), 64);
   // TODO: Set exposure from camera exposure

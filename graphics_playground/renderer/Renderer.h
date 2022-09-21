@@ -74,7 +74,6 @@ class Renderer {
   gpu::Texture* depth_texture_;
   gpu::Texture* colour_texture_;
   gpu::Texture* normal_texture_;
-  gpu::Texture* pos_texture_;
 
   gpu::Texture* ssao_noise_texture_;
   std::vector<glm::vec3> ssao_samples_;
