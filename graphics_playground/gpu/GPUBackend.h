@@ -17,11 +17,14 @@ class Backend {
  public:
   static Backend* get();
 
-  virtual Texture* generateTexture(TextureType type, TextureFormat format,
-                                   DataType data_type, unsigned int width,
-                                   unsigned int height, unsigned int depth,
-                                   unsigned int mips, unsigned int levels,
-                                   const void* data) = 0;
+  virtual Texture* generateTexture(
+      TextureType type, TextureFormat format, DataType data_type,
+      unsigned int width, unsigned int height, unsigned int depth,
+      unsigned int mips, unsigned int levels, const void* data,
+      TextureFilter min_filter = TextureFilter::NEAREST,
+      TextureFilter mag_filter = TextureFilter::NEAREST,
+      TextureWrapping wrap_s = TextureWrapping::REPEAT,
+      TextureWrapping wrap_t = TextureWrapping::REPEAT) = 0;
 
   virtual FrameBuffer* defaultFrameBuffer() = 0;
   virtual FrameBuffer* allocFrameBuffer() = 0;

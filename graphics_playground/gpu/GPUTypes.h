@@ -11,17 +11,29 @@ enum class TextureType {
 
 enum class TextureFormat {
   R,
-  RGBA,
+  RG,
   RGB,
-  RGBA_16F,
-  RGBA_32F,
+  RGBA,
+  RG_16F,
+  RG_32F,
   RGB_16F,
   RGB_32F,
+  RGBA_16F,
+  RGBA_32F,
   R_16F,
   R_32F,
   DEPTH,
   DEPTH_24,
   DEPTH_32
+};
+
+enum class TextureFilter { LINEAR, NEAREST };
+
+enum class TextureWrapping {
+  CLAMP_TO_BORDER,
+  CLAMP_TO_EDGE,
+  REPEAT,
+  MIRRORED_REPEAT
 };
 
 enum class DataType {

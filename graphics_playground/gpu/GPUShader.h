@@ -17,6 +17,8 @@ class Shader {
                        const glm::vec2& value) const = 0;
   virtual void setVec3(const std::string& name,
                        const glm::vec3& value) const = 0;
+  virtual void setVec3Arr(const std::string& name, const glm::vec3* data,
+                          int count) const = 0;
   virtual void setMat3(const std::string& name,
                        const glm::mat3& value) const = 0;
   virtual void setMat4(const std::string& name,

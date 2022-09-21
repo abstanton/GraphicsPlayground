@@ -26,11 +26,14 @@ class GlBackend : public Backend {
   Shader* compileShaderProgram(const char* vs_source,
                                const char* fs_source) override;
 
-  Texture* generateTexture(TextureType type, TextureFormat format,
-                           DataType data_type, unsigned int width,
-                           unsigned int height, unsigned int depth,
-                           unsigned int mips, unsigned int levels,
-                           const void* data) override;
+  Texture* generateTexture(
+      TextureType type, TextureFormat format, DataType data_type,
+      unsigned int width, unsigned int height, unsigned int depth,
+      unsigned int mips, unsigned int levels, const void* data,
+      TextureFilter min_filter = TextureFilter::NEAREST,
+      TextureFilter mag_filter = TextureFilter::NEAREST,
+      TextureWrapping wrap_s = TextureWrapping::REPEAT,
+      TextureWrapping wrap_t = TextureWrapping::REPEAT) override;
 
   void setViewport(int x, int y, int width, int height) override;
   void unbindFramebuffer() override;

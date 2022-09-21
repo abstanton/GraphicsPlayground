@@ -12,7 +12,12 @@ class GlTexture : public Texture {
   GlTexture(TextureType type, TextureFormat format, DataType data_type,
             unsigned int width, unsigned int height, unsigned int depth,
             unsigned int mips, unsigned int levels, const void* data,
-            bool create_handle = true);
+            bool create_handle = true,
+            TextureFilter min_filter = TextureFilter::NEAREST,
+            TextureFilter mag_filter = TextureFilter::NEAREST,
+            TextureWrapping wrap_s = TextureWrapping::REPEAT,
+            TextureWrapping wrap_t = TextureWrapping::REPEAT,
+            glm::vec4 border_color = {0, 0, 0, 0});
 
   void bind(int slot) override;
   void generateMipmap() override;

@@ -9,6 +9,11 @@ void GlFrameBuffer::attachTexture(Texture* texture,
                                   int layer, int mip) {
   GlTexture* gl_texture = static_cast<GlTexture*>(texture);
   GLenum gl_attachment_type = attachmentTypeToGlType(attachment_type);
+  if (attachment_type != TextureAttachmentType::DepthAttachment &&
+      attachment_type != TextureAttachmentType::StencilAttachment &&
+      attachment_type != TextureAttachmentType::ColorAttachment0) {
+    color_attachments_.push_back(gl_attachment_type);
+  }
   this->bind();
   switch (texture->type) {
     case TextureType::TEXTURE_1D:
@@ -39,14 +44,33 @@ void GlFrameBuffer::attachTexture(Texture* texture,
   }
 }
 
-void GlFrameBuffer::bind() { glBindFramebuffer(GL_FRAMEBUFFER, id_); }
+void GlFrameBuffer::clearAttachments() {
+  color_attachments_ = {GL_COLOR_ATTACHMENT0};
+}
+
+void GlFrameBuffer::bind() {
+  glBindFramebuffer(GL_FRAMEBUFFER, id_);
+  if (color_attachments_.size() >= 1) {
+    glDrawBuffers(color_attachments_.size(), color_attachments_.data());
+  }
+}
 
 void GlFrameBuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
 GLenum GlFrameBuffer::attachmentTypeToGlType(TextureAttachmentType type) const {
   switch (type) {
-    case TextureAttachmentType::ColorAttachement:
+    case TextureAttachmentType::ColorAttachment0:
       return GL_COLOR_ATTACHMENT0;
+    case TextureAttachmentType::ColorAttachment1:
+      return GL_COLOR_ATTACHMENT1;
+    case TextureAttachmentType::ColorAttachment2:
+      return GL_COLOR_ATTACHMENT2;
+    case TextureAttachmentType::ColorAttachment3:
+      return GL_COLOR_ATTACHMENT3;
+    case TextureAttachmentType::ColorAttachment4:
+      return GL_COLOR_ATTACHMENT4;
+    case TextureAttachmentType::ColorAttachment5:
+      return GL_COLOR_ATTACHMENT5;
     case TextureAttachmentType::DepthAttachment:
       return GL_DEPTH_ATTACHMENT;
     case TextureAttachmentType::StencilAttachment:

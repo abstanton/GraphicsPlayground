@@ -16,7 +16,10 @@ GlBackend::GlBackend() {
   glDebugMessageCallback(MessageCallback, 0);
 }
 
-FrameBuffer* GlBackend::defaultFrameBuffer() { return new GlFrameBuffer(0); }
+FrameBuffer* GlBackend::defaultFrameBuffer() {
+  return GlFrameBuffer::defaultFrameBuffer();
+}
+
 FrameBuffer* GlBackend::allocFrameBuffer() { return new GlFrameBuffer(); }
 
 UniformBuffer* GlBackend::allocUniformBuffer(size_t size) {
@@ -43,9 +46,13 @@ Texture* GlBackend::generateTexture(TextureType type, TextureFormat format,
                                     DataType data_type, unsigned int width,
                                     unsigned int height, unsigned int depth,
                                     unsigned int mips, unsigned int levels,
-                                    const void* data) {
+                                    const void* data, TextureFilter min_filter,
+                                    TextureFilter mag_filter,
+                                    TextureWrapping wrap_s,
+                                    TextureWrapping wrap_t) {
   return new GlTexture(type, format, data_type, width, height, depth, mips,
-                       levels, data);
+                       levels, data, true, min_filter, mag_filter, wrap_s,
+                       wrap_t);
 }
 
 void GlBackend::setViewport(int x, int y, int width, int height) {

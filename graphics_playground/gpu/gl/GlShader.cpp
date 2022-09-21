@@ -106,6 +106,11 @@ void GlShader::setVec3(const std::string& name, const glm::vec3& value) const {
   glUniform3f(glGetUniformLocation(shaderProgram_, name.c_str()), value.x,
               value.y, value.z);
 }
+void GlShader::setVec3Arr(const std::string& name, const glm::vec3* data,
+                          int count) const {
+  glUniform3fv(glGetUniformLocation(shaderProgram_, name.c_str()), count,
+               (GLfloat*)data);
+}
 void GlShader::setMat3(const std::string& name, const glm::mat3& value) const {
   glUniformMatrix3fv(glGetUniformLocation(shaderProgram_, name.c_str()), 1,
                      GL_FALSE, glm::value_ptr(value));

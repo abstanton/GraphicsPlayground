@@ -25,6 +25,8 @@ class GlShader : public Shader {
   void setFloat(const std::string& name, const float value) const override;
   void setVec2(const std::string& name, const glm::vec2& value) const override;
   void setVec3(const std::string& name, const glm::vec3& value) const override;
+  void setVec3Arr(const std::string& name, const glm::vec3* data,
+                  int count) const override;
   void setMat3(const std::string& name, const glm::mat3& value) const override;
   void setMat4(const std::string& name, const glm::mat4& value) const override;
 
