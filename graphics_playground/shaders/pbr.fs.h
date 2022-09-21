@@ -3,12 +3,15 @@
 const char* pbr_fs = R"(#version 460
 #extension GL_ARB_bindless_texture : require
 
-out vec4 FragColor;
+layout(location = 0) out vec4 lighting_color;
+layout(location = 1) out vec3 normal_color;
+layout(location = 2) out vec3 pos_color;
             
 in vec2 uv;
-in vec3 norm;
 in vec3 pos;
 in mat3 TBN;
+in vec3 view_pos;
+in vec3 view_norm;
 
 #define MAX_TOTAL_POINT_LIGHTS 100
 #define MAX_TOTAL_DIRECTION_LIGHTS 100
@@ -31,6 +34,7 @@ struct DirectionLight {
 layout(std140, binding = 0) uniform CameraMatrices {
     mat4 view;
     mat4 projection;
+    mat4 inverse_proj;
     vec4 cam_position;
 };
 
@@ -148,12 +152,12 @@ void main()
         normal = normalize(TBN * normal);
     }
     else {
-        normal = norm;
+        normal = view_norm;
     }
     
     float metallic = metalness_use_tex == 1? vec3(texture(metalness_tex, uv*metalness_scale)).x : metalness_val;
 
-	vec3 V = normalize(vec3(cam_position) - pos);    
+	vec3 V = (view * vec4(normalize(vec3(cam_position) - pos), 0.0)).xyz;    
     vec3 N = normal;
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
@@ -168,7 +172,7 @@ void main()
         float attenuation = 1/(distance*distance);
         vec3 radiance = colour * attenuation * light.intensity;
 
-        vec3 L = normalize(position - pos);
+        vec3 L = normalize((view*vec4(vec3(position - pos), 0.0)).xyz);;
         vec3 H = normalize(V + L);
 
 		float NDF = DistributionGGX(N, H, roughness);
@@ -192,12 +196,11 @@ void main()
         DirectionLight light = direction_lights[i];
 		vec4 fragPosLightSpace = light.light_space_matrix * vec4(pos, 1.0);
         float shadow = ShadowCalculation(fragPosLightSpace, i);
-
         vec3 colour = vec3(light.colour.x, light.colour.y, light.colour.z);
     
         vec3 radiance = colour * (1-shadow);
 
-        vec3 L = normalize(vec3(light.direction));
+        vec3 L = normalize((view*vec4(vec3(light.direction), 0.0)).xyz);
         vec3 H = normalize(V + L);
 
 		float NDF = DistributionGGX(N, H, roughness);
@@ -220,5 +223,7 @@ void main()
 	vec3 ambient = vec3(0.03) * albedo * vec3(ambientLight);
     vec3 color = ambient + Lo; 
    
-    FragColor = vec4(color, 1.0);
+    lighting_color = vec4(color, 1.0);
+    normal_color = view_norm;
+    pos_color = view_pos;
 })";

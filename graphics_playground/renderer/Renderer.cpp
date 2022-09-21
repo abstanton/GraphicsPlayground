@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+#include <iostream>
+#include <random>
+
 #include "../core/managers/ResourceManager.h"
 #include "../core/managers/ShaderManager.h"
 
@@ -27,13 +30,36 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   shadow_map_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
-      MAX_DIRECTION_SHADOWS, nullptr);
+      MAX_DIRECTION_SHADOWS, nullptr, gpu::TextureFilter::NEAREST,
+      gpu::TextureFilter::NEAREST, gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
   depth_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH_32,
-      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
+      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  normal_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
+      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  pos_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_32F,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
+      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
   colour_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
+
+  auto ssao_noise = getSSAONoise(16);
+  ssao_noise_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
+      gpu::DataType::FLOAT, 4, 4, 1, 1, 1, ssao_noise.data());
+  ssao_samples_ = getSSAOKernel(64);
 
   quad_batch_ = getScreenQuadBatch();
 }
@@ -69,6 +95,7 @@ void Renderer::begin(Camera camera, std::vector<PointLight> point_lights,
   gpu_camera_buffer_.view = view_matrix;
   gpu_camera_buffer_.projection = projection_matrix;
   gpu_camera_buffer_.position = camera.Position;
+  gpu_camera_buffer_.inverse_proj = glm::inverse(projection_matrix);
 
   gpu_light_buffer_.ambient_light = ambient_light;
   gpu_light_buffer_.num_point_lights = static_cast<int>(point_lights.size());
@@ -142,14 +169,21 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
 }
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
-  colour_frame_buffer_->bind();
   colour_frame_buffer_->attachTexture(
       depth_texture_, gpu::TextureAttachmentType::DepthAttachment, 0, 0);
+  colour_frame_buffer_->attachTexture(
+      colour_texture_, gpu::TextureAttachmentType::ColorAttachment0, 0, 0);
+  colour_frame_buffer_->attachTexture(
+      normal_texture_, gpu::TextureAttachmentType::ColorAttachment1, 0, 0);
+  colour_frame_buffer_->attachTexture(
+      pos_texture_, gpu::TextureAttachmentType::ColorAttachment2, 0, 0);
+  colour_frame_buffer_->bind();
 
   backend_->setViewport(0, 0, scr_width_, scr_height_);
 
   depth_shader_->use();
   camera_uniform_buffer_->bind(0);
+  lights_uniform_buffer_->bind(1);
 
   // TODO: Refactor this
   glDepthMask(GL_TRUE);
@@ -157,7 +191,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   glDepthFunc(GL_LESS);
   glEnable(GL_DEPTH_TEST);
 
-  backend_->clear(gpu::ClearType::DEPTH);
+  backend_->clear(gpu::ClearType::ALL);
 
   for (auto&& [mc, transform] : mesh_renderers) {
     depth_shader_->setMat4("model", transform.transformation());
@@ -168,19 +202,12 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     batch->draw();
   }
 
-  colour_frame_buffer_->attachTexture(
-      colour_texture_, gpu::TextureAttachmentType::ColorAttachement, 0, 0);
-
-  camera_uniform_buffer_->bind(0);
-  lights_uniform_buffer_->bind(1);
-
   // TODO: Refactor this
   glDepthMask(GL_FALSE);
   glColorMask(1, 1, 1, 1);
   glDepthFunc(GL_LEQUAL);
 
   backend_->clear(gpu::ClearType::COLOR);
-
   for (auto&& [mc, transform] : mesh_renderers) {
     gpu::Shader* shader =
         ShaderManager::get().getShader(mc.material_comp_.shader_name);
@@ -188,7 +215,6 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     setShaderInputsForMaterial(mc.material_comp_, shader);
     shadow_map_texture_->bind(10);
     depth_texture_->bind(11);
-
     shader->setMat4("model", transform.transformation());
 
     gpu::Batch* batch =
@@ -197,12 +223,19 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     batch->draw();
   }
 
+  colour_frame_buffer_->clearAttachments();
   default_frame_buffer_->bind();
   screen_quad_shader_->use();
+  camera_uniform_buffer_->bind(0);
   colour_texture_->bind(0);
   depth_texture_->bind(1);
+  normal_texture_->bind(2);
+  pos_texture_->bind(3);
+  ssao_noise_texture_->bind(5);
+  screen_quad_shader_->setVec3Arr("samples", ssao_samples_.data(), 64);
   // TODO: Set exposure from camera exposure
   quad_batch_->draw();
+  glGetError();
 }
 
 gpu::Batch* Renderer::getScreenQuadBatch() {
@@ -336,4 +369,38 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
   for (auto&& [name, input] : mat.bool_uniforms) {
     shader->setBool(name, input.value);
   }
+}
+
+float lerp(float a, float b, float f) { return a + f * (b - a); }
+
+std::vector<glm::vec3> Renderer::getSSAOKernel(int num_samples) const {
+  std::uniform_real_distribution<float> random_floats(
+      0.0, 1.0);  // random floats between [0.0, 1.0]
+  std::default_random_engine generator;
+  std::vector<glm::vec3> ssao_kernel;
+  for (int i = 0; i < num_samples; ++i) {
+    glm::vec3 sample(random_floats(generator) * 2.0 - 1.0,
+                     random_floats(generator) * 2.0 - 1.0,
+                     random_floats(generator));
+    sample = glm::normalize(sample);
+    sample *= random_floats(generator);
+    float scale = (float)i / 64.0f;
+    scale = lerp(0.1f, 1.0f, scale * scale);
+    sample *= scale;
+    ssao_kernel.push_back(sample);
+  }
+  return ssao_kernel;
+}
+
+std::vector<glm::vec3> Renderer::getSSAONoise(int num_samples) const {
+  std::uniform_real_distribution<float> random_floats(
+      0.0, 1.0);  // random floats between [0.0, 1.0]
+  std::default_random_engine generator;
+  std::vector<glm::vec3> ssao_noise;
+  for (int i = 0; i < 16; i++) {
+    glm::vec3 noise(random_floats(generator) * 2.0 - 1.0,
+                    random_floats(generator) * 2.0 - 1.0, 0.0f);
+    ssao_noise.push_back(glm::normalize(noise));
+  }
+  return ssao_noise;
 }

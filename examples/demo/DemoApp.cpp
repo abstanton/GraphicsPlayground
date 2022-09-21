@@ -28,7 +28,7 @@ void DemoApp::setup() {
 
   Material blank_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
-  // Material metal_material = blank_material;
+  // metal_material = blank_material;
 
   cube_component.material_comp_ = blank_material;
   monkey_component.material_comp_ = metal_material;
@@ -48,7 +48,6 @@ void DemoApp::setup() {
       monkey_ent,
       Transform(glm::vec3(0, 3.5, 0), glm::vec3(0), glm::vec3(2.0f)));
   registry.addComponent<MeshRenderer>(monkey_ent, monkey_component);
-  registry.addComponent<Rotate>(monkey_ent, {2, 0, 0.5});
 
   auto light_0 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_0, glm::vec3(-2.5f, 6.0f, 1.0f),
@@ -61,12 +60,12 @@ void DemoApp::setup() {
                                         glm::vec3(1.0f, 1.0f, 1.0f), 20.0f);
 
   MeshRenderer cube_mesh = mr_0;
-  cube_mesh.material_comp_ = metal_material;
+  // cube_mesh.material_comp_ = metal_material;
   for (float i = 0; i < 5; i++) {
     for (float j = 0; j < 5; j++) {
       registry.createEntity<MeshRenderer, Transform, Rotate>(
           cube_mesh,
-          Transform({-(i - 2) * 2.5, -0.2, -(j - 2) * 2.5}, {0, 0, 0},
+          Transform({-(i - 2) * 3, -2, -(j - 2) * 2.5}, {0, 0, 0},
                     {0.5, 0.5, 0.5}),
           {(i / 10), 0, j / 10});
     }

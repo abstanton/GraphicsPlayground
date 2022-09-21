@@ -51,6 +51,7 @@ struct GPULightBuffer {
 struct GPUCameraBuffer {
   glm::mat4 view;
   glm::mat4 projection;
+  glm::mat4 inverse_proj;
   glm::vec3 position;
   float padding;
 };
@@ -72,6 +73,11 @@ class Renderer {
   gpu::Texture* shadow_map_texture_;
   gpu::Texture* depth_texture_;
   gpu::Texture* colour_texture_;
+  gpu::Texture* normal_texture_;
+  gpu::Texture* pos_texture_;
+
+  gpu::Texture* ssao_noise_texture_;
+  std::vector<glm::vec3> ssao_samples_;
 
   gpu::FrameBuffer* shadow_frame_buffer_;
   gpu::FrameBuffer* default_frame_buffer_;
@@ -104,6 +110,9 @@ class Renderer {
   void drawMainPass(std::vector<MeshPair> mesh_renderers);
 
   void setShaderInputsForMaterial(const Material& mat, gpu::Shader* shader);
+
+  std::vector<glm::vec3> getSSAOKernel(int num_samples) const;
+  std::vector<glm::vec3> getSSAONoise(int num_samples) const;
 
   gpu::Batch* getScreenQuadBatch();
 };

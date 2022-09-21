@@ -25,6 +25,7 @@ struct DirectionLight {
 layout(std140, binding = 0) uniform CameraMatrices {
     mat4 view;
     mat4 projection;
+    mat4 inverse_proj;
     vec4 cam_position;
 };
 
