@@ -51,7 +51,8 @@ void GlFrameBuffer::clearAttachments() {
 void GlFrameBuffer::bind() {
   glBindFramebuffer(GL_FRAMEBUFFER, id_);
   if (color_attachments_.size() >= 1) {
-    glDrawBuffers(color_attachments_.size(), color_attachments_.data());
+    glDrawBuffers(static_cast<int>(color_attachments_.size()),
+                  color_attachments_.data());
   }
 }
 

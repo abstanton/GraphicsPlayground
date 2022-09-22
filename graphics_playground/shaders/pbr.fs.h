@@ -5,7 +5,6 @@ const char* pbr_fs = R"(#version 460
 
 layout(location = 0) out vec4 lighting_color;
 layout(location = 1) out vec3 normal_color;
-layout(location = 2) out vec3 pos_color;
             
 in vec2 uv;
 in vec3 pos;
@@ -139,6 +138,34 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }  
 
+// Return light contribution
+// param: radiance: radiance of light incidident at position
+// param: L: view space direciton from frag to light
+// param: V: view space vector from camera to frag
+// param: N: view space normal at frag
+// param: F0: Reflection at zero incidence for material
+// param: albedo: albedo colour at surface
+// param: roughness: roughness of surface
+// param: metalness: metalness of surface
+vec3 lightingCalc(vec3 radiance, vec3 L, vec3 V, vec3 N, vec3 F0, vec3 albedo, float roughness, float metallic) {
+    vec3 H = normalize(V + L);
+
+    float NDF = DistributionGGX(N, H, roughness);
+    float G  = GeometrySmith(N, V, L, roughness);
+    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 numerator    = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+    vec3 specular     = numerator / denominator;  
+        
+    float NdotL = max(dot(N, L), 0.0);          
+
+    return (kD * albedo / PI + specular) * radiance * NdotL; 
+} 
 
 void main()
 {
@@ -173,23 +200,7 @@ void main()
         vec3 radiance = colour * attenuation * light.intensity;
 
         vec3 L = normalize((view*vec4(vec3(position - pos), 0.0)).xyz);;
-        vec3 H = normalize(V + L);
-
-		float NDF = DistributionGGX(N, H, roughness);
-        float G  = GeometrySmith(N, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;
-
-		vec3 numerator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular     = numerator / denominator;  
-            
-        // add to outgoing radiance Lo
-        float NdotL = max(dot(N, L), 0.0);                
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+        Lo += lightingCalc(radiance, L, V, N, F0, albedo, roughness, metallic);
     }
 
 	for (int i = 0; i < numDirectionLights; i++) {
@@ -201,29 +212,12 @@ void main()
         vec3 radiance = colour * (1-shadow);
 
         vec3 L = normalize((view*vec4(vec3(light.direction), 0.0)).xyz);
-        vec3 H = normalize(V + L);
-
-		float NDF = DistributionGGX(N, H, roughness);
-        float G  = GeometrySmith(N, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;
-
-		vec3 numerator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular     = numerator / denominator;  
-            
-        // add to outgoing radiance Lo
-        float NdotL = max(dot(N, L), 0.0);                
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+        Lo += lightingCalc(radiance, L, V, N, F0, albedo, roughness, metallic);
     }
 
 	vec3 ambient = vec3(0.03) * albedo * vec3(ambientLight);
     vec3 color = ambient + Lo; 
    
     lighting_color = vec4(color, 1.0);
-    normal_color = view_norm;
-    pos_color = view_pos;
+    normal_color = normal;
 })";

@@ -8,7 +8,7 @@
 #include "../../shaders/default.vs.h"
 #include "../../shaders/light.fs.h"
 #include "../../shaders/pbr.fs.h"
-#include "../../shaders/quad.fs.h"
+#include "../../shaders/post.fs.h"
 #include "../../shaders/quad.vs.h"
 #include "../../shaders/shadow.fs.h"
 #include "../../shaders/shadow.vs.h"
@@ -23,7 +23,7 @@ ShaderManager::ShaderManager() {
   builtin_shaders_["shadow"] =
       backend->compileShaderProgram(shadow_vs, shadow_fs);
   builtin_shaders_["depth"] = backend->compileShaderProgram(def_vs, shadow_fs);
-  builtin_shaders_["quad"] = backend->compileShaderProgram(quad_vs, quad_fs);
+  builtin_shaders_["post"] = backend->compileShaderProgram(quad_vs, post_fs);
   std::cout << "Finished" << std::endl;
 }
 
@@ -47,10 +47,10 @@ string ShaderManager::getShaderName(BuiltinShader type) const {
       return "emissive";
     case BuiltinShader::PBR:
       return "pbr";
+    case BuiltinShader::POST:
+      return "post";
     case BuiltinShader::SHADOW:
       return "shadow";
-    case BuiltinShader::QUAD:
-      return "quad";
     default:
       return "default";
   }

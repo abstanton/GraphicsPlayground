@@ -12,8 +12,8 @@ enum class BuiltinShader {
   DEPTH,
   EMISSIVE,
   PBR,
+  POST,
   SHADOW,
-  QUAD
 };
 
 class ShaderManager {

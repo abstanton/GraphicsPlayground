@@ -1,6 +1,6 @@
 #pragma once
 
-const char* quad_fs = R"(
+const char* post_fs = R"(
 #version 460 core
 out vec4 FragColor;
   
@@ -27,6 +27,8 @@ uniform vec3 samples[64];
 const vec4 viewport = vec4(0, 0, 1920, 1280);
 const vec2 depthrange = vec2(0,1);
 
+
+// TODO: Use more efficient version!
 vec4 CalcEyeFromWindow(in vec3 windowSpace)
 {
 	vec3 ndcPos;

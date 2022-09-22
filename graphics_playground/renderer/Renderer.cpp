@@ -16,7 +16,7 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
 
   shadow_shader_ = ShaderManager::get().getShader("shadow");
-  screen_quad_shader_ = ShaderManager::get().getShader("quad");
+  screen_quad_shader_ = ShaderManager::get().getShader("post");
   depth_shader_ = ShaderManager::get().getShader("depth");
 
   camera_uniform_buffer_ =
@@ -129,6 +129,9 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
   shadow_frame_buffer_->bind();
   backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
   shadow_shader_->use();
+  glCullFace(GL_FRONT);
+  glEnable(GL_POLYGON_OFFSET_FILL);
+  glPolygonOffset(2.0, 1.0);
 
   // TODO: Investigate how to abstract this
   glDepthMask(GL_TRUE);
@@ -160,6 +163,8 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
       batch->draw();
     }
   }
+  glDisable(GL_POLYGON_OFFSET_FILL);
+  glCullFace(GL_BACK);
 }
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
