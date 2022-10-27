@@ -266,10 +266,9 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   ss_frame_buffer_->bind();
   blur_shader_->use();
   ao_texture_->bind(0);
-  blur_shader_->setFloat("radius", 0.008f);
+  blur_shader_->setFloat("radius", 1.0f);
   // Do this with texture or ubo
-  auto blur_kernel = getBlurKernel();
-  blur_shader_->setFloatArr("kernel", blur_kernel.data(), blur_kernel.size());
+
   quad_batch_->draw();
 
   // -------- POST PASS ----------
@@ -340,7 +339,8 @@ gpu::Texture* Renderer::retrieveGPUTexture(const Texture* texture) {
 
   gpu::Texture* gpu_texture = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu_texture_format, gpu_data_type,
-      texture->width, texture->height, 0, 0, 0, texture->data);
+      texture->width, texture->height, 0, 0, 0, texture->data,
+      gpu::TextureFilter::LINEAR);
   gpu_texture->generateMipmap();
 
   texture_cache_[texture->id] = gpu_texture;
@@ -435,11 +435,6 @@ std::vector<glm::vec3> Renderer::getSSAOKernel(int num_samples) const {
     ssao_kernel.push_back(sample);
   }
   return ssao_kernel;
-}
-
-std::vector<float> Renderer::getBlurKernel() const {
-  return {1,  4, 7, 4,  1,  4,  16, 26, 16, 4, 7, 26, 41,
-          26, 7, 4, 16, 26, 16, 4,  1,  4,  7, 4, 1};
 }
 
 std::vector<glm::vec3> Renderer::getSSAONoise(int num_samples) const {
