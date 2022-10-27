@@ -56,6 +56,13 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   ssao_samples_ = getSSAOKernel(64);
 
   quad_batch_ = getScreenQuadBatch();
+
+  colour_frame_buffer_->addAttachment(
+      {depth_texture_, gpu::TextureAttachmentType::DepthAttachment, 0, 0});
+  colour_frame_buffer_->addAttachment(
+      {colour_texture_, gpu::TextureAttachmentType::ColorAttachment0, 0, 0});
+  colour_frame_buffer_->addAttachment(
+      {normal_texture_, gpu::TextureAttachmentType::ColorAttachment1, 0, 0});
 }
 
 Renderer::~Renderer() {
@@ -143,8 +150,11 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
     if (i >= MAX_DIRECTION_SHADOWS) {
       break;
     }
-    shadow_frame_buffer_->attachTexture(
-        shadow_map_texture_, gpu::TextureAttachmentType::DepthAttachment, i, 0);
+    shadow_frame_buffer_->clearAttachments();
+    shadow_frame_buffer_->addAttachment(
+        {shadow_map_texture_, gpu::TextureAttachmentType::DepthAttachment, i,
+         0});
+    shadow_frame_buffer_->bind();
     backend_->clear(gpu::ClearType::DEPTH);
 
     float near_plane = 1.0f, far_plane = 20.0f;
@@ -168,12 +178,6 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
 }
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
-  colour_frame_buffer_->attachTexture(
-      depth_texture_, gpu::TextureAttachmentType::DepthAttachment, 0, 0);
-  colour_frame_buffer_->attachTexture(
-      colour_texture_, gpu::TextureAttachmentType::ColorAttachment0, 0, 0);
-  colour_frame_buffer_->attachTexture(
-      normal_texture_, gpu::TextureAttachmentType::ColorAttachment1, 0, 0);
   colour_frame_buffer_->bind();
 
   backend_->setViewport(0, 0, scr_width_, scr_height_);

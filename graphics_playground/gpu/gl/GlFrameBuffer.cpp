@@ -4,36 +4,29 @@
 namespace gpu {
 GlFrameBuffer::GlFrameBuffer() { glGenFramebuffers(1, &id_); }
 
-void GlFrameBuffer::attachTexture(Texture* texture,
-                                  TextureAttachmentType attachment_type,
-                                  int layer, int mip) {
-  GlTexture* gl_texture = static_cast<GlTexture*>(texture);
-  GLenum gl_attachment_type = attachmentTypeToGlType(attachment_type);
-  if (attachment_type != TextureAttachmentType::DepthAttachment &&
-      attachment_type != TextureAttachmentType::StencilAttachment &&
-      attachment_type != TextureAttachmentType::ColorAttachment0) {
-    color_attachments_.push_back(gl_attachment_type);
-  }
-  this->bind();
-  switch (texture->type) {
+void GlFrameBuffer::bindAttachment(FrameBufferAttachment attachment) {
+  GlTexture* gl_texture = static_cast<GlTexture*>(attachment.texture);
+  GLenum gl_attachment_type =
+      attachmentTypeToGlType(attachment.attachment_type);
+  switch (attachment.texture->type) {
     case TextureType::TEXTURE_1D:
     case TextureType::TEXTURE_1D_ARRAY:
       glFramebufferTexture1D(GL_FRAMEBUFFER, gl_attachment_type, GL_TEXTURE_1D,
-                             gl_texture->id_, 0);
+                             gl_texture->id_, attachment.mip);
       break;
     case TextureType::TEXTURE_2D:
       glFramebufferTexture2D(GL_FRAMEBUFFER, gl_attachment_type, GL_TEXTURE_2D,
-                             gl_texture->id_, 0);
+                             gl_texture->id_, attachment.mip);
       break;
     case TextureType::TEXTURE_2D_ARRAY:
       glFramebufferTextureLayer(GL_FRAMEBUFFER, gl_attachment_type,
-                                gl_texture->id_, mip, layer);
-      glGetError();
+                                gl_texture->id_, attachment.mip,
+                                attachment.layer);
       break;
     case TextureType::TEXTURE_3D:
     case TextureType::TEXTURE_3D_ARRAY:
       glFramebufferTexture3D(GL_FRAMEBUFFER, gl_attachment_type, GL_TEXTURE_3D,
-                             gl_texture->id_, 0, 0);
+                             gl_texture->id_, attachment.mip, attachment.layer);
       break;
   }
   switch (gl_attachment_type) {
@@ -44,16 +37,21 @@ void GlFrameBuffer::attachTexture(Texture* texture,
   }
 }
 
-void GlFrameBuffer::clearAttachments() {
-  color_attachments_ = {GL_COLOR_ATTACHMENT0};
-}
-
 void GlFrameBuffer::bind() {
   glBindFramebuffer(GL_FRAMEBUFFER, id_);
-  if (color_attachments_.size() >= 1) {
-    glDrawBuffers(static_cast<int>(color_attachments_.size()),
-                  color_attachments_.data());
+  bindAttachments();
+  std::vector<GLenum> attachment_types;
+  for (const auto& attachment : attachments_) {
+    if (attachment.attachment_type == TextureAttachmentType::DepthAttachment)
+      continue;
+    attachment_types.push_back(
+        attachmentTypeToGlType(attachment.attachment_type));
   }
+  if (attachment_types.size() < 1) return;
+  std::cout << "Attachment types size: " << attachment_types.size()
+            << std::endl;
+  glDrawBuffers(static_cast<int>(attachment_types.size()),
+                attachment_types.data());
 }
 
 void GlFrameBuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }

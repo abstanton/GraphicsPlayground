@@ -14,19 +14,15 @@ class GlFrameBuffer : public FrameBuffer {
 
   static GlFrameBuffer* defaultFrameBuffer() {
     GlFrameBuffer* fb = new GlFrameBuffer(0);
-    fb->color_attachments_ = {};
     return fb;
   }
 
-  void attachTexture(Texture* texture, TextureAttachmentType attachment_type,
-                     int level, int mip) override;
-  void clearAttachments() override;
+  void bindAttachment(FrameBufferAttachment attachment) override;
   void bind() override;
   void unbind() override;
   ~GlFrameBuffer();
 
  private:
-  std::vector<GLenum> color_attachments_ = {GL_COLOR_ATTACHMENT0};
   GLuint id_;
   GLenum attachmentTypeToGlType(TextureAttachmentType type) const;
 };
