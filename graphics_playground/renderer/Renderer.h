@@ -113,5 +113,5 @@ class Renderer {
   std::vector<glm::vec3> getSSAOKernel(int num_samples) const;
   std::vector<glm::vec3> getSSAONoise(int num_samples) const;
 
-  gpu::Batch* getScreenQuadBatch();
+  gpu::Batch* allocScreenQuadBatch();
 };

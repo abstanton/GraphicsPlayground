@@ -17,13 +17,14 @@ class GlFrameBuffer : public FrameBuffer {
     return fb;
   }
 
-  void bindAttachment(FrameBufferAttachment attachment) override;
+  void bindAttachment(FrameBufferAttachmentType attachment_type,
+                      FrameBufferAttachment attachment) override;
   void bind() override;
   void unbind() override;
   ~GlFrameBuffer();
 
  private:
   GLuint id_;
-  GLenum attachmentTypeToGlType(TextureAttachmentType type) const;
+  GLenum attachmentTypeToGlType(FrameBufferAttachmentType type) const;
 };
 }  // namespace gpu

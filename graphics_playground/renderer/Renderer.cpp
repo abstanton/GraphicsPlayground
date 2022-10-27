@@ -55,14 +55,16 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       gpu::DataType::FLOAT, 4, 4, 1, 1, 1, ssao_noise.data());
   ssao_samples_ = getSSAOKernel(64);
 
-  quad_batch_ = getScreenQuadBatch();
+  quad_batch_ = allocScreenQuadBatch();
 
   colour_frame_buffer_->addAttachment(
-      {depth_texture_, gpu::TextureAttachmentType::DepthAttachment, 0, 0});
+      gpu::FrameBufferAttachmentType::DepthAttachment, {depth_texture_, 0, 0});
   colour_frame_buffer_->addAttachment(
-      {colour_texture_, gpu::TextureAttachmentType::ColorAttachment0, 0, 0});
+      gpu::FrameBufferAttachmentType::ColorAttachment0,
+      {colour_texture_, 0, 0});
   colour_frame_buffer_->addAttachment(
-      {normal_texture_, gpu::TextureAttachmentType::ColorAttachment1, 0, 0});
+      gpu::FrameBufferAttachmentType::ColorAttachment1,
+      {normal_texture_, 0, 0});
 }
 
 Renderer::~Renderer() {
@@ -137,8 +139,6 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
   backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
   shadow_shader_->use();
   glCullFace(GL_FRONT);
-  glEnable(GL_POLYGON_OFFSET_FILL);
-  glPolygonOffset(2.0, 1.0);
 
   // TODO: Investigate how to abstract this
   glDepthMask(GL_TRUE);
@@ -150,11 +150,12 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
     if (i >= MAX_DIRECTION_SHADOWS) {
       break;
     }
-    shadow_frame_buffer_->clearAttachments();
+    // Attach appropriate layer of depth texture array
     shadow_frame_buffer_->addAttachment(
-        {shadow_map_texture_, gpu::TextureAttachmentType::DepthAttachment, i,
-         0});
+        gpu::FrameBufferAttachmentType::DepthAttachment,
+        {shadow_map_texture_, i, 0});
     shadow_frame_buffer_->bind();
+    // clear texture before drawing depth
     backend_->clear(gpu::ClearType::DEPTH);
 
     float near_plane = 1.0f, far_plane = 20.0f;
@@ -179,9 +180,9 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
 
 void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   colour_frame_buffer_->bind();
-
   backend_->setViewport(0, 0, scr_width_, scr_height_);
 
+  // -------- DEPTH PRE-PASS ----------
   depth_shader_->use();
   camera_uniform_buffer_->bind(0);
   lights_uniform_buffer_->bind(1);
@@ -202,6 +203,8 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
 
     batch->draw();
   }
+
+  // -------- FORWARD PASS ----------
 
   // TODO: Refactor this
   glDepthMask(GL_FALSE);
@@ -224,7 +227,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     batch->draw();
   }
 
-  colour_frame_buffer_->clearAttachments();
+  // -------- POST PASS ----------
   default_frame_buffer_->bind();
   screen_quad_shader_->use();
   camera_uniform_buffer_->bind(0);
@@ -238,7 +241,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   glGetError();
 }
 
-gpu::Batch* Renderer::getScreenQuadBatch() {
+gpu::Batch* Renderer::allocScreenQuadBatch() {
   float quadVertices[] = {// positions   // texCoords
                           -1.0f, 1.0f, 0.0f, 1.0f,  -1.0f, -1.0f,
                           0.0f,  0.0f, 1.0f, -1.0f, 1.0f,  0.0f,

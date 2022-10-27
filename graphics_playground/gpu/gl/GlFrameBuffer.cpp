@@ -4,10 +4,10 @@
 namespace gpu {
 GlFrameBuffer::GlFrameBuffer() { glGenFramebuffers(1, &id_); }
 
-void GlFrameBuffer::bindAttachment(FrameBufferAttachment attachment) {
+void GlFrameBuffer::bindAttachment(FrameBufferAttachmentType attachment_type,
+                                   FrameBufferAttachment attachment) {
   GlTexture* gl_texture = static_cast<GlTexture*>(attachment.texture);
-  GLenum gl_attachment_type =
-      attachmentTypeToGlType(attachment.attachment_type);
+  GLenum gl_attachment_type = attachmentTypeToGlType(attachment_type);
   switch (attachment.texture->type) {
     case TextureType::TEXTURE_1D:
     case TextureType::TEXTURE_1D_ARRAY:
@@ -41,38 +41,35 @@ void GlFrameBuffer::bind() {
   glBindFramebuffer(GL_FRAMEBUFFER, id_);
   bindAttachments();
   std::vector<GLenum> attachment_types;
-  for (const auto& attachment : attachments_) {
-    if (attachment.attachment_type == TextureAttachmentType::DepthAttachment)
-      continue;
-    attachment_types.push_back(
-        attachmentTypeToGlType(attachment.attachment_type));
+  for (const auto& [attachment_type, attachment] : attachments_) {
+    if (attachment_type == FrameBufferAttachmentType::DepthAttachment) continue;
+    attachment_types.push_back(attachmentTypeToGlType(attachment_type));
   }
   if (attachment_types.size() < 1) return;
-  std::cout << "Attachment types size: " << attachment_types.size()
-            << std::endl;
   glDrawBuffers(static_cast<int>(attachment_types.size()),
                 attachment_types.data());
 }
 
 void GlFrameBuffer::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-GLenum GlFrameBuffer::attachmentTypeToGlType(TextureAttachmentType type) const {
+GLenum GlFrameBuffer::attachmentTypeToGlType(
+    FrameBufferAttachmentType type) const {
   switch (type) {
-    case TextureAttachmentType::ColorAttachment0:
+    case FrameBufferAttachmentType::ColorAttachment0:
       return GL_COLOR_ATTACHMENT0;
-    case TextureAttachmentType::ColorAttachment1:
+    case FrameBufferAttachmentType::ColorAttachment1:
       return GL_COLOR_ATTACHMENT1;
-    case TextureAttachmentType::ColorAttachment2:
+    case FrameBufferAttachmentType::ColorAttachment2:
       return GL_COLOR_ATTACHMENT2;
-    case TextureAttachmentType::ColorAttachment3:
+    case FrameBufferAttachmentType::ColorAttachment3:
       return GL_COLOR_ATTACHMENT3;
-    case TextureAttachmentType::ColorAttachment4:
+    case FrameBufferAttachmentType::ColorAttachment4:
       return GL_COLOR_ATTACHMENT4;
-    case TextureAttachmentType::ColorAttachment5:
+    case FrameBufferAttachmentType::ColorAttachment5:
       return GL_COLOR_ATTACHMENT5;
-    case TextureAttachmentType::DepthAttachment:
+    case FrameBufferAttachmentType::DepthAttachment:
       return GL_DEPTH_ATTACHMENT;
-    case TextureAttachmentType::StencilAttachment:
+    case FrameBufferAttachmentType::StencilAttachment:
       return GL_STENCIL_ATTACHMENT;
     default:
       return -1;
