@@ -15,15 +15,18 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   backend_ = gpu::Backend::get();
   backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
 
-  shadow_shader_ = ShaderManager::get().getShader("shadow");
-  screen_quad_shader_ = ShaderManager::get().getShader("post");
+  ao_shader_ = ShaderManager::get().getShader("ssao");
+  blur_shader_ = ShaderManager::get().getShader("blur");
   depth_shader_ = ShaderManager::get().getShader("depth");
+  screen_quad_shader_ = ShaderManager::get().getShader("post");
+  shadow_shader_ = ShaderManager::get().getShader("shadow");
 
   camera_uniform_buffer_ =
       backend_->allocUniformBuffer(sizeof(GPUCameraBuffer));
   lights_uniform_buffer_ = backend_->allocUniformBuffer(sizeof(GPULightBuffer));
 
   shadow_frame_buffer_ = backend_->allocFrameBuffer();
+  ss_frame_buffer_ = backend_->allocFrameBuffer();
   colour_frame_buffer_ = backend_->allocFrameBuffer();
   default_frame_buffer_ = backend_->defaultFrameBuffer();
 
@@ -33,6 +36,21 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
       MAX_DIRECTION_SHADOWS, nullptr, gpu::TextureFilter::NEAREST,
       gpu::TextureFilter::NEAREST, gpu::TextureWrapping::CLAMP_TO_BORDER,
       gpu::TextureWrapping::CLAMP_TO_BORDER);
+  ao_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
+      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  blurred_ao_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
+      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  blurred_colour_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
   depth_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
@@ -65,6 +83,9 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   colour_frame_buffer_->addAttachment(
       gpu::FrameBufferAttachmentType::ColorAttachment1,
       {normal_texture_, 0, 0});
+
+  ss_frame_buffer_->addAttachment(
+      gpu::FrameBufferAttachmentType::ColorAttachment0, {ao_texture_, 0, 0});
 }
 
 Renderer::~Renderer() {
@@ -227,15 +248,36 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     batch->draw();
   }
 
+  // -------- Screen Space Effects ---------
+  // -------- SSAO -----------
+  ss_frame_buffer_->addAttachment(
+      gpu::FrameBufferAttachmentType::ColorAttachment0, {ao_texture_, 0, 0});
+  ss_frame_buffer_->bind();
+  ao_shader_->use();
+  ao_shader_->setVec3Arr("samples", ssao_samples_.data(), 64);
+  depth_texture_->bind(0);
+  normal_texture_->bind(1);
+  ssao_noise_texture_->bind(5);
+  quad_batch_->draw();
+  // // blur
+  ss_frame_buffer_->addAttachment(
+      gpu::FrameBufferAttachmentType::ColorAttachment0,
+      {blurred_ao_texture_, 0, 0});
+  ss_frame_buffer_->bind();
+  blur_shader_->use();
+  ao_texture_->bind(0);
+  blur_shader_->setFloat("radius", 0.008f);
+  // Do this with texture or ubo
+  auto blur_kernel = getBlurKernel();
+  blur_shader_->setFloatArr("kernel", blur_kernel.data(), blur_kernel.size());
+  quad_batch_->draw();
+
   // -------- POST PASS ----------
   default_frame_buffer_->bind();
   screen_quad_shader_->use();
   camera_uniform_buffer_->bind(0);
   colour_texture_->bind(0);
-  depth_texture_->bind(1);
-  normal_texture_->bind(2);
-  ssao_noise_texture_->bind(5);
-  screen_quad_shader_->setVec3Arr("samples", ssao_samples_.data(), 64);
+  blurred_ao_texture_->bind(1);
   // TODO: Set exposure from camera exposure
   quad_batch_->draw();
   glGetError();
@@ -393,6 +435,11 @@ std::vector<glm::vec3> Renderer::getSSAOKernel(int num_samples) const {
     ssao_kernel.push_back(sample);
   }
   return ssao_kernel;
+}
+
+std::vector<float> Renderer::getBlurKernel() const {
+  return {1,  4, 7, 4,  1,  4,  16, 26, 16, 4, 7, 26, 41,
+          26, 7, 4, 16, 26, 16, 4,  1,  4,  7, 4, 1};
 }
 
 std::vector<glm::vec3> Renderer::getSSAONoise(int num_samples) const {

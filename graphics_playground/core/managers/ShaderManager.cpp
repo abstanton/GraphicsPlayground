@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "../../shaders/blur.fs.h"
 #include "../../shaders/default.fs.h"
 #include "../../shaders/default.vs.h"
 #include "../../shaders/light.fs.h"
@@ -12,18 +13,21 @@
 #include "../../shaders/quad.vs.h"
 #include "../../shaders/shadow.fs.h"
 #include "../../shaders/shadow.vs.h"
+#include "../../shaders/ssao.fs.h"
 
 ShaderManager::ShaderManager() {
   std::cout << "Loading builtin shaders" << std::endl;
   gpu::Backend* backend = gpu::Backend::get();
+  builtin_shaders_["blur"] = backend->compileShaderProgram(quad_vs, blur_fs);
   builtin_shaders_["default"] = backend->compileShaderProgram(def_vs, def_fs);
+  builtin_shaders_["depth"] = backend->compileShaderProgram(def_vs, shadow_fs);
   builtin_shaders_["emissive"] =
       backend->compileShaderProgram(def_vs, light_fs);
   builtin_shaders_["pbr"] = backend->compileShaderProgram(def_vs, pbr_fs);
+  builtin_shaders_["post"] = backend->compileShaderProgram(quad_vs, post_fs);
+  builtin_shaders_["ssao"] = backend->compileShaderProgram(quad_vs, ssao_fs);
   builtin_shaders_["shadow"] =
       backend->compileShaderProgram(shadow_vs, shadow_fs);
-  builtin_shaders_["depth"] = backend->compileShaderProgram(def_vs, shadow_fs);
-  builtin_shaders_["post"] = backend->compileShaderProgram(quad_vs, post_fs);
   std::cout << "Finished" << std::endl;
 }
 

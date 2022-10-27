@@ -98,6 +98,11 @@ void GlShader::setInt(const std::string& name, const int value) const {
 void GlShader::setFloat(const std::string& name, const float value) const {
   glUniform1f(glGetUniformLocation(shaderProgram_, name.c_str()), value);
 }
+void GlShader::setFloatArr(const std::string& name, const float* data,
+                           int count) const {
+  glUniform1fv(glGetUniformLocation(shaderProgram_, name.c_str()), count,
+               (GLfloat*)data);
+}
 void GlShader::setVec2(const std::string& name, const glm::vec2& value) const {
   glUniform2f(glGetUniformLocation(shaderProgram_, name.c_str()), value.x,
               value.y);

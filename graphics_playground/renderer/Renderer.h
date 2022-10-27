@@ -66,21 +66,27 @@ class Renderer {
   ~Renderer();
 
  private:
-  gpu::Shader* shadow_shader_;
-  gpu::Shader* screen_quad_shader_;
+  gpu::Shader* ao_shader_;
+  gpu::Shader* blur_shader_;
   gpu::Shader* depth_shader_;
+  gpu::Shader* screen_quad_shader_;
+  gpu::Shader* shadow_shader_;
 
-  gpu::Texture* shadow_map_texture_;
-  gpu::Texture* depth_texture_;
+  gpu::Texture* ao_texture_;
+  gpu::Texture* blurred_ao_texture_;
+  gpu::Texture* blurred_colour_texture_;
   gpu::Texture* colour_texture_;
+  gpu::Texture* depth_texture_;
   gpu::Texture* normal_texture_;
+  gpu::Texture* shadow_map_texture_;
 
   gpu::Texture* ssao_noise_texture_;
   std::vector<glm::vec3> ssao_samples_;
 
   gpu::FrameBuffer* shadow_frame_buffer_;
-  gpu::FrameBuffer* default_frame_buffer_;
+  gpu::FrameBuffer* ss_frame_buffer_;
   gpu::FrameBuffer* colour_frame_buffer_;
+  gpu::FrameBuffer* default_frame_buffer_;
 
   gpu::UniformBuffer* camera_uniform_buffer_;
   gpu::UniformBuffer* lights_uniform_buffer_;
@@ -112,6 +118,7 @@ class Renderer {
 
   std::vector<glm::vec3> getSSAOKernel(int num_samples) const;
   std::vector<glm::vec3> getSSAONoise(int num_samples) const;
+  std::vector<float> getBlurKernel() const;
 
   gpu::Batch* allocScreenQuadBatch();
 };
