@@ -60,12 +60,11 @@ void DemoApp::setup() {
                                         glm::vec3(1.0f, 1.0f, 1.0f), 20.0f);
 
   MeshRenderer cube_mesh = mr_0;
-  // cube_mesh.material_comp_ = metal_material;
   for (float i = 0; i < 5; i++) {
     for (float j = 0; j < 5; j++) {
       registry.createEntity<MeshRenderer, Transform, Rotate>(
           cube_mesh,
-          Transform({-(i - 2) * 3, -2, -(j - 2) * 2.5}, {0, 0, 0},
+          Transform({-(i - 2) * 3, 1, -(j - 2) * 2.5}, {0, 0, 0},
                     {0.5, 0.5, 0.5}),
           {(i / 10), 0, j / 10});
     }
