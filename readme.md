@@ -25,8 +25,9 @@ Demo image
 - [ ] Improve input support
 - [ ] Support transparent materials
 - [ ] Image Based Lighting
-- [ ] Screen Space Effects (AO, SSR etc)
-- [ ] Improve building experience
+- [x] SSAO
+- [ ] SSR
+- [x] Improve building experience
 - [ ] Make prettier demo
 
 ## Building
