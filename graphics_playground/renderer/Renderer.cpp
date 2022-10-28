@@ -108,13 +108,14 @@ void Renderer::draw(Camera camera, std::vector<MeshPair> mesh_pairs,
                     std::vector<PointLight> point_lights,
                     std::vector<DirectionLight> direction_lights) {
   backend_->clear(gpu::ClearType::ALL);
-  begin(camera, point_lights, direction_lights);
+  uploadRenderData(camera, point_lights, direction_lights);
   drawShadowPass(mesh_pairs, point_lights, direction_lights);
   drawMainPass(mesh_pairs);
 }
 
-void Renderer::begin(Camera camera, std::vector<PointLight> point_lights,
-                     std::vector<DirectionLight> direction_lights) {
+void Renderer::uploadRenderData(Camera camera,
+                                std::vector<PointLight> point_lights,
+                                std::vector<DirectionLight> direction_lights) {
   glm::vec3 ambient_light = clear_colour;
 
   glm::mat4 view_matrix = camera.getViewMatrix();

@@ -107,8 +107,8 @@ class Renderer {
   std::unordered_map<unsigned int, gpu::Texture*> texture_cache_;
   std::unordered_map<unsigned int, gpu::Batch*> batch_cache_;
 
-  void begin(Camera camera, std::vector<PointLight> point_lights,
-             std::vector<DirectionLight> direction_lights);
+  void uploadRenderData(Camera camera, std::vector<PointLight> point_lights,
+                        std::vector<DirectionLight> direction_lights);
   void drawShadowPass(std::vector<MeshPair> mesh_renderers,
                       std::vector<PointLight> point_lights,
                       std::vector<DirectionLight> direction_lights);
