@@ -89,6 +89,12 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
 }
 
 Renderer::~Renderer() {
+  for (auto [id, resource] : batch_cache_) {
+    delete resource;
+  }
+  for (auto [id, texture] : texture_cache_) {
+    delete texture;
+  }
   batch_cache_.clear();
   texture_cache_.clear();
 
