@@ -6,11 +6,11 @@
 #include <map>
 #include <optional>
 
-#include "../../components/MeshRenderer.h"
-#include "../../resources/IResource.h"
-#include "../../resources/Mesh.h"
-#include "../../resources/Texture.h"
 #include "../UUIDGenerator.h"
+#include "../components/MeshRenderer.h"
+#include "core/IResource.h"
+#include "core/Mesh.h"
+#include "core/Texture.h"
 
 using std::map;
 using std::string;

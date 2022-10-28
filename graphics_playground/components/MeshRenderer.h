@@ -1,6 +1,6 @@
 #pragma once
-#include "../resources/Material.h"
-#include "../resources/Mesh.h"
+#include "../resources/core/Material.h"
+#include "../resources/core/Mesh.h"
 #include "Transform.h"
 
 using std::string;

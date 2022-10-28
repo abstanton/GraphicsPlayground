@@ -3,8 +3,8 @@
 #include <iostream>
 #include <random>
 
-#include "../core/managers/ResourceManager.h"
-#include "../core/managers/ShaderManager.h"
+#include "../resources/ResourceManager.h"
+#include "../shaders/ShaderManager.h"
 
 Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
     : scr_width_(scr_width),

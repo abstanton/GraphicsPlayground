@@ -2,16 +2,16 @@
 #include <glm/glm.hpp>
 #include <map>
 
-#include "../Window.h"
+#include "Window.h"
 
 class GraphicsPlayground;
 
-class InputManager {
+class Input {
   friend GraphicsPlayground;
 
  public:
-  static InputManager& get() {
-    static InputManager input_manager;
+  static Input& get() {
+    static Input input_manager;
     return input_manager;
   }
 
@@ -21,7 +21,7 @@ class InputManager {
   glm::vec2 getScrollOffset();
 
  private:
-  InputManager() {}
+  Input() {}
 
   bool first_mouse_movement = true;
   double last_mouse_pos[2] = {0, 0};

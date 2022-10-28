@@ -4,16 +4,16 @@
 #include <iostream>
 #include <sstream>
 
-#include "../../shaders/blur.fs.h"
-#include "../../shaders/default.fs.h"
-#include "../../shaders/default.vs.h"
-#include "../../shaders/light.fs.h"
-#include "../../shaders/pbr.fs.h"
-#include "../../shaders/post.fs.h"
-#include "../../shaders/quad.vs.h"
-#include "../../shaders/shadow.fs.h"
-#include "../../shaders/shadow.vs.h"
-#include "../../shaders/ssao.fs.h"
+#include "core/blur.fs.h"
+#include "core/default.fs.h"
+#include "core/default.vs.h"
+#include "core/light.fs.h"
+#include "core/pbr.fs.h"
+#include "core/post.fs.h"
+#include "core/quad.vs.h"
+#include "core/shadow.fs.h"
+#include "core/shadow.vs.h"
+#include "core/ssao.fs.h"
 
 ShaderManager::ShaderManager() {
   std::cout << "Loading builtin shaders" << std::endl;

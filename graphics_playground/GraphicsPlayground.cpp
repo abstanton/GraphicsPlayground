@@ -3,14 +3,14 @@
 #include <iostream>
 
 #include "components/MeshRenderer.h"
-#include "resources/Material.h"
+#include "resources/core/Material.h"
 
 GraphicsPlayground::GraphicsPlayground()
     : resource_manager_(ResourceManager::get()) {
   system_manager = std::make_unique<SystemManager>(registry);
 
   window = std::make_unique<Window>(1920, 1280, "Graphics Playground");
-  InputManager& input_manager = InputManager::get();
+  Input& input_manager = Input::get();
   input_manager.setWindow(window.get());
   window->setMouseMovementCallback(
       [&](double x, double y) { input_manager.mouseMoveCallback(x, y); });

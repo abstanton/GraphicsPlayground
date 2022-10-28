@@ -6,8 +6,8 @@
 #include "../components/MeshRenderer.h"
 #include "../components/PointLight.h"
 #include "../gpu/GPUBackend.h"
-#include "../resources/Material.h"
-#include "../resources/Texture.h"
+#include "../resources/core/Material.h"
+#include "../resources/core/Texture.h"
 
 #define MAX_POINT_LIGHTS 100
 #define MAX_DIRECTION_LIGHTS 100

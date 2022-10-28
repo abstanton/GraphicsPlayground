@@ -2,8 +2,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "../../gpu/GPUBackend.h"
-#include "../../resources/Material.h"
+#include "../gpu/GPUBackend.h"
+#include "../resources/core/Material.h"
 
 using std::string;
 

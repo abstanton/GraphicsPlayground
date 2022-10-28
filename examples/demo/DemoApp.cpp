@@ -1,6 +1,6 @@
 #include "DemoApp.h"
 
-#include <core/managers/ShaderManager.h>
+#include <shaders/ShaderManager.h>
 
 #include "components/RotateComponent.h"
 

@@ -1,11 +1,11 @@
 #pragma once
-#include "core/Window.h"
-#include "core/managers/InputManager.h"
-#include "core/managers/ResourceManager.h"
-#include "core/managers/SystemManager.h"
 #include "ecs/Registry.hpp"
+#include "platform/Input.h"
+#include "platform/Window.h"
 #include "renderer/Renderer.h"
-#include "systems/RenderSystem.h"
+#include "resources/ResourceManager.h"
+#include "systems/SystemManager.h"
+#include "systems/core/RenderSystem.h"
 
 class GraphicsPlayground {
  public:

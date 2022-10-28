@@ -1,6 +1,6 @@
-#include "InputManager.h"
+#include "Input.h"
 
-glm::vec2 InputManager::getMouseMovement() {
+glm::vec2 Input::getMouseMovement() {
   double xpos = input_state_.mouse_position[0];
   double ypos = input_state_.mouse_position[1];
 
@@ -14,7 +14,7 @@ glm::vec2 InputManager::getMouseMovement() {
   return {xoffset, yoffset};
 }
 
-glm::vec2 InputManager::getScrollOffset() {
+glm::vec2 Input::getScrollOffset() {
   glm::vec2 output = {input_state_.scroll_offset[0],
                       input_state_.scroll_offset[1]};
   input_state_.scroll_offset[0] = 0;
@@ -22,7 +22,7 @@ glm::vec2 InputManager::getScrollOffset() {
   return output;
 }
 
-KeyState InputManager::getKeyState(Key key) const {
+KeyState Input::getKeyState(Key key) const {
   if (window_ == nullptr) {
     return KeyState::UP;
   }

@@ -1,7 +1,7 @@
 #include "CameraMovementSystem.h"
 
 #include <components/Camera.h>
-#include <core/managers/InputManager.h>
+#include <platform/Input.h>
 
 void CameraMovementSystem::onConfigure(ecs::Registry& registry) {
   registry.view<Camera>().each(
@@ -11,7 +11,7 @@ void CameraMovementSystem::onConfigure(ecs::Registry& registry) {
 void CameraMovementSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   Camera& camera = registry.getComponent<Camera>(camera_entity);
 
-  InputManager& input = InputManager::get();
+  Input& input = Input::get();
 
   glm::vec2 mouse_movement = input.getMouseMovement();
   glm::vec2 scroll_offset = input.getScrollOffset();
