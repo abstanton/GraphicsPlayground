@@ -17,21 +17,35 @@
 
 ShaderManager::ShaderManager() {
   std::cout << "Loading builtin shaders" << std::endl;
-  gpu::Backend* backend = gpu::Backend::get();
-  builtin_shaders_["blur"] = backend->compileShaderProgram(quad_vs, blur_fs);
-  builtin_shaders_["default"] = backend->compileShaderProgram(def_vs, def_fs);
-  builtin_shaders_["depth"] = backend->compileShaderProgram(def_vs, shadow_fs);
+  builtin_shaders_["blur"] =
+      this->compileVertFragShaderProgram(quad_vs, blur_fs);
+  builtin_shaders_["default"] =
+      this->compileVertFragShaderProgram(def_vs, def_fs);
+  builtin_shaders_["depth"] =
+      this->compileVertFragShaderProgram(def_vs, shadow_fs);
   builtin_shaders_["emissive"] =
-      backend->compileShaderProgram(def_vs, light_fs);
-  builtin_shaders_["pbr"] = backend->compileShaderProgram(def_vs, pbr_fs);
-  builtin_shaders_["post"] = backend->compileShaderProgram(quad_vs, post_fs);
-  builtin_shaders_["ssao"] = backend->compileShaderProgram(quad_vs, ssao_fs);
+      this->compileVertFragShaderProgram(def_vs, light_fs);
+  builtin_shaders_["pbr"] = this->compileVertFragShaderProgram(def_vs, pbr_fs);
+  builtin_shaders_["post"] =
+      this->compileVertFragShaderProgram(quad_vs, post_fs);
+  builtin_shaders_["ssao"] =
+      this->compileVertFragShaderProgram(quad_vs, ssao_fs);
   builtin_shaders_["shadow"] =
-      backend->compileShaderProgram(shadow_vs, shadow_fs);
+      this->compileVertFragShaderProgram(shadow_vs, shadow_fs);
   std::cout << "Finished" << std::endl;
 }
 
-gpu::Shader* ShaderManager::getShader(string name) const {
+gpu::ShaderProgram* ShaderManager::compileVertFragShaderProgram(
+    const char* vs_source, const char* fs_source) const {
+  gpu::ShaderProgram* shader_program =
+      gpu::Backend::get()->allocShaderProgram();
+  shader_program->addShaderFromSource(gpu::ShaderType::VERT, vs_source);
+  shader_program->addShaderFromSource(gpu::ShaderType::FRAG, fs_source);
+  shader_program->link();
+  return shader_program;
+}
+
+gpu::ShaderProgram* ShaderManager::getShader(string name) const {
   if (builtin_shaders_.find(name) != builtin_shaders_.end()) {
     return (*builtin_shaders_.find(name)).second;
   }
@@ -60,8 +74,8 @@ string ShaderManager::getShaderName(BuiltinShader type) const {
   }
 }
 
-gpu::Shader* ShaderManager::compileFromFiles(const char* vs_filename,
-                                             const char* fs_filename) const {
+gpu::ShaderProgram* ShaderManager::compileFromFiles(
+    const char* vs_filename, const char* fs_filename) const {
   gpu::Backend* backend = gpu::Backend::get();
   std::string vertex_code;
   std::string fragment_code;
@@ -89,12 +103,12 @@ gpu::Shader* ShaderManager::compileFromFiles(const char* vs_filename,
     return nullptr;
   }
 
-  return backend->compileShaderProgram(vertex_code.c_str(), def_fs);
+  return compileVertFragShaderProgram(vertex_code.c_str(), def_fs);
 }
 
 bool ShaderManager::addShaderProgram(const char* vs_filename,
                                      const char* fs_filename, string name) {
-  gpu::Shader* shader = compileFromFiles(vs_filename, fs_filename);
+  gpu::ShaderProgram* shader = compileFromFiles(vs_filename, fs_filename);
   if (shader != nullptr) {
     custom_shaders_[name] = shader;
     return true;

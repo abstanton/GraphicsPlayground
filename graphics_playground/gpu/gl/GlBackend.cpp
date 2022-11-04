@@ -37,9 +37,9 @@ Batch* GlBackend::allocBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff) {
   return new GlBatch(vert_buff, index_buff);
 }
 
-Shader* GlBackend::compileShaderProgram(const char* vs_source,
-                                        const char* fs_source) {
-  return new GlShader(vs_source, fs_source);
+ShaderProgram* GlBackend::allocShaderProgram() {
+  auto shader_program = new GlShaderProgram();
+  return shader_program;
 }
 
 Texture* GlBackend::generateTexture(TextureType type, TextureFormat format,

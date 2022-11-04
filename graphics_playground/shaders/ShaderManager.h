@@ -23,7 +23,7 @@ class ShaderManager {
     return shader_manager;
   }
 
-  gpu::Shader* getShader(string name) const;
+  gpu::ShaderProgram* getShader(string name) const;
   string getShaderName(BuiltinShader type) const;
   Material getMaterialForBuiltin(BuiltinShader type) const;
   bool addShaderProgram(const char* vs_filename, const char* fs_filename,
@@ -32,9 +32,12 @@ class ShaderManager {
  private:
   ShaderManager();
 
-  gpu::Shader* compileFromFiles(const char* vs_filename,
-                                const char* fs_filename) const;
+  gpu::ShaderProgram* compileFromFiles(const char* vs_filename,
+                                       const char* fs_filename) const;
 
-  std::unordered_map<string, gpu::Shader*> custom_shaders_;
-  std::unordered_map<string, gpu::Shader*> builtin_shaders_;
+  gpu::ShaderProgram* ShaderManager::compileVertFragShaderProgram(
+      const char* vs_source, const char* fs_source) const;
+
+  std::unordered_map<string, gpu::ShaderProgram*> custom_shaders_;
+  std::unordered_map<string, gpu::ShaderProgram*> builtin_shaders_;
 };

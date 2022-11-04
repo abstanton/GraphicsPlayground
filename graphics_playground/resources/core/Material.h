@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../components/Transform.h"
-#include "../gpu/GPUShader.h"
+#include "../gpu/GPUShaderProgram.h"
 
 /*
         Represents the following glsl:

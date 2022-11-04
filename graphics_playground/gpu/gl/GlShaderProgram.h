@@ -7,18 +7,26 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
-#include "../GPUShader.h"
+#include "../GPUShaderProgram.h"
 
 namespace gpu {
-class GlShader : public Shader {
+
+struct GlShader {
+  GLuint id;
+};
+
+class GlShaderProgram : public ShaderProgram {
  public:
-  static std::optional<GlShader> fromFilepaths(
+  static std::optional<GlShaderProgram> fromFilepaths(
       const std::string& vertexShaderPath,
       const std::string& fragmentShaderPath);
 
-  GlShader(const char* vertexSource, const char* fragmentSource);
+  GlShaderProgram();
   void use() const override;
+  void link() override;
+  void addShaderFromSource(ShaderType, const char*) override;
   void setTexture(const char* name, const gpu::Texture* texture) const override;
   void setBool(const std::string& name, const bool value) const override;
   void setInt(const std::string& name, const int value) const override;
@@ -32,6 +40,8 @@ class GlShader : public Shader {
   void setMat3(const std::string& name, const glm::mat3& value) const override;
   void setMat4(const std::string& name, const glm::mat4& value) const override;
 
-  unsigned int shaderProgram_ = 0;
+ private:
+  unsigned int shader_program_ = 0;
+  std::unordered_map<GLuint, GlShader> shaders_;
 };
 }  // namespace gpu

@@ -241,7 +241,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
 
   backend_->clear(gpu::ClearType::COLOR);
   for (auto&& [mc, transform] : mesh_renderers) {
-    gpu::Shader* shader =
+    gpu::ShaderProgram* shader =
         ShaderManager::get().getShader(mc.material_comp_.shader_name);
     shader->use();
     setShaderInputsForMaterial(mc.material_comp_, shader);
@@ -385,7 +385,7 @@ gpu::Batch* Renderer::retrieveMeshGPUBatch(const Mesh* mesh) {
 }
 
 void Renderer::setShaderInputsForMaterial(const Material& mat,
-                                          gpu::Shader* shader) {
+                                          gpu::ShaderProgram* shader) {
   for (auto&& [name, input] : mat.colour_inputs) {
     if (input.use_tex) {
       shader->setBool(name + "_use_tex", true);

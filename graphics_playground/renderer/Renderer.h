@@ -66,11 +66,11 @@ class Renderer {
   ~Renderer();
 
  private:
-  gpu::Shader* ao_shader_;
-  gpu::Shader* blur_shader_;
-  gpu::Shader* depth_shader_;
-  gpu::Shader* screen_quad_shader_;
-  gpu::Shader* shadow_shader_;
+  gpu::ShaderProgram* ao_shader_;
+  gpu::ShaderProgram* blur_shader_;
+  gpu::ShaderProgram* depth_shader_;
+  gpu::ShaderProgram* screen_quad_shader_;
+  gpu::ShaderProgram* shadow_shader_;
 
   gpu::Texture* ao_texture_;
   gpu::Texture* blurred_ao_texture_;
@@ -114,7 +114,8 @@ class Renderer {
                       std::vector<DirectionLight> direction_lights);
   void drawMainPass(std::vector<MeshPair> mesh_renderers);
 
-  void setShaderInputsForMaterial(const Material& mat, gpu::Shader* shader);
+  void setShaderInputsForMaterial(const Material& mat,
+                                  gpu::ShaderProgram* shader);
 
   std::vector<glm::vec3> getSSAOKernel(int num_samples) const;
   std::vector<glm::vec3> getSSAONoise(int num_samples) const;

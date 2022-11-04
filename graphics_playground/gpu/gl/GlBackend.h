@@ -3,7 +3,7 @@
 #include "GlBatch.h"
 #include "GlFrameBuffer.h"
 #include "GlIndexBuffer.h"
-#include "GlShader.h"
+#include "GlShaderProgram.h"
 #include "GlTexture.h"
 #include "GlUniformBuffer.h"
 #include "GlVertexArray.h"
@@ -23,8 +23,7 @@ class GlBackend : public Backend {
   Batch* allocBatch(VertexBuffer* vert_buff) override;
   Batch* allocBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff) override;
 
-  Shader* compileShaderProgram(const char* vs_source,
-                               const char* fs_source) override;
+  ShaderProgram* allocShaderProgram() override;
 
   Texture* generateTexture(
       TextureType type, TextureFormat format, DataType data_type,

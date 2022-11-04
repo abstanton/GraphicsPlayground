@@ -5,9 +5,24 @@
 #include "GPUTexture.h"
 
 namespace gpu {
-class Shader {
+enum class ShaderType { FRAG, VERT, COMPUTE, GEOM };
+
+class ShaderProgram {
+  /*
+  TODO:
+  1. Rename to ShaderProgram
+  2. Add these methods
+  addShaderFromSource(enum class ShaderType, const char* source)
+  link()
+  3. Replace source
+  4. Ready for adding compute shaders
+  */
  public:
   virtual void use() const = 0;
+  virtual void link() = 0;
+
+  virtual void addShaderFromSource(ShaderType, const char*) = 0;
+
   virtual void setTexture(const char* name,
                           const gpu::Texture* texture) const = 0;
   virtual void setBool(const std::string& name, const bool value) const = 0;

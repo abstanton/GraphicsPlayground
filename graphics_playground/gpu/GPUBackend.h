@@ -4,7 +4,7 @@
 #include "GPUBatch.h"
 #include "GPUFrameBuffer.h"
 #include "GPUIndexBuffer.h"
-#include "GPUShader.h"
+#include "GPUShaderProgram.h"
 #include "GPUTexture.h"
 #include "GPUUniformBuffer.h"
 #include "GPUVertexBuffer.h"
@@ -28,12 +28,12 @@ class Backend {
 
   virtual FrameBuffer* defaultFrameBuffer() = 0;
   virtual FrameBuffer* allocFrameBuffer() = 0;
+
   virtual UniformBuffer* allocUniformBuffer(size_t size) = 0;
   virtual IndexBuffer* allocIndexBuffer() = 0;
   virtual VertexBuffer* allocVertexBuffer() = 0;
 
-  virtual Shader* compileShaderProgram(const char* vs_source,
-                                       const char* fs_source) = 0;
+  virtual ShaderProgram* allocShaderProgram() = 0;
 
   virtual Batch* allocBatch(VertexBuffer* vert_buff) = 0;
   virtual Batch* allocBatch(VertexBuffer* vert_buff,

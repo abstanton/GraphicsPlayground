@@ -37,6 +37,7 @@ void GraphicsPlayground::run() {
 
   system_manager->configure();
   while (!glfwWindowShouldClose(window->window_)) {
+    // TODO Refactor this into window
     glfwSwapBuffers(window->window_);
     glfwPollEvents();
 
@@ -47,6 +48,8 @@ void GraphicsPlayground::run() {
     system_manager->update(delta_time);
     system_manager->render();
   }
+
+  // TODO Refactor into window destructor
   glfwTerminate();
   return;
 }
