@@ -26,7 +26,12 @@ class GlShaderProgram : public ShaderProgram {
   GlShaderProgram();
   void use() const override;
   void link() override;
+
   void addShaderFromSource(ShaderType, const char*) override;
+
+  void dispatch(int num_groups_x, int num_groups_y,
+                int num_groups_z) const override;
+
   void setTexture(const char* name, const gpu::Texture* texture) const override;
   void setBool(const std::string& name, const bool value) const override;
   void setInt(const std::string& name, const int value) const override;

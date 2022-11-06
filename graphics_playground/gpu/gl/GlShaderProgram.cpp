@@ -45,51 +45,6 @@ std::optional<GlShaderProgram> GlShaderProgram::fromFilepaths(
 
 GlShaderProgram::GlShaderProgram() { shader_program_ = glCreateProgram(); }
 
-// GlShaderProgram::GlShaderProgram() {
-//   int success;
-//   char infoLog[512];
-
-//   unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-//   glShaderSource(vertexShader, 1, &vertexSource, NULL);
-
-//   unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-//   glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-
-//   glCompileShader(vertexShader);
-//   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-//   if (!success) {
-//     glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-//     std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-//               << infoLog << std::endl;
-//     return;
-//   }
-
-//   glCompileShader(fragmentShader);
-//   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-//   if (!success) {
-//     glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-//     std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-//               << infoLog << std::endl;
-//     return;
-//   }
-
-//   shaderProgram_ = glCreateProgram();
-//   glAttachShader(shaderProgram_, vertexShader);
-//   glAttachShader(shaderProgram_, fragmentShader);
-//   glLinkProgram(shaderProgram_);
-
-//   glGetShaderiv(shaderProgram_, GL_LINK_STATUS, &success);
-//   if (!success) {
-//     glGetProgramInfoLog(shaderProgram_, 512, NULL, infoLog);
-//     std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-//               << infoLog << std::endl;
-//     return;
-//   }
-
-//   glDeleteShader(vertexShader);
-//   glDeleteShader(fragmentShader);
-// }
-
 GLuint glShaderTypeFromShaderType(ShaderType type) {
   switch (type) {
     case ShaderType::FRAG:
@@ -143,6 +98,12 @@ void GlShaderProgram::addShaderFromSource(ShaderType type, const char* source) {
 }
 
 void GlShaderProgram::use() const { glUseProgram(shader_program_); }
+
+void GlShaderProgram::dispatch(int num_groups_x, int num_groups_y,
+                               int num_groups_z) const {
+  this->use();
+  glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+}
 
 void GlShaderProgram::setTexture(const char* name,
                                  const gpu::Texture* texture) const {

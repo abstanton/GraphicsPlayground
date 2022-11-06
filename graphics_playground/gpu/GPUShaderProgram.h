@@ -23,6 +23,9 @@ class ShaderProgram {
 
   virtual void addShaderFromSource(ShaderType, const char*) = 0;
 
+  virtual void dispatch(int num_groups_x, int num_groups_y,
+                        int num_groups_z) const = 0;
+
   virtual void setTexture(const char* name,
                           const gpu::Texture* texture) const = 0;
   virtual void setBool(const std::string& name, const bool value) const = 0;
