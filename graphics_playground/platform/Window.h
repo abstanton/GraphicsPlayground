@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../gpu/GPUBackend.h"
+#include <GLFW/glfw3.h>
 
 #include <functional>
 #include <vector>
 
-#include "../gpu/GPUBackend.h"
-#include <GLFW/glfw3.h>
 
 using MouseMoveCallback = std::function<void(double, double)>;
 using ScrollOffsetCallback = std::function<void(double, double)>;
@@ -65,6 +65,13 @@ class Window {
 
  public:
   Window(int width, int height, const char* title);
+
+  virtual ~Window();
+
+  void pollEvents();
+  void swapBuffers();
+
+  bool shouldClose();
 
   void setMouseMovementCallback(MouseMoveCallback);
   void setScrollOffsetCallback(ScrollOffsetCallback);

@@ -16,13 +16,6 @@ GraphicsPlayground::GraphicsPlayground()
       [&](double x, double y) { input_manager.mouseMoveCallback(x, y); });
   window->setScrollOffsetCallback(
       [&](double x, double y) { input_manager.scrollCallback(x, y); });
-
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cout << "Failed to initialize GLAD" << std::endl;
-    return;
-  }
-
-  glEnable(GL_DEPTH_TEST);
 }
 
 void GraphicsPlayground::run() {
@@ -36,10 +29,10 @@ void GraphicsPlayground::run() {
   this->load();
 
   system_manager->configure();
-  while (!glfwWindowShouldClose(window->window_)) {
+  while (!window->shouldClose()) {
     // TODO Refactor this into window
-    glfwSwapBuffers(window->window_);
-    glfwPollEvents();
+    window->swapBuffers();
+    window->pollEvents();
 
     float current_frame = static_cast<float>(glfwGetTime());
     delta_time = current_frame - last_time;
@@ -49,7 +42,5 @@ void GraphicsPlayground::run() {
     system_manager->render();
   }
 
-  // TODO Refactor into window destructor
-  glfwTerminate();
   return;
 }

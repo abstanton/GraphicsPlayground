@@ -11,6 +11,14 @@ void Window::scrollCallback(GLFWwindow* window, double x_offset,
       ->scroll_callback_(x_offset, y_offset);
 }
 
+Window::~Window() { glfwTerminate(); }
+
+void Window::pollEvents() { glfwPollEvents(); }
+
+void Window::swapBuffers() { glfwSwapBuffers(window_); }
+
+bool Window::shouldClose() { return glfwWindowShouldClose(window_); }
+
 Window::Window(int width, int height, const char* title)
     : width(width), height(height) {
   glfwInit();
@@ -30,6 +38,10 @@ Window::Window(int width, int height, const char* title)
 
   glfwMakeContextCurrent(window_);
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    return;
+  }
 }
 
 void Window::setMouseMovementCallback(MouseMoveCallback func) {
