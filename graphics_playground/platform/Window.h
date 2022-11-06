@@ -64,7 +64,7 @@ class Window {
   friend GraphicsPlayground;
 
  public:
-  Window(int width, int height, const char* title);
+  Window(int width, int height, const char* title, bool hide_cursor = true);
 
   virtual ~Window();
 
