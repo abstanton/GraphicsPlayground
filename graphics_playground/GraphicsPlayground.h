@@ -21,6 +21,7 @@ class GraphicsPlayground {
   float last_time;
 
   std::unique_ptr<Window> window;
+  std::unique_ptr<Renderer> renderer;
   std::unique_ptr<SystemManager> system_manager;
   ResourceManager& resource_manager_;
 

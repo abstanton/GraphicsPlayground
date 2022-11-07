@@ -21,71 +21,82 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   screen_quad_shader_ = ShaderManager::get().getShader("post");
   shadow_shader_ = ShaderManager::get().getShader("shadow");
 
-  camera_uniform_buffer_ =
-      backend_->allocUniformBuffer(sizeof(GPUCameraBuffer));
-  lights_uniform_buffer_ = backend_->allocUniformBuffer(sizeof(GPULightBuffer));
+  camera_uniform_buffer_.reset(
+      backend_->allocUniformBuffer(sizeof(GPUCameraBuffer)));
+  lights_uniform_buffer_.reset(
+      backend_->allocUniformBuffer(sizeof(GPULightBuffer)));
 
-  shadow_frame_buffer_ = backend_->allocFrameBuffer();
-  ss_frame_buffer_ = backend_->allocFrameBuffer();
-  colour_frame_buffer_ = backend_->allocFrameBuffer();
-  default_frame_buffer_ = backend_->defaultFrameBuffer();
+  shadow_frame_buffer_.reset(backend_->allocFrameBuffer());
+  ss_frame_buffer_.reset(backend_->allocFrameBuffer());
+  colour_frame_buffer_.reset(backend_->allocFrameBuffer());
+  default_frame_buffer_.reset(backend_->defaultFrameBuffer());
 
-  shadow_map_texture_ = backend_->generateTexture(
+  auto ssao_noise = getSSAONoise(16);
+  ssao_noise_texture_.reset(backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
+      gpu::DataType::FLOAT, 4, 4, 1, 1, 1, ssao_noise.data()));
+  ssao_samples_ = getSSAOKernel(64);
+
+  quad_batch_.reset(allocScreenQuadBatch());
+
+  this->resizeViewport(scr_width, scr_height);
+}
+
+void Renderer::resizeViewport(int width, int height) {
+  backend_->setViewport(0, 0, width, height);
+
+  scr_width_ = width;
+  scr_height_ = height;
+
+  shadow_map_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
       MAX_DIRECTION_SHADOWS, nullptr, gpu::TextureFilter::NEAREST,
       gpu::TextureFilter::NEAREST, gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER);
-  ao_texture_ = backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER));
+  ao_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
       gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER);
-  blurred_ao_texture_ = backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER));
+  blurred_ao_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
       gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER);
-  blurred_colour_texture_ = backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER));
+  blurred_colour_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
-      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
-  depth_texture_ = backend_->generateTexture(
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr));
+  depth_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
       gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER);
-  normal_texture_ = backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER));
+  normal_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
       gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER);
-  colour_texture_ = backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER));
+  colour_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
-      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
-
-  auto ssao_noise = getSSAONoise(16);
-  ssao_noise_texture_ = backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
-      gpu::DataType::FLOAT, 4, 4, 1, 1, 1, ssao_noise.data());
-  ssao_samples_ = getSSAOKernel(64);
-
-  quad_batch_ = allocScreenQuadBatch();
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr));
 
   colour_frame_buffer_->addAttachment(
-      gpu::FrameBufferAttachmentType::DepthAttachment, {depth_texture_, 0, 0});
+      gpu::FrameBufferAttachmentType::DepthAttachment,
+      {depth_texture_.get(), 0, 0});
   colour_frame_buffer_->addAttachment(
       gpu::FrameBufferAttachmentType::ColorAttachment0,
-      {colour_texture_, 0, 0});
+      {colour_texture_.get(), 0, 0});
   colour_frame_buffer_->addAttachment(
       gpu::FrameBufferAttachmentType::ColorAttachment1,
-      {normal_texture_, 0, 0});
-
+      {normal_texture_.get(), 0, 0});
   ss_frame_buffer_->addAttachment(
-      gpu::FrameBufferAttachmentType::ColorAttachment0, {ao_texture_, 0, 0});
+      gpu::FrameBufferAttachmentType::ColorAttachment0,
+      {ao_texture_.get(), 0, 0});
 }
 
 Renderer::~Renderer() {
@@ -97,11 +108,6 @@ Renderer::~Renderer() {
   }
   batch_cache_.clear();
   texture_cache_.clear();
-
-  delete shadow_map_texture_;
-  delete shadow_frame_buffer_;
-  delete lights_uniform_buffer_;
-  delete camera_uniform_buffer_;
 }
 
 void Renderer::draw(Camera camera, std::vector<MeshPair> mesh_pairs,
@@ -181,7 +187,7 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
     // Attach appropriate layer of depth texture array
     shadow_frame_buffer_->addAttachment(
         gpu::FrameBufferAttachmentType::DepthAttachment,
-        {shadow_map_texture_, i, 0});
+        {shadow_map_texture_.get(), i, 0});
     shadow_frame_buffer_->bind();
     // clear texture before drawing depth
     backend_->clear(gpu::ClearType::DEPTH);
@@ -258,7 +264,8 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   // -------- Screen Space Effects ---------
   // -------- SSAO -----------
   ss_frame_buffer_->addAttachment(
-      gpu::FrameBufferAttachmentType::ColorAttachment0, {ao_texture_, 0, 0});
+      gpu::FrameBufferAttachmentType::ColorAttachment0,
+      {ao_texture_.get(), 0, 0});
   ss_frame_buffer_->bind();
   ao_shader_->use();
   ao_shader_->setVec3Arr("samples", ssao_samples_.data(), 64);
@@ -269,7 +276,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   // // blur
   ss_frame_buffer_->addAttachment(
       gpu::FrameBufferAttachmentType::ColorAttachment0,
-      {blurred_ao_texture_, 0, 0});
+      {blurred_ao_texture_.get(), 0, 0});
   ss_frame_buffer_->bind();
   blur_shader_->use();
   ao_texture_->bind(0);

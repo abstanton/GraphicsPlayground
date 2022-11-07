@@ -58,6 +58,8 @@ struct GPUCameraBuffer {
 
 class Renderer {
  public:
+  void resizeViewport(int width, int height);
+
   void draw(Camera camera, std::vector<MeshPair> mesh_renderers,
             std::vector<PointLight> point_lights,
             std::vector<DirectionLight> direction_lights);
@@ -72,26 +74,26 @@ class Renderer {
   gpu::ShaderProgram* screen_quad_shader_;
   gpu::ShaderProgram* shadow_shader_;
 
-  gpu::Texture* ao_texture_;
-  gpu::Texture* blurred_ao_texture_;
-  gpu::Texture* blurred_colour_texture_;
-  gpu::Texture* colour_texture_;
-  gpu::Texture* depth_texture_;
-  gpu::Texture* normal_texture_;
-  gpu::Texture* shadow_map_texture_;
+  std::unique_ptr<gpu::Texture> ao_texture_;
+  std::unique_ptr<gpu::Texture> blurred_ao_texture_;
+  std::unique_ptr<gpu::Texture> blurred_colour_texture_;
+  std::unique_ptr<gpu::Texture> colour_texture_;
+  std::unique_ptr<gpu::Texture> depth_texture_;
+  std::unique_ptr<gpu::Texture> normal_texture_;
+  std::unique_ptr<gpu::Texture> shadow_map_texture_;
 
-  gpu::Texture* ssao_noise_texture_;
+  std::unique_ptr<gpu::Texture> ssao_noise_texture_;
   std::vector<glm::vec3> ssao_samples_;
 
-  gpu::FrameBuffer* shadow_frame_buffer_;
-  gpu::FrameBuffer* ss_frame_buffer_;
-  gpu::FrameBuffer* colour_frame_buffer_;
-  gpu::FrameBuffer* default_frame_buffer_;
+  std::unique_ptr<gpu::FrameBuffer> shadow_frame_buffer_;
+  std::unique_ptr<gpu::FrameBuffer> ss_frame_buffer_;
+  std::unique_ptr<gpu::FrameBuffer> colour_frame_buffer_;
+  std::unique_ptr<gpu::FrameBuffer> default_frame_buffer_;
 
-  gpu::UniformBuffer* camera_uniform_buffer_;
-  gpu::UniformBuffer* lights_uniform_buffer_;
+  std::unique_ptr<gpu::UniformBuffer> camera_uniform_buffer_;
+  std::unique_ptr<gpu::UniformBuffer> lights_uniform_buffer_;
 
-  gpu::Batch* quad_batch_;
+  std::unique_ptr<gpu::Batch> quad_batch_;
 
   gpu::Backend* backend_;
 

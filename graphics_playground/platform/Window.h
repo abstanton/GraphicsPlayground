@@ -9,6 +9,7 @@
 
 using MouseMoveCallback = std::function<void(double, double)>;
 using ScrollOffsetCallback = std::function<void(double, double)>;
+using ResizeCallback = std::function<void(int, int)>;
 
 class GraphicsPlayground;
 
@@ -75,12 +76,14 @@ class Window {
 
   void setMouseMovementCallback(MouseMoveCallback);
   void setScrollOffsetCallback(ScrollOffsetCallback);
+  void setResizeCallback(ResizeCallback);
   KeyState getKeyState(Key key) const;
 
  private:
   GLFWwindow* window_;
   MouseMoveCallback mouse_callback_;
   ScrollOffsetCallback scroll_callback_;
+  ResizeCallback resize_callback_;
 
   int width;
   int height;
@@ -89,6 +92,8 @@ class Window {
                                 double yposIn);
   static void scrollCallback(GLFWwindow* window, double xoffset,
                              double yoffset);
+
+  static void resizeCallback(GLFWwindow* window, int width, int height);
 
   KeyState processGlfwKey(int glfw_key) const;
 };

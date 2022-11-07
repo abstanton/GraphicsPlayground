@@ -12,10 +12,7 @@ Window::Window(int width, int height, const char* title, bool hide_cursor)
   glfwSetWindowUserPointer(window_, this);
   glfwSetCursorPosCallback(window_, &Window::mouseMoveCallback);
   glfwSetScrollCallback(window_, &Window::scrollCallback);
-  glfwSetFramebufferSizeCallback(
-      window_, [](GLFWwindow* window, int width, int height) {
-        gpu::Backend::get()->setViewport(0, 0, width, height);
-      });
+  glfwSetFramebufferSizeCallback(window_, &Window::resizeCallback);
 
   glfwMakeContextCurrent(window_);
 
@@ -28,6 +25,11 @@ Window::Window(int width, int height, const char* title, bool hide_cursor)
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     return;
   }
+}
+
+void Window::resizeCallback(GLFWwindow* window, int x_pos, int y_pos) {
+  static_cast<Window*>(glfwGetWindowUserPointer(window))
+      ->resize_callback_(x_pos, y_pos);
 }
 
 void Window::mouseMoveCallback(GLFWwindow* window, double x_pos, double y_pos) {
@@ -56,6 +58,8 @@ void Window::setMouseMovementCallback(MouseMoveCallback func) {
 void Window::setScrollOffsetCallback(ScrollOffsetCallback func) {
   scroll_callback_ = func;
 }
+
+void Window::setResizeCallback(ResizeCallback func) { resize_callback_ = func; }
 
 KeyState Window::processGlfwKey(int glfw_key) const {
   int glfw_state = glfwGetKey(window_, glfw_key);

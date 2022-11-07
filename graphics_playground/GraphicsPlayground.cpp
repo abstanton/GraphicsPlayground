@@ -16,13 +16,13 @@ GraphicsPlayground::GraphicsPlayground()
       [&](double x, double y) { input_manager.mouseMoveCallback(x, y); });
   window->setScrollOffsetCallback(
       [&](double x, double y) { input_manager.scrollCallback(x, y); });
+  renderer = std::make_unique<Renderer>(1920, 1280, glm::vec3(0.2, 0.2, 0.2));
+  window->setResizeCallback(
+      [&](int x, int y) { renderer->resizeViewport(x, y); });
 }
 
 void GraphicsPlayground::run() {
-  // TODO: Refactor resolution into window, add renderer resize callback to
-  // window resize callback
-  Renderer renderer(1920, 1280, glm::vec3(0.2, 0.2, 0.2));
-  RenderSystem render_system(&renderer);
+  RenderSystem render_system(renderer.get());
   system_manager->addSystem(&render_system);
 
   this->setup();
