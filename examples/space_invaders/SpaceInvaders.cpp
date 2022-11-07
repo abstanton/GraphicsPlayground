@@ -5,7 +5,7 @@
 #include "components/PlayerComponent.h"
 
 void SpaceInvaders::setup() {
-  renderer->setClearColour({0.4, 0.4, 0.4});
+  renderer->setClearColour({0.0, 0.0, 0.0});
 
   MeshRenderer spaceship_mesh =
       resource_manager_.loadObject("meshes\\Spaceship.fbx", "spaceship")[0];
@@ -26,7 +26,7 @@ void SpaceInvaders::setup() {
   spaceship_material.setFloatInput("roughness", "spaceship_roughness");
 
   MeshRenderer bullet_mesh =
-      resource_manager_.loadObject("meshes\\cube.obj", "cube")[0];
+      resource_manager_.loadObject("meshes\\sphere.obj", "sphere")[0];
   Material bullet_material =
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::EMISSIVE);
   bullet_material.setColourInput("colour", glm::vec3(10.0f, 5.0f, 5.0f));

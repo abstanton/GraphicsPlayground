@@ -114,18 +114,18 @@ Renderer::~Renderer() {
   texture_cache_.clear();
 }
 
-void Renderer::draw(Camera camera, std::vector<MeshPair> mesh_pairs,
-                    std::vector<PointLight> point_lights,
-                    std::vector<DirectionLight> direction_lights) {
+void Renderer::draw(const Camera& camera, const std::vector<MeshPair>& mesh_pairs,
+                    const std::vector<PointLight>& point_lights,
+                    const std::vector<DirectionLight>& direction_lights) {
   backend_->clear(gpu::ClearType::ALL);
   uploadRenderData(camera, point_lights, direction_lights);
   drawShadowPass(mesh_pairs, point_lights, direction_lights);
   drawMainPass(mesh_pairs);
 }
 
-void Renderer::uploadRenderData(Camera camera,
-                                std::vector<PointLight> point_lights,
-                                std::vector<DirectionLight> direction_lights) {
+void Renderer::uploadRenderData(const Camera& camera,
+                                const std::vector<PointLight>& point_lights,
+                                const std::vector<DirectionLight>& direction_lights) {
   glm::vec3 ambient_light = clear_colour;
 
   glm::mat4 view_matrix = camera.getViewMatrix();
@@ -172,9 +172,9 @@ void Renderer::uploadRenderData(Camera camera,
   camera_uniform_buffer_->uploadData(&gpu_camera_buffer_);
 }
 
-void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
-                              std::vector<PointLight> point_lights,
-                              std::vector<DirectionLight> direction_lights) {
+void Renderer::drawShadowPass(const std::vector<MeshPair>& mesh_renderers,
+                              const std::vector<PointLight>& point_lights,
+                              const std::vector<DirectionLight>& direction_lights) {
   shadow_frame_buffer_->bind();
   backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
   shadow_shader_->use();
@@ -218,7 +218,7 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
   glCullFace(GL_BACK);
 }
 
-void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
+void Renderer::drawMainPass(const std::vector<MeshPair>& mesh_renderers) {
   colour_frame_buffer_->bind();
   backend_->setViewport(0, 0, scr_width_, scr_height_);
 

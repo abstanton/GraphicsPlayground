@@ -34,26 +34,21 @@ struct Transform {
     dirty = true;
   }
 
-  glm::vec3 position() { return pos; }
+  glm::vec3 position() const { return pos; }
 
-  glm::vec3 euler() { return glm::eulerAngles(rot); }
+  glm::vec3 euler() const { return glm::eulerAngles(rot); }
 
-  glm::vec2 scale() { return sca; }
+  glm::vec2 scale() const { return sca; }
 
-  glm::quat rotation() { return rot; }
+  glm::quat rotation() const { return rot; }
 
-  glm::mat4 transformation() {
-    if (!dirty) {
-      return matrix_;
-    }
-
+  glm::mat4 transformation() const {
+ 
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
     glm::mat4 rotation = glm::toMat4(rot);
     glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), sca);
 
-    matrix_ = translation * rotation * scale_mat;
-    dirty = false;
-    return matrix_;
+    return translation * rotation * scale_mat;
   }
 
  private:

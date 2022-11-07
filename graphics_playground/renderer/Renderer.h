@@ -67,9 +67,9 @@ class Renderer {
                             1.0f);
   }
 
-  void draw(Camera camera, std::vector<MeshPair> mesh_renderers,
-            std::vector<PointLight> point_lights,
-            std::vector<DirectionLight> direction_lights);
+  void draw(const Camera& camera, const std::vector<MeshPair>& mesh_renderers,
+            const std::vector<PointLight>& point_lights,
+            const std::vector<DirectionLight>& direction_lights);
 
   Renderer(int scr_width, int scr_height, glm::vec3 clear_color);
   ~Renderer();
@@ -118,12 +118,12 @@ class Renderer {
   std::unordered_map<unsigned int, gpu::Texture*> texture_cache_;
   std::unordered_map<unsigned int, gpu::Batch*> batch_cache_;
 
-  void uploadRenderData(Camera camera, std::vector<PointLight> point_lights,
-                        std::vector<DirectionLight> direction_lights);
-  void drawShadowPass(std::vector<MeshPair> mesh_renderers,
-                      std::vector<PointLight> point_lights,
-                      std::vector<DirectionLight> direction_lights);
-  void drawMainPass(std::vector<MeshPair> mesh_renderers);
+  void uploadRenderData(const Camera& camera, const std::vector<PointLight>& point_lights,
+                        const std::vector<DirectionLight>& direction_lights);
+  void drawShadowPass(const std::vector<MeshPair>& mesh_renderers,
+                      const std::vector<PointLight>& point_lights,
+                      const std::vector<DirectionLight>& direction_lights);
+  void drawMainPass(const std::vector<MeshPair>& mesh_renderers);
 
   void setShaderInputsForMaterial(const Material& mat,
                                   gpu::ShaderProgram* shader);

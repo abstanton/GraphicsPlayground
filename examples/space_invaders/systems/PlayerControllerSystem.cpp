@@ -20,7 +20,7 @@ void PlayerControllerSystem::onUpdate(ecs::Registry& registry,
   if (space_state == KeyState::DOWN) {
     if (player.bullet_delta_time > 0.2f) {
       // Shoot bullet
-      spawnBullet({1.0f, glm::vec3(0.0f, 10.0f, 0.0f)},
+      spawnBullet({1.0f, glm::vec3(0.0f, 20.0f, 0.0f)},
                   player_transform.position(), registry);
       player.bullet_delta_time = 0;
     }
