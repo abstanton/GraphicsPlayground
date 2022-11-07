@@ -5,16 +5,7 @@
 #include "components/PlayerComponent.h"
 
 void SpaceInvaders::setup() {
-  renderer->setClearColour({0, 0, 0});
-
-  resource_manager_.loadTexture("textures\\metal_plate_diff_1k.png",
-                                "metal_diff");
-  resource_manager_.loadTexture("textures\\metal_plate_rough_1k.png",
-                                "metal_rough");
-  resource_manager_.loadTexture("textures\\metal_plate_nor_gl_1k.png",
-                                "metal_norm");
-  resource_manager_.loadTexture("textures\\metal_plate_metal_1k.png",
-                                "metal_metal");
+  renderer->setClearColour({0.4, 0.4, 0.4});
 
   MeshRenderer spaceship_mesh =
       resource_manager_.loadObject("meshes\\Spaceship.fbx", "spaceship")[0];
@@ -34,22 +25,14 @@ void SpaceInvaders::setup() {
   spaceship_material.setFloatInput("metalness", "spaceship_metallic");
   spaceship_material.setFloatInput("roughness", "spaceship_roughness");
 
-  MeshRenderer cube_component =
+  MeshRenderer bullet_mesh =
       resource_manager_.loadObject("meshes\\cube.obj", "cube")[0];
-  Material metal_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
-  metal_material.setColourInput("diffuse", "metal_diff", {1, 1});
-  metal_material.setColourInput("normal", "metal_norm", {1, 1});
-  metal_material.setFloatInput("roughness", "metal_rough", {1, 1});
-  metal_material.setFloatInput("metalness", "metal_metal", {1, 1});
+  Material bullet_material =
+      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::EMISSIVE);
+  bullet_material.setColourInput("colour", glm::vec3(10.0f, 5.0f, 5.0f));
+  bullet_mesh.material = bullet_material;
 
-  Material blank_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
-  // metal_material = blank_material;
-
-  cube_component.material_comp_ = blank_material;
-
-  spaceship_mesh.material_comp_ = spaceship_material;
+  spaceship_mesh.material = spaceship_material;
 
   auto camera_ent = registry.createEntity();
   Camera& camera =
@@ -66,7 +49,7 @@ void SpaceInvaders::setup() {
       DirectionLight({0, 1, 0.5}, {1.0, 1.0, 1.0}, 10.0f));
 
   player_controller_system =
-      std::make_unique<PlayerControllerSystem>(cube_component);
+      std::make_unique<PlayerControllerSystem>(bullet_mesh);
   system_manager->addSystem(player_controller_system.get());
 
   bullet_system = std::make_unique<BulletSystem>();

@@ -209,8 +209,8 @@ void Renderer::drawShadowPass(std::vector<MeshPair> mesh_renderers,
     for (auto&& [mc, transform] : mesh_renderers) {
       shadow_shader_->setMat4("model", transform.transformation());
 
-      gpu::Batch* batch = retrieveMeshGPUBatch(
-          ResourceManager::get().getMesh(mc.mesh_).value());
+      gpu::Batch* batch =
+          retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh).value());
       batch->draw();
     }
   }
@@ -239,7 +239,7 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
     depth_shader_->setMat4("model", transform.transformation());
 
     gpu::Batch* batch =
-        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh_).value());
+        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh).value());
 
     batch->draw();
   }
@@ -254,15 +254,15 @@ void Renderer::drawMainPass(std::vector<MeshPair> mesh_renderers) {
   backend_->clear(gpu::ClearType::COLOR);
   for (auto&& [mc, transform] : mesh_renderers) {
     gpu::ShaderProgram* shader =
-        ShaderManager::get().getShader(mc.material_comp_.shader_name);
+        ShaderManager::get().getShader(mc.material.shader_name);
     shader->use();
-    setShaderInputsForMaterial(mc.material_comp_, shader);
+    setShaderInputsForMaterial(mc.material, shader);
     shadow_map_texture_->bind(10);
     depth_texture_->bind(11);
     shader->setMat4("model", transform.transformation());
 
     gpu::Batch* batch =
-        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh_).value());
+        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh).value());
 
     batch->draw();
   }

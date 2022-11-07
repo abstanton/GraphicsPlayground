@@ -1,6 +1,7 @@
 #include "PlayerControllerSystem.h"
 
 // gp
+#include <components/PointLight.h>
 #include <components/Transform.h>
 #include <platform/Input.h>
 
@@ -40,6 +41,7 @@ void PlayerControllerSystem::onUpdate(ecs::Registry& registry,
 
 void PlayerControllerSystem::spawnBullet(Bullet bullet, glm::vec3 pos,
                                          ecs::Registry& registry) {
-  registry.createEntity<Bullet, Transform, MeshRenderer>(
-      bullet, Transform(pos, {0, 0, 0}, {0.1, 0.1, 0.1}), bullet_mesh_);
+  registry.createEntity<Bullet, Transform, MeshRenderer, PointLight>(
+      bullet, Transform(pos, {0, 0, 0}, {0.1, 0.1, 0.1}), bullet_mesh_,
+      PointLight(pos, {1.0, 0.4, 0.4}, 20.0f));
 }

@@ -120,7 +120,11 @@ Material genDefaultMaterial() {
   MaterialBuilder builder;
   return builder.addColourInput("colour").setShaderName("default").build();
 }
-Material genEmissiveMaterial() { return Material{}; }
+Material genEmissiveMaterial() {
+  MaterialBuilder builder;
+  return builder.addColourInput("colour").setShaderName("emissive").build();
+}
+
 Material genPBRMaterial() {
   MaterialBuilder builder;
   return builder.addColourInput("diffuse")

@@ -95,6 +95,7 @@ struct Material {
   std::string shader_name;
   bool transparent;
   bool receive_shadows;
+  bool cast_ao;
 };
 
 class MaterialBuilder {
@@ -119,6 +120,14 @@ class MaterialBuilder {
   }
   MaterialBuilder& addBoolUniform(string name) {
     material_.bool_uniforms[name] = Uniform<bool>{};
+    return *this;
+  }
+  MaterialBuilder& setReceiveShadow(bool val) {
+    material_.receive_shadows = val;
+    return *this;
+  }
+  MaterialBuilder& setCastAO(bool val) {
+    material_.cast_ao = val;
     return *this;
   }
   MaterialBuilder& setShaderName(string name) {

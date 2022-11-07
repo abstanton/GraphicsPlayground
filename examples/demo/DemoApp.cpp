@@ -30,8 +30,8 @@ void DemoApp::setup() {
       ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
   // metal_material = blank_material;
 
-  cube_component.material_comp_ = blank_material;
-  monkey_component.material_comp_ = metal_material;
+  cube_component.material = blank_material;
+  monkey_component.material = metal_material;
 
   auto camera_ent = registry.createEntity();
   Camera& camera =

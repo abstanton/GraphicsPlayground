@@ -8,15 +8,6 @@ namespace gpu {
 enum class ShaderType { FRAG, VERT, COMPUTE, GEOM };
 
 class ShaderProgram {
-  /*
-  TODO:
-  1. Rename to ShaderProgram
-  2. Add these methods
-  addShaderFromSource(enum class ShaderType, const char* source)
-  link()
-  3. Replace source
-  4. Ready for adding compute shaders
-  */
  public:
   virtual void use() const = 0;
   virtual void link() = 0;

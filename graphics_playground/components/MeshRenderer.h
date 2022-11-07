@@ -5,12 +5,11 @@
 
 using std::string;
 struct MeshRenderer {
- public:
-  string mesh_;
-  Material material_comp_;
+  string mesh;
+  Material material;
   bool cast_shadows = true;
 
   MeshRenderer(){};
   MeshRenderer(string mesh, Material material)
-      : mesh_(mesh), material_comp_(material) {}
+      : mesh(mesh), material(material) {}
 };
