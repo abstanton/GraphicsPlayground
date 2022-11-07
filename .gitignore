@@ -1,4 +1,6 @@
 .vscode
+.vs
 build
+out
 graphics_playground/build
 *.pdb
