@@ -21,7 +21,7 @@ class AsteroidSystem : public System {
 
   int max_asteroids = 15;
   glm::vec2 x_spawn_range = {-5, 5};
-  glm::vec2 y_spawn_range = {20.0f, 30.0f};
+  glm::vec2 y_spawn_range = {20.0f, 50.0f};
   glm::vec2 y_vel_range = {-4.0f, -8.0f};
   glm::vec2 x_vel_range = {-2.0f, 2.0f};
   float max_ang_vel = 1.0f;

@@ -3,5 +3,6 @@
 
 struct Asteroid {
   glm::vec3 velocity;
-  glm::vec3 ang_velocity;
+  glm::vec3 rot_axis;
+  float ang_velocity;
 };

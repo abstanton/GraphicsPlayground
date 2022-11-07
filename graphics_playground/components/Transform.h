@@ -10,7 +10,7 @@ struct Transform {
     rot = glm::quat({0, 0, 0});
     sca = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
     glm::mat4 rotation = glm::toMat4(rot);
     glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), sca);
 
@@ -28,7 +28,7 @@ struct Transform {
 
   void setPosition(glm::vec3 p) {
     pos = p;
-	glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
+    glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);
     glm::mat4 rotation = glm::toMat4(rot);
     glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), sca);
 
@@ -70,9 +70,7 @@ struct Transform {
 
   glm::quat rotation() const { return rot; }
 
-  glm::mat4 transformation() const {
-      return matrix_;
-  }
+  glm::mat4 transformation() const { return matrix_; }
 
  private:
   glm::vec3 pos;

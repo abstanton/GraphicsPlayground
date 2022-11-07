@@ -15,7 +15,7 @@ void AsteroidSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   int num_alive_asteroids = 0;
   registry.view<Asteroid, Transform>().each(
       [&](ecs::Entity ent, Asteroid&, Transform& trans) {
-        if ((trans.position().y < -20.0) || (abs(trans.position().x) > 10.0f)) {
+        if ((trans.position().y < -8.0) || (abs(trans.position().x) > 10.0f)) {
           registry.destroyEntity(ent);
         } else {
           num_alive_asteroids++;
@@ -27,11 +27,12 @@ void AsteroidSystem::onUpdate(ecs::Registry& registry, float delta_time) {
     // sample random position
     glm::vec3 position = {randomInRange(x_spawn_range.x, x_spawn_range.y),
                           randomInRange(y_spawn_range.x, y_spawn_range.y), 0};
-    glm::vec3 angular_vel = {randomInRange(-max_ang_vel, max_ang_vel),
-                             randomInRange(-max_ang_vel, max_ang_vel),
-                             randomInRange(-max_ang_vel, max_ang_vel)};
     glm::vec3 velocity = {randomInRange(x_vel_range.x, x_vel_range.y),
                           randomInRange(y_vel_range.x, y_vel_range.y), 0};
+    glm::vec3 rot_axis = {randomInRange(-1, 1), randomInRange(-1, 1),
+                          randomInRange(-1, 1)};
+    rot_axis = glm::normalize(rot_axis);
+    float angular_vel = randomInRange(-max_ang_vel, max_ang_vel);
 
     float scale = randomInRange(scale_range.x, scale_range.y);
 
@@ -39,7 +40,7 @@ void AsteroidSystem::onUpdate(ecs::Registry& registry, float delta_time) {
         0, static_cast<int>(asteroid_meshes_.size()) - 1);
     int mesh_index = distr(gen);
 
-    spawnAsteroid(registry, mesh_index, {velocity, angular_vel},
+    spawnAsteroid(registry, mesh_index, {velocity, rot_axis, angular_vel},
                   Transform(position, glm::vec3(0), glm::vec3(scale)));
   }
 
@@ -47,7 +48,9 @@ void AsteroidSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   registry.view<Asteroid, Transform>().each(
       [&](ecs::Entity ent, Asteroid& asteroid, Transform& trans) {
         trans.setPosition(trans.position() + asteroid.velocity * delta_time);
-        trans.setRotation(trans.euler() + asteroid.ang_velocity * delta_time);
+        // trans.setRotation(glm::rotate(trans.rotation(),
+        //                               asteroid.ang_velocity * delta_time,
+        //                               asteroid.rot_axis));
       });
 }
 
