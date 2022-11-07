@@ -16,9 +16,10 @@ GraphicsPlayground::GraphicsPlayground()
       [&](double x, double y) { input_manager.mouseMoveCallback(x, y); });
   window->setScrollOffsetCallback(
       [&](double x, double y) { input_manager.scrollCallback(x, y); });
+
   renderer = std::make_unique<Renderer>(1920, 1280, glm::vec3(0.2, 0.2, 0.2));
   window->setResizeCallback(
-      [&](int x, int y) { renderer->resizeViewport(x, y); });
+      [this](int x, int y) { renderer->resizeViewport(x, y); });
 }
 
 void GraphicsPlayground::run() {
@@ -30,7 +31,6 @@ void GraphicsPlayground::run() {
 
   system_manager->configure();
   while (!window->shouldClose()) {
-    // TODO Refactor this into window
     window->swapBuffers();
     window->pollEvents();
 
