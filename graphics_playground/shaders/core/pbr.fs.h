@@ -209,7 +209,7 @@ void main()
         float shadow = ShadowCalculation(fragPosLightSpace, i);
         vec3 colour = vec3(light.colour.x, light.colour.y, light.colour.z);
     
-        vec3 radiance = colour * (1-shadow);
+        vec3 radiance = colour * (1-shadow) * light.intensity;
 
         vec3 L = normalize((view*vec4(vec3(light.direction), 0.0)).xyz);
         Lo += lightingCalc(radiance, L, V, N, F0, albedo, roughness, metallic);
