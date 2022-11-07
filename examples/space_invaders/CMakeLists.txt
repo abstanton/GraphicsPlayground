@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2.0)
 project(space_invaders)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_executable(space_invaders main.cpp SpaceInvaders.cpp systems/PlayerControllerSystem.cpp systems/BulletSystem.cpp)
+add_executable(space_invaders main.cpp SpaceInvaders.cpp systems/PlayerControllerSystem.cpp systems/BulletSystem.cpp systems/AsteroidSystem.cpp)
 
 add_custom_command(TARGET space_invaders PRE_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
