@@ -58,7 +58,14 @@ struct GPUCameraBuffer {
 
 class Renderer {
  public:
-  void resizeViewport(int width, int height);
+  void resizeViewport(int width, int height, float z_near = 0.1f,
+                      float z_far = 100.0f);
+
+  void setClearColour(glm::vec3 col) {
+    clear_colour = col;
+    backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z,
+                            1.0f);
+  }
 
   void draw(Camera camera, std::vector<MeshPair> mesh_renderers,
             std::vector<PointLight> point_lights,
@@ -102,6 +109,8 @@ class Renderer {
 
   int scr_width_, scr_height_;
   glm::vec3 clear_colour;
+  float z_near_;
+  float z_far_;
 
   gpu::Texture* retrieveGPUTexture(const Texture* texture);
   gpu::Batch* retrieveMeshGPUBatch(const Mesh* mesh);

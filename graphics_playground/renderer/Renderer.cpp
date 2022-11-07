@@ -42,11 +42,15 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   this->resizeViewport(scr_width, scr_height);
 }
 
-void Renderer::resizeViewport(int width, int height) {
+void Renderer::resizeViewport(int width, int height, float z_near,
+                              float z_far) {
+  std::cout << "Resizing viewport" << std::endl;
   backend_->setViewport(0, 0, width, height);
 
   scr_width_ = width;
   scr_height_ = height;
+  z_near_ = z_near;
+  z_far_ = z_far;
 
   shadow_map_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
@@ -127,7 +131,7 @@ void Renderer::uploadRenderData(Camera camera,
   glm::mat4 view_matrix = camera.getViewMatrix();
   glm::mat4 projection_matrix =
       glm::perspective(glm::radians(camera.Zoom),
-                       (float)scr_width_ / (float)scr_height_, 0.1f, 100.0f);
+                       (float)scr_width_ / (float)scr_height_, z_near_, z_far_);
 
   gpu_camera_buffer_.view = view_matrix;
   gpu_camera_buffer_.projection = projection_matrix;
@@ -151,6 +155,8 @@ void Renderer::uploadRenderData(Camera camera,
     direction_light.is_shadowed = 1;
     direction_light.colour = direction_lights[i].colour;
     direction_light.direction = direction_lights[i].direction;
+
+    // TODO: Get this out of here!
     float near_plane = 1.0f, far_plane = 20.0f;
     glm::mat4 light_projection =
         glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
