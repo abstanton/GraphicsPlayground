@@ -15,7 +15,7 @@ struct Transform {
       : pos(pos), rot(eul), sca(sca) {}
 
   void setPosition(glm::vec3 p) {
-    pos = pos;
+    pos = p;
     dirty = true;
   }
 
