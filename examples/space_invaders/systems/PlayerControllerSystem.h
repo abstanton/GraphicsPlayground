@@ -3,7 +3,7 @@
 
 // space_invaders
 #include "../components/Bullet.h"
-#include "../components/PlayerComponent.h"
+#include "../components/Player.h"
 
 // gp
 #include <components/MeshRenderer.h>

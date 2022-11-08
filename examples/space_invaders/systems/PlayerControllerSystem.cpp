@@ -62,5 +62,5 @@ void PlayerControllerSystem::spawnBullet(Bullet bullet, glm::vec3 pos,
                                          ecs::Registry& registry) {
   registry.createEntity<Bullet, Transform, MeshRenderer, PointLight>(
       bullet, Transform(pos, {0, 0, 0}, {0.1, 0.1, 0.1}), bullet_mesh_,
-      PointLight(pos, {1.0, 0.4, 0.4}, 20.0f));
+      PointLight({1.0, 0.4, 0.4}, 20.0f));
 }

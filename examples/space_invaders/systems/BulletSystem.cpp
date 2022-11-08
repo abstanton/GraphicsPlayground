@@ -12,7 +12,6 @@ void BulletSystem::onUpdate(ecs::Registry& registry, float delta_time) {
                                                           Transform& transform,
                                                           PointLight& light) {
     transform.setPosition(transform.position() + bullet.velocity * delta_time);
-    light.position = transform.position();
     if (transform.position().y > 20.0f) {
       // TODO: Can I do this in a loop? not sure, i think I can cos it doesn't
       // move memory around afaik
