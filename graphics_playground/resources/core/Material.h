@@ -51,8 +51,6 @@ struct Uniform {
   void setValue(T val) { value = val; }
 };
 
-using std::string;
-
 struct Material {
   void setColourInput(string name, glm::vec3 value) {
     if (colour_inputs.find(name) == colour_inputs.end()) {
