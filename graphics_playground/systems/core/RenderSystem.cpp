@@ -18,15 +18,17 @@ void RenderSystem::onRender(ecs::Registry& registry) {
       [&](ecs::Entity, MeshRenderer& mr, Transform& t) {
         mesh_renderers.push_back({mr, t});
       });
-  std::vector<PointLight> point_lights;
-  registry.view<PointLight>().each(
-      [&](ecs::Entity, PointLight& pc) { point_lights.push_back(pc); });
+  std::vector<PointPair> point_pairs;
+  registry.view<PointLight, Transform>().each(
+      [&](ecs::Entity, PointLight& pc, Transform& transform) {
+        point_pairs.push_back({pc, transform});
+      });
   std::vector<DirectionLight> direction_lights;
   registry.view<DirectionLight>().each(
       [&](ecs::Entity, DirectionLight& dr) { direction_lights.push_back(dr); });
   Camera camera = registry.getComponent<Camera>(camera_entity_);
 
-  renderer_->draw(camera, mesh_renderers, point_lights, direction_lights);
+  renderer_->draw(camera, mesh_renderers, point_pairs, direction_lights);
 }
 
 void RenderSystem::onExit(ecs::Registry& registry) {}

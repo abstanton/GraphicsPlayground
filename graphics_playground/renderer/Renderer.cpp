@@ -114,18 +114,19 @@ Renderer::~Renderer() {
   texture_cache_.clear();
 }
 
-void Renderer::draw(const Camera& camera, const std::vector<MeshPair>& mesh_pairs,
-                    const std::vector<PointLight>& point_lights,
+void Renderer::draw(const Camera& camera,
+                    const std::vector<MeshPair>& mesh_pairs,
+                    const std::vector<PointPair>& point_pairs,
                     const std::vector<DirectionLight>& direction_lights) {
   backend_->clear(gpu::ClearType::ALL);
-  uploadRenderData(camera, point_lights, direction_lights);
-  drawShadowPass(mesh_pairs, point_lights, direction_lights);
+  uploadRenderData(camera, point_pairs, direction_lights);
+  drawShadowPass(mesh_pairs, point_pairs, direction_lights);
   drawMainPass(mesh_pairs);
 }
 
-void Renderer::uploadRenderData(const Camera& camera,
-                                const std::vector<PointLight>& point_lights,
-                                const std::vector<DirectionLight>& direction_lights) {
+void Renderer::uploadRenderData(
+    const Camera& camera, const std::vector<PointPair>& point_pairs,
+    const std::vector<DirectionLight>& direction_lights) {
   glm::vec3 ambient_light = clear_colour;
 
   glm::mat4 view_matrix = camera.getViewMatrix();
@@ -139,14 +140,14 @@ void Renderer::uploadRenderData(const Camera& camera,
   gpu_camera_buffer_.inverse_proj = glm::inverse(projection_matrix);
 
   gpu_light_buffer_.ambient_light = ambient_light;
-  gpu_light_buffer_.num_point_lights = static_cast<int>(point_lights.size());
+  gpu_light_buffer_.num_point_lights = static_cast<int>(point_pairs.size());
   gpu_light_buffer_.num_direction_lights =
       static_cast<int>(direction_lights.size());
-  for (int i = 0; i < point_lights.size(); i++) {
+  for (int i = 0; i < point_pairs.size(); i++) {
     GPUPointLight point_light;
-    point_light.intensity = point_lights[i].intensity;
-    point_light.colour = point_lights[i].colour;
-    point_light.position = point_lights[i].position;
+    point_light.intensity = point_pairs[i].first.intensity;
+    point_light.colour = point_pairs[i].first.colour;
+    point_light.position = point_pairs[i].second.position();
     gpu_light_buffer_.point_lights[i] = point_light;
   }
   for (int i = 0; i < direction_lights.size(); i++) {
@@ -172,9 +173,10 @@ void Renderer::uploadRenderData(const Camera& camera,
   camera_uniform_buffer_->uploadData(&gpu_camera_buffer_);
 }
 
-void Renderer::drawShadowPass(const std::vector<MeshPair>& mesh_renderers,
-                              const std::vector<PointLight>& point_lights,
-                              const std::vector<DirectionLight>& direction_lights) {
+void Renderer::drawShadowPass(
+    const std::vector<MeshPair>& mesh_renderers,
+    const std::vector<PointPair>& point_pairs,
+    const std::vector<DirectionLight>& direction_lights) {
   shadow_frame_buffer_->bind();
   backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
   shadow_shader_->use();

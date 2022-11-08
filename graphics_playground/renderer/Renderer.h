@@ -16,7 +16,6 @@
 
 using MeshPair = std::pair<MeshRenderer, Transform>;
 using PointPair = std::pair<PointLight, Transform>;
-using DirectionPair = std::pair<DirectionLight, Transform>;
 
 struct GPUPointLight {
   glm::vec3 position;
@@ -68,7 +67,7 @@ class Renderer {
   }
 
   void draw(const Camera& camera, const std::vector<MeshPair>& mesh_renderers,
-            const std::vector<PointLight>& point_lights,
+            const std::vector<PointPair>& point_lights,
             const std::vector<DirectionLight>& direction_lights);
 
   Renderer(int scr_width, int scr_height, glm::vec3 clear_color);
@@ -118,10 +117,11 @@ class Renderer {
   std::unordered_map<unsigned int, gpu::Texture*> texture_cache_;
   std::unordered_map<unsigned int, gpu::Batch*> batch_cache_;
 
-  void uploadRenderData(const Camera& camera, const std::vector<PointLight>& point_lights,
+  void uploadRenderData(const Camera& camera,
+                        const std::vector<PointPair>& point_lights,
                         const std::vector<DirectionLight>& direction_lights);
   void drawShadowPass(const std::vector<MeshPair>& mesh_renderers,
-                      const std::vector<PointLight>& point_lights,
+                      const std::vector<PointPair>& point_lights,
                       const std::vector<DirectionLight>& direction_lights);
   void drawMainPass(const std::vector<MeshPair>& mesh_renderers);
 
