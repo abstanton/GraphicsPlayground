@@ -1,5 +1,6 @@
 .vscode
 .vs
+.VSCodeCounter
 build
 out
 graphics_playground/build
