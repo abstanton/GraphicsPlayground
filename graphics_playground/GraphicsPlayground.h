@@ -17,12 +17,13 @@ class GraphicsPlayground {
   virtual void load() = 0;
 
  protected:
-  float delta_time;
-  float last_time;
-
   std::unique_ptr<Window> window;
   std::unique_ptr<Renderer> renderer;
   std::unique_ptr<SystemManager> system_manager;
 
   ecs::Registry registry;
+
+ private:
+  float delta_time;
+  float last_time;
 };
