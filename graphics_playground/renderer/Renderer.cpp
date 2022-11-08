@@ -114,18 +114,20 @@ Renderer::~Renderer() {
   texture_cache_.clear();
 }
 
-void Renderer::draw(const Camera& camera,
-                    const std::vector<MeshPair>& mesh_pairs,
-                    const std::vector<PointPair>& point_pairs,
-                    const std::vector<DirectionLight>& direction_lights) {
+void Renderer::draw(
+    const Camera& camera,
+    const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers,
+    const std::vector<TransformAnd<PointLight>>& point_lights,
+    const std::vector<DirectionLight>& direction_lights) {
   backend_->clear(gpu::ClearType::ALL);
-  uploadRenderData(camera, point_pairs, direction_lights);
-  drawShadowPass(mesh_pairs, point_pairs, direction_lights);
-  drawMainPass(mesh_pairs);
+  uploadRenderData(camera, point_lights, direction_lights);
+  drawShadowPass(mesh_renderers, point_lights, direction_lights);
+  drawMainPass(mesh_renderers);
 }
 
 void Renderer::uploadRenderData(
-    const Camera& camera, const std::vector<PointPair>& point_pairs,
+    const Camera& camera,
+    const std::vector<TransformAnd<PointLight>>& point_lights,
     const std::vector<DirectionLight>& direction_lights) {
   glm::vec3 ambient_light = clear_colour;
 
@@ -140,14 +142,14 @@ void Renderer::uploadRenderData(
   gpu_camera_buffer_.inverse_proj = glm::inverse(projection_matrix);
 
   gpu_light_buffer_.ambient_light = ambient_light;
-  gpu_light_buffer_.num_point_lights = static_cast<int>(point_pairs.size());
+  gpu_light_buffer_.num_point_lights = static_cast<int>(point_lights.size());
   gpu_light_buffer_.num_direction_lights =
       static_cast<int>(direction_lights.size());
-  for (int i = 0; i < point_pairs.size(); i++) {
+  for (int i = 0; i < point_lights.size(); i++) {
     GPUPointLight point_light;
-    point_light.intensity = point_pairs[i].first.intensity;
-    point_light.colour = point_pairs[i].first.colour;
-    point_light.position = point_pairs[i].second.position();
+    point_light.intensity = point_lights[i].data.intensity;
+    point_light.colour = point_lights[i].data.colour;
+    point_light.position = point_lights[i].transform.position();
     gpu_light_buffer_.point_lights[i] = point_light;
   }
   for (int i = 0; i < direction_lights.size(); i++) {
@@ -174,8 +176,8 @@ void Renderer::uploadRenderData(
 }
 
 void Renderer::drawShadowPass(
-    const std::vector<MeshPair>& mesh_renderers,
-    const std::vector<PointPair>& point_pairs,
+    const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers,
+    const std::vector<TransformAnd<PointLight>>& point_lights,
     const std::vector<DirectionLight>& direction_lights) {
   shadow_frame_buffer_->bind();
   backend_->setViewport(0, 0, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION);
@@ -208,11 +210,12 @@ void Renderer::drawShadowPass(
                     glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     shadow_shader_->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-    for (auto&& [mc, transform] : mesh_renderers) {
-      shadow_shader_->setMat4("model", transform.transformation());
+    for (const auto& mesh_renderer : mesh_renderers) {
+      shadow_shader_->setMat4("model",
+                              mesh_renderer.transform.transformation());
 
-      gpu::Batch* batch =
-          retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh).value());
+      gpu::Batch* batch = retrieveMeshGPUBatch(
+          ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
       batch->draw();
     }
   }
@@ -220,7 +223,8 @@ void Renderer::drawShadowPass(
   glCullFace(GL_BACK);
 }
 
-void Renderer::drawMainPass(const std::vector<MeshPair>& mesh_renderers) {
+void Renderer::drawMainPass(
+    const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers) {
   colour_frame_buffer_->bind();
   backend_->setViewport(0, 0, scr_width_, scr_height_);
 
@@ -237,11 +241,11 @@ void Renderer::drawMainPass(const std::vector<MeshPair>& mesh_renderers) {
 
   backend_->clear(gpu::ClearType::ALL);
 
-  for (auto&& [mc, transform] : mesh_renderers) {
-    depth_shader_->setMat4("model", transform.transformation());
+  for (const auto& mesh_renderer : mesh_renderers) {
+    depth_shader_->setMat4("model", mesh_renderer.transform.transformation());
 
-    gpu::Batch* batch =
-        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh).value());
+    gpu::Batch* batch = retrieveMeshGPUBatch(
+        ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
 
     batch->draw();
   }
@@ -254,17 +258,17 @@ void Renderer::drawMainPass(const std::vector<MeshPair>& mesh_renderers) {
   glDepthFunc(GL_LEQUAL);
 
   backend_->clear(gpu::ClearType::COLOR);
-  for (auto&& [mc, transform] : mesh_renderers) {
+  for (const auto& mesh_renderer : mesh_renderers) {
     gpu::ShaderProgram* shader =
-        ShaderManager::get().getShader(mc.material.shader_name);
+        ShaderManager::get().getShader(mesh_renderer.data.material.shader_name);
     shader->use();
-    setShaderInputsForMaterial(mc.material, shader);
+    setShaderInputsForMaterial(mesh_renderer.data.material, shader);
     shadow_map_texture_->bind(10);
     depth_texture_->bind(11);
-    shader->setMat4("model", transform.transformation());
+    shader->setMat4("model", mesh_renderer.transform.transformation());
 
-    gpu::Batch* batch =
-        retrieveMeshGPUBatch(ResourceManager::get().getMesh(mc.mesh).value());
+    gpu::Batch* batch = retrieveMeshGPUBatch(
+        ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
 
     batch->draw();
   }

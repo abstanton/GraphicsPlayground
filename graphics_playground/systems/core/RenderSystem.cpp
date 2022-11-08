@@ -13,12 +13,12 @@ void RenderSystem::onConfigure(ecs::Registry& registry) {
 }
 
 void RenderSystem::onRender(ecs::Registry& registry) {
-  std::vector<MeshPair> mesh_renderers;
+  std::vector<TransformAnd<MeshRenderer>> mesh_renderers;
   registry.view<MeshRenderer, Transform>().each(
       [&](ecs::Entity, MeshRenderer& mr, Transform& t) {
         mesh_renderers.push_back({mr, t});
       });
-  std::vector<PointPair> point_pairs;
+  std::vector<TransformAnd<PointLight>> point_pairs;
   registry.view<PointLight, Transform>().each(
       [&](ecs::Entity, PointLight& pc, Transform& transform) {
         point_pairs.push_back({pc, transform});
