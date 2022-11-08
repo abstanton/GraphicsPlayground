@@ -42,4 +42,15 @@ Space Invaders demo
 - [ ] Audio handling
 
 ## Building
-As one of the Todos says, this will not build on other systems because I have included paths on my machine in the CMakeLists.txt. Hopefully I'll fix that
+Dependencies: glfw, assimp, glm
+
+The easiest way to install these it with vcpkg: https://vcpkg.io/
+
+To build:
+
+``` 
+mkdir build
+cd build
+cmake ..
+msbuild ALL_BUILD.vcxproj
+```
