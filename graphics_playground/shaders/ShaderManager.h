@@ -18,18 +18,17 @@ enum class BuiltinShader {
 
 class ShaderManager {
  public:
+  static gpu::ShaderProgram* getShader(string name);
+  static string getShaderName(BuiltinShader type);
+  static Material getMaterialForBuiltin(BuiltinShader type);
+  static bool addShaderProgram(const char* vs_filename, const char* fs_filename,
+                               string shader_name);
+
+ private:
   static ShaderManager& get() {
     static ShaderManager shader_manager = {};
     return shader_manager;
   }
-
-  gpu::ShaderProgram* getShader(string name) const;
-  string getShaderName(BuiltinShader type) const;
-  Material getMaterialForBuiltin(BuiltinShader type) const;
-  bool addShaderProgram(const char* vs_filename, const char* fs_filename,
-                        string shader_name);
-
- private:
   ShaderManager();
 
   gpu::ShaderProgram* compileFromFiles(const char* vs_filename,

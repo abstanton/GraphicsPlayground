@@ -20,8 +20,8 @@ void PlayerControllerSystem::onUpdate(ecs::Registry& registry,
   Transform& player_transform = registry.getComponent<Transform>(player_entity);
 
   // Movement
-  auto a_state = Input::get().getKeyState(Key::A);
-  auto d_state = Input::get().getKeyState(Key::D);
+  auto a_state = Input::getKeyState(Key::A);
+  auto d_state = Input::getKeyState(Key::D);
   bool stopped = (a_state == KeyState::UP) && (d_state == KeyState::UP);
 
   if (stopped) {
@@ -47,7 +47,7 @@ void PlayerControllerSystem::onUpdate(ecs::Registry& registry,
 
   // Shooting
   player.bullet_delta_time += delta_time;
-  auto space_state = Input::get().getKeyState(Key::SPACE);
+  auto space_state = Input::getKeyState(Key::SPACE);
   if (space_state == KeyState::DOWN) {
     if (player.bullet_delta_time > 0.2f) {
       // Shoot bullet

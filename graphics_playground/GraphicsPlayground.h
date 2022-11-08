@@ -23,7 +23,6 @@ class GraphicsPlayground {
   std::unique_ptr<Window> window;
   std::unique_ptr<Renderer> renderer;
   std::unique_ptr<SystemManager> system_manager;
-  ResourceManager& resource_manager_;
 
   ecs::Registry registry;
 };

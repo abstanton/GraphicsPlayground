@@ -10,18 +10,18 @@ void SpaceInvaders::setup() {
   renderer->setClearColour({0.0, 0.0, 0.0});
 
   std::vector<MeshRenderer> asteroid_meshes =
-      resource_manager_.loadObject("meshes\\asteroids.fbx", "asteroids");
-  resource_manager_.loadTexture("textures\\asteroid\\Mat1_Base_Color.jpeg",
-                                "asteroid_diffuse");
-  resource_manager_.loadTexture("textures\\asteroid\\Mat1_Metallic.jpeg",
-                                "asteroid_metalness");
-  resource_manager_.loadTexture("textures\\asteroid\\Mat1_Normal_DirectX.jpeg",
-                                "asteroid_normal");
-  resource_manager_.loadTexture("textures\\asteroid\\Mat1_Roughness.jpeg",
-                                "asteroid_roughness");
+      ResourceManager::loadObject("meshes\\asteroids.fbx", "asteroids");
+  ResourceManager::loadTexture("textures\\asteroid\\Mat1_Base_Color.jpeg",
+                               "asteroid_diffuse");
+  ResourceManager::loadTexture("textures\\asteroid\\Mat1_Metallic.jpeg",
+                               "asteroid_metalness");
+  ResourceManager::loadTexture("textures\\asteroid\\Mat1_Normal_DirectX.jpeg",
+                               "asteroid_normal");
+  ResourceManager::loadTexture("textures\\asteroid\\Mat1_Roughness.jpeg",
+                               "asteroid_roughness");
 
   Material asteroid_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+      ShaderManager::getMaterialForBuiltin(BuiltinShader::PBR);
   asteroid_material.setColourInput("diffuse", "asteroid_diffuse");
   asteroid_material.setColourInput("normal", "asteroid_normal");
   asteroid_material.setFloatInput("roughness", "asteroid_roughness");
@@ -33,26 +33,26 @@ void SpaceInvaders::setup() {
   }
 
   MeshRenderer spaceship_mesh =
-      resource_manager_.loadObject("meshes\\Spaceship.fbx", "spaceship")[0];
-  resource_manager_.loadTexture("textures\\spaceship\\Osn_Base_color.jpg",
-                                "spaceship_base");
-  resource_manager_.loadTexture("textures\\spaceship\\Osn_Metallic.jpg",
-                                "spaceship_metallic");
-  resource_manager_.loadTexture("textures\\spaceship\\Osn_Normal_OpenGL.jpg",
-                                "spaceship_normal");
-  resource_manager_.loadTexture("textures\\spaceship\\Osn_Roughness.jpg",
-                                "spaceship_roughness");
+      ResourceManager::loadObject("meshes\\Spaceship.fbx", "spaceship")[0];
+  ResourceManager::loadTexture("textures\\spaceship\\Osn_Base_color.jpg",
+                               "spaceship_base");
+  ResourceManager::loadTexture("textures\\spaceship\\Osn_Metallic.jpg",
+                               "spaceship_metallic");
+  ResourceManager::loadTexture("textures\\spaceship\\Osn_Normal_OpenGL.jpg",
+                               "spaceship_normal");
+  ResourceManager::loadTexture("textures\\spaceship\\Osn_Roughness.jpg",
+                               "spaceship_roughness");
   Material spaceship_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+      ShaderManager::getMaterialForBuiltin(BuiltinShader::PBR);
   spaceship_material.setColourInput("diffuse", "spaceship_base");
   spaceship_material.setColourInput("normal", "spaceship_normal");
   spaceship_material.setFloatInput("metalness", "spaceship_metallic");
   spaceship_material.setFloatInput("roughness", "spaceship_roughness");
 
   MeshRenderer bullet_mesh =
-      resource_manager_.loadObject("meshes\\sphere.obj", "sphere")[0];
+      ResourceManager::loadObject("meshes\\sphere.obj", "sphere")[0];
   Material bullet_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::EMISSIVE);
+      ShaderManager::getMaterialForBuiltin(BuiltinShader::EMISSIVE);
   bullet_material.setColourInput("colour", glm::vec3(10.0f, 5.0f, 5.0f));
   bullet_mesh.material = bullet_material;
 

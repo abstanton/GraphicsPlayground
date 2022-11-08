@@ -10,18 +10,21 @@ class Input {
   friend GraphicsPlayground;
 
  public:
+  static void setWindow(const Window* window) {
+    auto& inst = Input::get();
+    inst.window_ = window;
+  }
+  static KeyState getKeyState(Key);
+  static glm::vec2 getMouseMovement();
+  static glm::vec2 getScrollOffset();
+
+ private:
+  Input() {}
+
   static Input& get() {
     static Input input_manager;
     return input_manager;
   }
-
-  void setWindow(const Window* window) { window_ = window; }
-  KeyState getKeyState(Key) const;
-  glm::vec2 getMouseMovement();
-  glm::vec2 getScrollOffset();
-
- private:
-  Input() {}
 
   bool first_mouse_movement = true;
   double last_mouse_pos[2] = {0, 0};
@@ -32,16 +35,18 @@ class Input {
     double mouse_position[2];
   };
 
-  void mouseMoveCallback(double x_pos, double y_pos) {
-    last_mouse_pos[0] = input_state_.mouse_position[0];
-    last_mouse_pos[1] = input_state_.mouse_position[1];
-    input_state_.mouse_position[0] = x_pos;
-    input_state_.mouse_position[1] = y_pos;
+  static void mouseMoveCallback(double x_pos, double y_pos) {
+    auto& inst = Input::get();
+    inst.last_mouse_pos[0] = inst.input_state_.mouse_position[0];
+    inst.last_mouse_pos[1] = inst.input_state_.mouse_position[1];
+    inst.input_state_.mouse_position[0] = x_pos;
+    inst.input_state_.mouse_position[1] = y_pos;
   }
 
-  void scrollCallback(double x_offset, double y_offset) {
-    input_state_.scroll_offset[0] = x_offset;
-    input_state_.scroll_offset[1] = y_offset;
+  static void scrollCallback(double x_offset, double y_offset) {
+    auto& inst = Input::get();
+    inst.input_state_.scroll_offset[0] = x_offset;
+    inst.input_state_.scroll_offset[1] = y_offset;
   }
 
   InputState input_state_{};

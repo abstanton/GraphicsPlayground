@@ -45,17 +45,18 @@ gpu::ShaderProgram* ShaderManager::compileVertFragShaderProgram(
   return shader_program;
 }
 
-gpu::ShaderProgram* ShaderManager::getShader(string name) const {
-  if (builtin_shaders_.find(name) != builtin_shaders_.end()) {
-    return (*builtin_shaders_.find(name)).second;
+gpu::ShaderProgram* ShaderManager::getShader(string name) {
+  auto& inst = ShaderManager::get();
+  if (inst.builtin_shaders_.find(name) != inst.builtin_shaders_.end()) {
+    return (*inst.builtin_shaders_.find(name)).second;
   }
-  if (custom_shaders_.find(name) != custom_shaders_.end()) {
-    return (*custom_shaders_.find(name)).second;
+  if (inst.custom_shaders_.find(name) != inst.custom_shaders_.end()) {
+    return (*inst.custom_shaders_.find(name)).second;
   }
   return nullptr;
 }
 
-string ShaderManager::getShaderName(BuiltinShader type) const {
+string ShaderManager::getShaderName(BuiltinShader type) {
   switch (type) {
     case BuiltinShader::DEFAULT:
       return "default";
@@ -108,9 +109,10 @@ gpu::ShaderProgram* ShaderManager::compileFromFiles(
 
 bool ShaderManager::addShaderProgram(const char* vs_filename,
                                      const char* fs_filename, string name) {
-  gpu::ShaderProgram* shader = compileFromFiles(vs_filename, fs_filename);
+  auto& inst = ShaderManager::get();
+  gpu::ShaderProgram* shader = inst.compileFromFiles(vs_filename, fs_filename);
   if (shader != nullptr) {
-    custom_shaders_[name] = shader;
+    inst.custom_shaders_[name] = shader;
     return true;
   }
   return false;
@@ -135,7 +137,7 @@ Material genPBRMaterial() {
       .build();
 }
 
-Material ShaderManager::getMaterialForBuiltin(BuiltinShader type) const {
+Material ShaderManager::getMaterialForBuiltin(BuiltinShader type) {
   switch (type) {
     case BuiltinShader::DEFAULT:
       return genDefaultMaterial();

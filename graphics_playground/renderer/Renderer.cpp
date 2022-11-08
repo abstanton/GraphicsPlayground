@@ -15,11 +15,11 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   backend_ = gpu::Backend::get();
   backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
 
-  ao_shader_ = ShaderManager::get().getShader("ssao");
-  blur_shader_ = ShaderManager::get().getShader("blur");
-  depth_shader_ = ShaderManager::get().getShader("depth");
-  screen_quad_shader_ = ShaderManager::get().getShader("post");
-  shadow_shader_ = ShaderManager::get().getShader("shadow");
+  ao_shader_ = ShaderManager::getShader("ssao");
+  blur_shader_ = ShaderManager::getShader("blur");
+  depth_shader_ = ShaderManager::getShader("depth");
+  screen_quad_shader_ = ShaderManager::getShader("post");
+  shadow_shader_ = ShaderManager::getShader("shadow");
 
   camera_uniform_buffer_.reset(
       backend_->allocUniformBuffer(sizeof(GPUCameraBuffer)));
@@ -208,7 +208,7 @@ void Renderer::drawShadowPass(
                               mesh_renderer.transform.transformation());
 
       const auto& batch = retrieveMeshGPUBatch(
-          ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
+          ResourceManager::getMesh(mesh_renderer.data.mesh).value());
       batch->draw();
     }
   }
@@ -238,7 +238,7 @@ void Renderer::drawMainPass(
     depth_shader_->setMat4("model", mesh_renderer.transform.transformation());
 
     const auto& batch = retrieveMeshGPUBatch(
-        ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
+        ResourceManager::getMesh(mesh_renderer.data.mesh).value());
 
     batch->draw();
   }
@@ -253,7 +253,7 @@ void Renderer::drawMainPass(
   backend_->clear(gpu::ClearType::COLOR);
   for (const auto& mesh_renderer : mesh_renderers) {
     gpu::ShaderProgram* shader =
-        ShaderManager::get().getShader(mesh_renderer.data.material.shader_name);
+        ShaderManager::getShader(mesh_renderer.data.material.shader_name);
     shader->use();
     setShaderInputsForMaterial(mesh_renderer.data.material, shader);
     shadow_map_texture_->bind(10);
@@ -261,7 +261,7 @@ void Renderer::drawMainPass(
     shader->setMat4("model", mesh_renderer.transform.transformation());
 
     const auto& batch = retrieveMeshGPUBatch(
-        ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
+        ResourceManager::getMesh(mesh_renderer.data.mesh).value());
 
     batch->draw();
   }
@@ -408,7 +408,7 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
       shader->setTexture(
           (name + "_tex").c_str(),
           retrieveGPUTexture(
-              ResourceManager::get().getTexture(input.tex_name).value())
+              ResourceManager::getTexture(input.tex_name).value())
               .get());
     } else {
       shader->setBool(name + "_use_tex", false);
@@ -422,7 +422,7 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
       shader->setTexture(
           (name + "_tex").c_str(),
           retrieveGPUTexture(
-              ResourceManager::get().getTexture(input.tex_name).value())
+              ResourceManager::getTexture(input.tex_name).value())
               .get());
     } else {
       shader->setBool(name + "_use_tex", false);

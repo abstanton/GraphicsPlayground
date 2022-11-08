@@ -5,29 +5,29 @@
 #include "components/RotateComponent.h"
 
 void DemoApp::setup() {
-  resource_manager_.loadTexture("textures\\metal_plate_diff_1k.png",
-                                "metal_diff");
-  resource_manager_.loadTexture("textures\\metal_plate_rough_1k.png",
-                                "metal_rough");
-  resource_manager_.loadTexture("textures\\metal_plate_nor_gl_1k.png",
-                                "metal_norm");
-  resource_manager_.loadTexture("textures\\metal_plate_metal_1k.png",
-                                "metal_metal");
+  ResourceManager::loadTexture("textures\\metal_plate_diff_1k.png",
+                               "metal_diff");
+  ResourceManager::loadTexture("textures\\metal_plate_rough_1k.png",
+                               "metal_rough");
+  ResourceManager::loadTexture("textures\\metal_plate_nor_gl_1k.png",
+                               "metal_norm");
+  ResourceManager::loadTexture("textures\\metal_plate_metal_1k.png",
+                               "metal_metal");
 
   MeshRenderer monkey_component =
-      resource_manager_.loadObject("meshes\\monkey.obj", "monkey")[0];
+      ResourceManager::loadObject("meshes\\monkey.obj", "monkey")[0];
   MeshRenderer cube_component =
-      resource_manager_.loadObject("meshes\\cube.obj", "cube")[0];
+      ResourceManager::loadObject("meshes\\cube.obj", "cube")[0];
 
   Material metal_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+      ShaderManager::getMaterialForBuiltin(BuiltinShader::PBR);
   metal_material.setColourInput("diffuse", "metal_diff", {1, 1});
   metal_material.setColourInput("normal", "metal_norm", {1, 1});
   metal_material.setFloatInput("roughness", "metal_rough", {1, 1});
   metal_material.setFloatInput("metalness", "metal_metal", {1, 1});
 
   Material blank_material =
-      ShaderManager::get().getMaterialForBuiltin(BuiltinShader::PBR);
+      ShaderManager::getMaterialForBuiltin(BuiltinShader::PBR);
   // metal_material = blank_material;
 
   cube_component.material = blank_material;

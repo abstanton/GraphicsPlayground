@@ -5,17 +5,15 @@
 #include "components/MeshRenderer.h"
 #include "resources/core/Material.h"
 
-GraphicsPlayground::GraphicsPlayground()
-    : resource_manager_(ResourceManager::get()) {
+GraphicsPlayground::GraphicsPlayground() {
   system_manager = std::make_unique<SystemManager>(registry);
 
   window = std::make_unique<Window>(1920, 1280, "Graphics Playground");
-  Input& input_manager = Input::get();
-  input_manager.setWindow(window.get());
+  Input::setWindow(window.get());
   window->setMouseMovementCallback(
-      [&](double x, double y) { input_manager.mouseMoveCallback(x, y); });
+      [&](double x, double y) { Input::mouseMoveCallback(x, y); });
   window->setScrollOffsetCallback(
-      [&](double x, double y) { input_manager.scrollCallback(x, y); });
+      [&](double x, double y) { Input::scrollCallback(x, y); });
 
   renderer = std::make_unique<Renderer>(1920, 1280, glm::vec3(0.2, 0.2, 0.2));
   window->setResizeCallback(

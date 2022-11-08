@@ -16,31 +16,55 @@ using std::map;
 using std::string;
 using std::vector;
 
+/*
+TODO:
+
+Return ResourceHandle<Type> instead of raw pointer
+then, we have a
+
+template <typename T>
+struct ResourceHandle {
+  string name;
+  uint64 id;
+}
+
+Type* resource_ptr = ResourceManager::getResource<Type>(ResourceHandle<Type>
+handle);
+
+ResourceHandle<Type> handle = ResourceManager::getHandle(string name);
+
+ResourceHandle<Type> handle = ResourceManager::loadResource<Type>(string path,
+options etc)
+
+Then,
+*/
+
 class ResourceManager {
  public:
+  /*
+   * Load Mesh resource, return loaded resource pointer
+   */
+  static std::optional<Mesh*> loadMeshResource(const string& path);
+
+  static bool loadTexture(const char* path, const char* name);
+  static bool loadMesh(const char* path, const char* name);
+  static std::vector<MeshRenderer> loadObject(const char* path,
+                                              const char* base_name);
+
+  static std::optional<Texture*> getTexture(string tex_name);
+  static std::optional<Mesh*> getMesh(string mesh_name);
+  /*
+   * Load Object resource, consisting of Mesh and Textures
+   */
+  static bool loadTextResource(const string& path);
+
+ private:
+  ResourceManager() {}
+
   static ResourceManager& get() {
     static ResourceManager resource_manager = {};
     return resource_manager;
   }
-
-  /*
-   * Load Mesh resource, return loaded resource pointer
-   */
-  std::optional<Mesh*> loadMeshResource(const string& path);
-
-  bool loadTexture(const char* path, const char* name);
-  bool loadMesh(const char* path, const char* name);
-  std::vector<MeshRenderer> loadObject(const char* path, const char* base_name);
-
-  std::optional<Texture*> getTexture(string tex_name);
-  std::optional<Mesh*> getMesh(string mesh_name);
-  /*
-   * Load Object resource, consisting of Mesh and Textures
-   */
-  bool loadTextResource(const string& path);
-
- private:
-  ResourceManager() {}
 
   vector<std::shared_ptr<IResource>> loaded_resources_;
 
