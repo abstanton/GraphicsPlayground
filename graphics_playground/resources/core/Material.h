@@ -8,6 +8,8 @@
 #include "../components/Transform.h"
 #include "../gpu/GPUShaderProgram.h"
 
+// TODO: Move this, material is not a resource, it's an asset?
+
 /*
         Represents the following glsl:
         uniform bool name_use_tex;

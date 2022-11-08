@@ -31,10 +31,16 @@ struct ResourceHandle {
 Type* resource_ptr = ResourceManager::getResource<Type>(ResourceHandle<Type>
 handle);
 
-ResourceHandle<Type> handle = ResourceManager::getHandle(string name);
+ResourceHandle<Type> handle = ResourceManager::getHandle<Type>(string name);
 
 ResourceHandle<Type> handle = ResourceManager::loadResource<Type>(string path,
-options etc)
+options etc) // overloaded for different resource types, for custom resources...
+
+std::unordered_map<string type_name, IResourceLoader>
+
+const IResourceLoader*  loader = ResourceManager::getResourceLoader<Type>()
+
+loadResource<
 
 Then,
 */
