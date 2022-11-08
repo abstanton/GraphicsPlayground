@@ -76,7 +76,7 @@ GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
   }
 }
 
-void GlTexture::bind(int slot) {
+void GlTexture::bind(int slot) const {
   glActiveTexture(GL_TEXTURE0 + slot);
   switch (type) {
     case TextureType::TEXTURE_1D:

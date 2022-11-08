@@ -26,7 +26,7 @@ class Texture {
         mips(mips),
         levels(levels) {}
 
-  virtual void bind(int slot) = 0;
+  virtual void bind(int slot) const = 0;
   virtual void generateMipmap() = 0;
 
   TextureFormat format;

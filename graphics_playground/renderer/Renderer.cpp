@@ -44,13 +44,12 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
 
 void Renderer::resizeViewport(int width, int height, float z_near,
                               float z_far) {
-  std::cout << "Resizing viewport" << std::endl;
-  backend_->setViewport(0, 0, width, height);
-
   scr_width_ = width;
   scr_height_ = height;
   z_near_ = z_near;
   z_far_ = z_far;
+
+  backend_->setViewport(0, 0, width, height);
 
   shadow_map_texture_.reset(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
@@ -104,12 +103,6 @@ void Renderer::resizeViewport(int width, int height, float z_near,
 }
 
 Renderer::~Renderer() {
-  for (auto [id, resource] : batch_cache_) {
-    delete resource;
-  }
-  for (auto [id, texture] : texture_cache_) {
-    delete texture;
-  }
   batch_cache_.clear();
   texture_cache_.clear();
 }
@@ -214,7 +207,7 @@ void Renderer::drawShadowPass(
       shadow_shader_->setMat4("model",
                               mesh_renderer.transform.transformation());
 
-      gpu::Batch* batch = retrieveMeshGPUBatch(
+      const auto& batch = retrieveMeshGPUBatch(
           ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
       batch->draw();
     }
@@ -244,7 +237,7 @@ void Renderer::drawMainPass(
   for (const auto& mesh_renderer : mesh_renderers) {
     depth_shader_->setMat4("model", mesh_renderer.transform.transformation());
 
-    gpu::Batch* batch = retrieveMeshGPUBatch(
+    const auto& batch = retrieveMeshGPUBatch(
         ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
 
     batch->draw();
@@ -267,7 +260,7 @@ void Renderer::drawMainPass(
     depth_texture_->bind(11);
     shader->setMat4("model", mesh_renderer.transform.transformation());
 
-    gpu::Batch* batch = retrieveMeshGPUBatch(
+    const auto& batch = retrieveMeshGPUBatch(
         ResourceManager::get().getMesh(mesh_renderer.data.mesh).value());
 
     batch->draw();
@@ -325,7 +318,8 @@ gpu::Batch* Renderer::allocScreenQuadBatch() {
   return backend_->allocBatch(vert_buffer);
 }
 
-gpu::Texture* Renderer::retrieveGPUTexture(const Texture* texture) {
+const std::unique_ptr<gpu::Texture>& Renderer::retrieveGPUTexture(
+    const Texture* texture) {
   if (texture_cache_.find(texture->id) != texture_cache_.end()) {
     return texture_cache_[texture->id];
   }
@@ -363,17 +357,18 @@ gpu::Texture* Renderer::retrieveGPUTexture(const Texture* texture) {
       gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
   }
 
-  gpu::Texture* gpu_texture = backend_->generateTexture(
+  auto gpu_texture = std::unique_ptr<gpu::Texture>(backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu_texture_format, gpu_data_type,
       texture->width, texture->height, 0, 0, 0, texture->data,
-      gpu::TextureFilter::LINEAR);
+      gpu::TextureFilter::LINEAR));
   gpu_texture->generateMipmap();
 
-  texture_cache_[texture->id] = gpu_texture;
-  return gpu_texture;
+  texture_cache_[texture->id] = std::move(gpu_texture);
+  return texture_cache_[texture->id];
 }
 
-gpu::Batch* Renderer::retrieveMeshGPUBatch(const Mesh* mesh) {
+const std::unique_ptr<gpu::Batch>& Renderer::retrieveMeshGPUBatch(
+    const Mesh* mesh) {
   if (batch_cache_.find(mesh->id) != batch_cache_.end()) {
     return batch_cache_[mesh->id];
   }
@@ -397,10 +392,11 @@ gpu::Batch* Renderer::retrieveMeshGPUBatch(const Mesh* mesh) {
                            mesh->indices_.size() * sizeof(unsigned int),
                            mesh->indices_.data());
 
-  gpu::Batch* batch = backend_->allocBatch(vertex_buffer, index_buffer);
-  batch_cache_[mesh->id] = batch;
+  auto batch = std::unique_ptr<gpu::Batch>(
+      backend_->allocBatch(vertex_buffer, index_buffer));
+  batch_cache_[mesh->id] = std::move(batch);
 
-  return batch;
+  return batch_cache_[mesh->id];
 }
 
 void Renderer::setShaderInputsForMaterial(const Material& mat,
@@ -412,7 +408,8 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
       shader->setTexture(
           (name + "_tex").c_str(),
           retrieveGPUTexture(
-              ResourceManager::get().getTexture(input.tex_name).value()));
+              ResourceManager::get().getTexture(input.tex_name).value())
+              .get());
     } else {
       shader->setBool(name + "_use_tex", false);
       shader->setVec3(name + "_val", input.value);
@@ -425,7 +422,8 @@ void Renderer::setShaderInputsForMaterial(const Material& mat,
       shader->setTexture(
           (name + "_tex").c_str(),
           retrieveGPUTexture(
-              ResourceManager::get().getTexture(input.tex_name).value()));
+              ResourceManager::get().getTexture(input.tex_name).value())
+              .get());
     } else {
       shader->setBool(name + "_use_tex", false);
       shader->setFloat(name + "_val", input.value);

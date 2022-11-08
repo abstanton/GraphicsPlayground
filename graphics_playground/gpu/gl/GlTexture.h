@@ -19,7 +19,7 @@ class GlTexture : public Texture {
             TextureWrapping wrap_t = TextureWrapping::REPEAT,
             glm::vec4 border_color = {0, 0, 0, 0});
 
-  void bind(int slot) override;
+  void bind(int slot) const override;
   void generateMipmap() override;
 
   GLuint id_;

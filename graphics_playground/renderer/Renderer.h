@@ -115,11 +115,11 @@ class Renderer {
   float z_near_;
   float z_far_;
 
-  gpu::Texture* retrieveGPUTexture(const Texture* texture);
-  gpu::Batch* retrieveMeshGPUBatch(const Mesh* mesh);
+  const std::unique_ptr<gpu::Texture>& retrieveGPUTexture(const Texture* texture);
+  const std::unique_ptr<gpu::Batch>& retrieveMeshGPUBatch(const Mesh* mesh);
 
-  std::unordered_map<unsigned int, gpu::Texture*> texture_cache_;
-  std::unordered_map<unsigned int, gpu::Batch*> batch_cache_;
+  std::unordered_map<unsigned int, std::unique_ptr<gpu::Texture>> texture_cache_;
+  std::unordered_map<unsigned int, std::unique_ptr<gpu::Batch>> batch_cache_;
 
   void uploadRenderData(
       const Camera& camera,

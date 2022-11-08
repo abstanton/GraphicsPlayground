@@ -28,7 +28,7 @@ GlBatch::GlBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff)
   glBindVertexArray(0);
 }
 
-void GlBatch::draw() {
+void GlBatch::draw() const {
   glBindVertexArray(vao_id_);
   if (index_buff_ != nullptr) {
     glDrawElements(GL_TRIANGLES, index_buff_->count(), GL_UNSIGNED_INT, 0);
@@ -38,5 +38,5 @@ void GlBatch::draw() {
   glBindVertexArray(0);
 }
 
-void GlBatch::drawIndirect() {}
+void GlBatch::drawIndirect() const {}
 }  // namespace gpu
