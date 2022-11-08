@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "components/PlayerComponent.h"
+#include "components/Player.h"
 
 void SpaceInvaders::setup() {
   renderer->setClearColour({0.0, 0.0, 0.0});
