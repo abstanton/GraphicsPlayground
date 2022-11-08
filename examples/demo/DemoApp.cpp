@@ -51,13 +51,13 @@ void DemoApp::setup() {
 
   auto light_0 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_0, glm::vec3(-2.5f, 6.0f, 1.0f),
-                                        glm::vec3(0.4f, 0.4f, 1.0f), 8.0f);
+                                        glm::vec3(0.4f, 0.4f, 1.0f), 2.0f);
   auto light_1 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_1, glm::vec3(2.5f, 6.0f, 0.0f),
-                                        glm::vec3(1.0f, 1.0f, 1.0f), 15.0f);
+                                        glm::vec3(1.0f, 1.0f, 1.0f), 7.0f);
   auto light_2 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_2, glm::vec3(0.0f, 6.0f, -2.5f),
-                                        glm::vec3(1.0f, 1.0f, 1.0f), 20.0f);
+                                        glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
 
   MeshRenderer cube_mesh = mr_0;
   for (float i = 0; i < 5; i++) {

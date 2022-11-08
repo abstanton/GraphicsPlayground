@@ -115,7 +115,7 @@ void Renderer::draw(
   backend_->clear(gpu::ClearType::ALL);
   uploadRenderData(camera, point_lights, direction_lights);
   drawShadowPass(mesh_renderers, point_lights, direction_lights);
-  drawMainPass(mesh_renderers);
+  drawMainPass(camera, mesh_renderers);
 }
 
 void Renderer::uploadRenderData(
@@ -217,6 +217,7 @@ void Renderer::drawShadowPass(
 }
 
 void Renderer::drawMainPass(
+    const Camera& camera,
     const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers) {
   colour_frame_buffer_->bind();
   backend_->setViewport(0, 0, scr_width_, scr_height_);
@@ -297,6 +298,7 @@ void Renderer::drawMainPass(
   colour_texture_->bind(0);
   blurred_ao_texture_->bind(1);
   // TODO: Set exposure from camera exposure
+  screen_quad_shader_->setFloat("exposure", camera.getExposure());
   quad_batch_->draw();
   glGetError();
 }

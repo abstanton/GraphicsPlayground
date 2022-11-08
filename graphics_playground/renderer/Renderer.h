@@ -130,6 +130,7 @@ class Renderer {
       const std::vector<TransformAnd<PointLight>>& point_lights,
       const std::vector<DirectionLight>& direction_lights);
   void drawMainPass(
+      const Camera& camera,
       const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers);
 
   void setShaderInputsForMaterial(const Material& mat,

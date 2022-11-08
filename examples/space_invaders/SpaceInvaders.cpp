@@ -29,7 +29,6 @@ void SpaceInvaders::setup() {
 
   for (auto& asteroid : asteroid_meshes) {
     asteroid.material = asteroid_material;
-    // registry.createEntity<MeshRenderer, Transform>(asteroid, Transform());
   }
 
   MeshRenderer spaceship_mesh =
@@ -61,6 +60,7 @@ void SpaceInvaders::setup() {
   auto camera_ent = registry.createEntity();
   Camera& camera =
       registry.addComponent<Camera>(camera_ent, glm::vec3(0.0f, 0.0f, 10.0f));
+  camera.setExposure(1.0f);
 
   auto player_ent = registry.createEntity();
   registry.addComponent<Transform>(
@@ -70,7 +70,7 @@ void SpaceInvaders::setup() {
   registry.addComponent<Player>(player_ent, Player());
 
   auto direction_light = registry.createEntity<DirectionLight>(
-      DirectionLight({0, 1, 0.5}, {1.0, 1.0, 1.0}, 10.0f));
+      DirectionLight({0, 1, 0.5}, {1.0, 1.0, 1.0}, 30.0f));
 
   player_controller_system =
       std::make_unique<PlayerControllerSystem>(bullet_mesh);
