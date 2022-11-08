@@ -9,6 +9,7 @@ out vec3 pos;
 out mat3 TBN;
 out vec3 view_pos;
 out vec3 view_norm;
+out mat3 view_model_mat;
 
 layout(std140, binding = 0) uniform CameraMatrices {
     mat4 view;
@@ -22,6 +23,7 @@ uniform mat4 model;
 void main()
 {
    mat3 viewModelVector = transpose(inverse(mat3(view*model)));
+   view_model_mat = viewModelVector;
 
    vec3 bitang = normalize(cross(normalize(aNorm), normalize(aTang)));
 

@@ -11,6 +11,7 @@ in vec3 pos;
 in mat3 TBN;
 in vec3 view_pos;
 in vec3 view_norm;
+in mat3 view_model_mat;
 
 #define MAX_TOTAL_POINT_LIGHTS 100
 #define MAX_TOTAL_DIRECTION_LIGHTS 100
@@ -70,7 +71,7 @@ layout(binding = 11) uniform sampler2D depth_map;
 
 const float PI = 3.14159265359;
 
-float ShadowCalculation(vec4 fragPosLightSpace, float i)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 light_dir, float i)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -79,7 +80,8 @@ float ShadowCalculation(vec4 fragPosLightSpace, float i)
   
     float currentDepth = projCoords.z;
 
-	float bias = 0.05;
+	float bias = max(0.05 * (1.0 - dot(normal, light_dir)), 0.005);  
+
    
 	float shadow = 0.0;
 	
@@ -181,6 +183,8 @@ void main()
     else {
         normal = view_norm;
     }
+
+    vec3 world_norm = inverse(view_model_mat) * view_norm;
     
     float metallic = metalness_use_tex == 1? vec3(texture(metalness_tex, uv*metalness_scale)).x : metalness_val;
 
@@ -206,7 +210,7 @@ void main()
 	for (int i = 0; i < numDirectionLights; i++) {
         DirectionLight light = direction_lights[i];
 		vec4 fragPosLightSpace = light.light_space_matrix * vec4(pos, 1.0);
-        float shadow = ShadowCalculation(fragPosLightSpace, i);
+        float shadow = ShadowCalculation(fragPosLightSpace, world_norm, normalize(light.direction.xyz), i);
         vec3 colour = vec3(light.colour.x, light.colour.y, light.colour.z);
     
         vec3 radiance = colour * (1-shadow) * light.intensity;
