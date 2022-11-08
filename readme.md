@@ -30,12 +30,13 @@ Space Invaders demo
 - [ ] Image Based Lighting
 - [x] SSAO
 - [ ] SSR
+- [ ] Contact Shadows
 - [x] Improve building experience
-- [ ] SceneGraph for speed
+- [ ] SceneGraph for collision, culling etc
 - [ ] SceneHierarchy for proper scene organisation
 - [ ] Assimp texture loading
 - [ ] Make prettier demo
-- [ ] Audio handling (unlikely)
+- [ ] Audio handling
 
 ## Building
 As one of the Todos says, this will not build on other systems because I have included paths on my machine in the CMakeLists.txt. Hopefully I'll fix that
