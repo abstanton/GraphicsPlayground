@@ -28,6 +28,7 @@ Space Invaders demo
 - [ ] Improve input support
 - [ ] Support transparent materials
 - [ ] Image Based Lighting
+- [ ] AA (FXAA, MSAA... tbd)
 - [x] SSAO
 - [ ] SSR
 - [ ] Contact Shadows
