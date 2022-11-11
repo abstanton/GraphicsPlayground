@@ -35,9 +35,9 @@ ShaderManager::ShaderManager() {
   std::cout << "Finished" << std::endl;
 }
 
-gpu::ShaderProgram* ShaderManager::compileVertFragShaderProgram(
+gpu::ShaderProgramPtr ShaderManager::compileVertFragShaderProgram(
     const char* vs_source, const char* fs_source) const {
-  gpu::ShaderProgram* shader_program =
+  gpu::ShaderProgramPtr shader_program =
       gpu::Backend::get()->allocShaderProgram();
   shader_program->addShaderFromSource(gpu::ShaderType::VERT, vs_source);
   shader_program->addShaderFromSource(gpu::ShaderType::FRAG, fs_source);
@@ -45,7 +45,7 @@ gpu::ShaderProgram* ShaderManager::compileVertFragShaderProgram(
   return shader_program;
 }
 
-gpu::ShaderProgram* ShaderManager::getShader(string name) {
+gpu::ShaderProgramPtr ShaderManager::getShader(string name) {
   auto& inst = ShaderManager::get();
   if (inst.builtin_shaders_.find(name) != inst.builtin_shaders_.end()) {
     return (*inst.builtin_shaders_.find(name)).second;
@@ -75,7 +75,7 @@ string ShaderManager::getShaderName(BuiltinShader type) {
   }
 }
 
-gpu::ShaderProgram* ShaderManager::compileFromFiles(
+gpu::ShaderProgramPtr ShaderManager::compileFromFiles(
     const char* vs_filename, const char* fs_filename) const {
   gpu::Backend* backend = gpu::Backend::get();
   std::string vertex_code;
@@ -110,7 +110,8 @@ gpu::ShaderProgram* ShaderManager::compileFromFiles(
 bool ShaderManager::addShaderProgram(const char* vs_filename,
                                      const char* fs_filename, string name) {
   auto& inst = ShaderManager::get();
-  gpu::ShaderProgram* shader = inst.compileFromFiles(vs_filename, fs_filename);
+  gpu::ShaderProgramPtr shader =
+      inst.compileFromFiles(vs_filename, fs_filename);
   if (shader != nullptr) {
     inst.custom_shaders_[name] = shader;
     return true;

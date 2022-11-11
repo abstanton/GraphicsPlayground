@@ -18,7 +18,7 @@ enum class BuiltinShader {
 
 class ShaderManager {
  public:
-  static gpu::ShaderProgram* getShader(string name);
+  static gpu::ShaderProgramPtr getShader(string name);
   static string getShaderName(BuiltinShader type);
   static Material getMaterialForBuiltin(BuiltinShader type);
   static bool addShaderProgram(const char* vs_filename, const char* fs_filename,
@@ -31,12 +31,12 @@ class ShaderManager {
   }
   ShaderManager();
 
-  gpu::ShaderProgram* compileFromFiles(const char* vs_filename,
+  gpu::ShaderProgramPtr compileFromFiles(const char* vs_filename,
                                        const char* fs_filename) const;
 
-  gpu::ShaderProgram* ShaderManager::compileVertFragShaderProgram(
+  gpu::ShaderProgramPtr ShaderManager::compileVertFragShaderProgram(
       const char* vs_source, const char* fs_source) const;
 
-  std::unordered_map<string, gpu::ShaderProgram*> custom_shaders_;
-  std::unordered_map<string, gpu::ShaderProgram*> builtin_shaders_;
+  std::unordered_map<string, gpu::ShaderProgramPtr> custom_shaders_;
+  std::unordered_map<string, gpu::ShaderProgramPtr> builtin_shaders_;
 };
