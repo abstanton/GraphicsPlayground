@@ -13,14 +13,18 @@ float randomInRange(float low, float high) {
 void AsteroidSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   // first delete asteroids too far away
   int num_alive_asteroids = 0;
+  std::vector<ecs::Entity> to_remove;
   registry.view<Asteroid, Transform>().each(
       [&](ecs::Entity ent, Asteroid&, Transform& trans) {
         if ((trans.position().y < -8.0) || (abs(trans.position().x) > 10.0f)) {
-          registry.destroyEntity(ent);
+          to_remove.push_back(ent);
         } else {
           num_alive_asteroids++;
         }
       });
+  for (auto ent : to_remove) {
+    registry.destroyEntity(ent);
+  }
 
   // add needed asteroids
   for (int i = num_alive_asteroids; i < max_asteroids; i++) {

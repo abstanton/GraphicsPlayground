@@ -19,7 +19,7 @@ class AsteroidSystem : public System {
  private:
   std::vector<MeshRenderer> asteroid_meshes_;
 
-  int max_asteroids = 15;
+  int max_asteroids = 40;
   glm::vec2 x_spawn_range = {-5, 5};
   glm::vec2 y_spawn_range = {20.0f, 50.0f};
   glm::vec2 y_vel_range = {-4.0f, -8.0f};
