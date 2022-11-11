@@ -11,8 +11,14 @@
 
 #define MAX_POINT_LIGHTS 100
 #define MAX_DIRECTION_LIGHTS 100
-#define SHADOW_MAP_RESOLUTION 1024
+#define SHADOW_MAP_RESOLUTION 4096
 #define MAX_DIRECTION_SHADOWS 10
+
+/*
+todo refs:
+https://gamedev.stackexchange.com/questions/73851/how-do-i-fit-the-camera-frustum-inside-directional-light-space
+(fit to frustrum)
+*/
 
 template <typename T>
 struct TransformAnd {
@@ -38,6 +44,9 @@ struct GPUDirectionLight {
   int is_shadowed;
   float padding_0[2];
   glm::mat4 light_space_matrix;
+  float size;
+  float frustrum_width;
+  float padding_3[2];
 };
 
 struct GPULightBuffer {
@@ -56,6 +65,7 @@ struct GPUCameraBuffer {
   glm::mat4 inverse_proj;
   glm::vec3 position;
   float padding;
+  float near_plane;
 };
 
 class Renderer {
@@ -78,32 +88,35 @@ class Renderer {
   ~Renderer();
 
  private:
-  gpu::ShaderProgram* ao_shader_;
-  gpu::ShaderProgram* blur_shader_;
-  gpu::ShaderProgram* depth_shader_;
-  gpu::ShaderProgram* screen_quad_shader_;
-  gpu::ShaderProgram* shadow_shader_;
+  gpu::ShaderProgramPtr ao_shader_;
+  gpu::ShaderProgramPtr blur_shader_;
+  gpu::ShaderProgramPtr depth_shader_;
+  gpu::ShaderProgramPtr screen_quad_shader_;
+  gpu::ShaderProgramPtr shadow_shader_;
 
-  std::unique_ptr<gpu::Texture> ao_texture_;
-  std::unique_ptr<gpu::Texture> blurred_ao_texture_;
-  std::unique_ptr<gpu::Texture> blurred_colour_texture_;
-  std::unique_ptr<gpu::Texture> colour_texture_;
-  std::unique_ptr<gpu::Texture> depth_texture_;
-  std::unique_ptr<gpu::Texture> normal_texture_;
-  std::unique_ptr<gpu::Texture> shadow_map_texture_;
+  gpu::TexturePtr ao_texture_;
+  gpu::TexturePtr blurred_ao_texture_;
+  gpu::TexturePtr blurred_colour_texture_;
+  gpu::TexturePtr colour_texture_;
+  gpu::TexturePtr depth_texture_;
+  gpu::TexturePtr normal_texture_;
+  gpu::TexturePtr shadow_map_texture_;
 
-  std::unique_ptr<gpu::Texture> ssao_noise_texture_;
+  gpu::TexturePtr ssao_noise_texture_;
   std::vector<glm::vec3> ssao_samples_;
 
-  std::unique_ptr<gpu::FrameBuffer> shadow_frame_buffer_;
-  std::unique_ptr<gpu::FrameBuffer> ss_frame_buffer_;
-  std::unique_ptr<gpu::FrameBuffer> colour_frame_buffer_;
-  std::unique_ptr<gpu::FrameBuffer> default_frame_buffer_;
+  gpu::TexturePtr noise_texture_;
+  gpu::TexturePtr disk_samples_texture_;
 
-  std::unique_ptr<gpu::UniformBuffer> camera_uniform_buffer_;
-  std::unique_ptr<gpu::UniformBuffer> lights_uniform_buffer_;
+  gpu::FrameBufferPtr shadow_frame_buffer_;
+  gpu::FrameBufferPtr ss_frame_buffer_;
+  gpu::FrameBufferPtr colour_frame_buffer_;
+  gpu::FrameBufferPtr default_frame_buffer_;
 
-  std::unique_ptr<gpu::Batch> quad_batch_;
+  gpu::UniformBufferPtr camera_uniform_buffer_;
+  gpu::UniformBufferPtr lights_uniform_buffer_;
+
+  gpu::BatchPtr quad_batch_;
 
   gpu::Backend* backend_;
 
@@ -115,17 +128,19 @@ class Renderer {
   float z_near_;
   float z_far_;
 
-  const std::unique_ptr<gpu::Texture>& retrieveGPUTexture(const Texture* texture);
-  const std::unique_ptr<gpu::Batch>& retrieveMeshGPUBatch(const Mesh* mesh);
+  gpu::TexturePtr loadGPUTexture(const Texture* texture);
+  const gpu::TexturePtr& retrieveGPUTexture(const Texture* texture);
+  const gpu::BatchPtr& retrieveMeshGPUBatch(const Mesh* mesh);
 
-  std::unordered_map<unsigned int, std::unique_ptr<gpu::Texture>> texture_cache_;
-  std::unordered_map<unsigned int, std::unique_ptr<gpu::Batch>> batch_cache_;
+  std::unordered_map<unsigned int, gpu::TexturePtr> texture_cache_;
+  std::unordered_map<unsigned int, gpu::BatchPtr> batch_cache_;
 
   void uploadRenderData(
       const Camera& camera,
       const std::vector<TransformAnd<PointLight>>& point_lights,
       const std::vector<DirectionLight>& direction_lights);
   void drawShadowPass(
+      const Camera& camera,
       const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers,
       const std::vector<TransformAnd<PointLight>>& point_lights,
       const std::vector<DirectionLight>& direction_lights);
@@ -134,10 +149,12 @@ class Renderer {
       const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers);
 
   void setShaderInputsForMaterial(const Material& mat,
-                                  gpu::ShaderProgram* shader);
+                                  const gpu::ShaderProgramPtr& shader);
 
   std::vector<glm::vec3> getSSAOKernel(int num_samples) const;
   std::vector<glm::vec3> getSSAONoise(int num_samples) const;
+  std::vector<glm::vec2> uniformDiskSamples(int num_samples) const;
+  std::vector<float> uniformLinearSamples(int num_samples) const;
 
-  gpu::Batch* allocScreenQuadBatch();
+  gpu::BatchPtr allocScreenQuadBatch();
 };

@@ -21,23 +21,41 @@ Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
   screen_quad_shader_ = ShaderManager::getShader("post");
   shadow_shader_ = ShaderManager::getShader("shadow");
 
-  camera_uniform_buffer_.reset(
-      backend_->allocUniformBuffer(sizeof(GPUCameraBuffer)));
-  lights_uniform_buffer_.reset(
-      backend_->allocUniformBuffer(sizeof(GPULightBuffer)));
+  camera_uniform_buffer_ =
+      backend_->allocUniformBuffer(sizeof(GPUCameraBuffer));
+  lights_uniform_buffer_ = backend_->allocUniformBuffer(sizeof(GPULightBuffer));
 
-  shadow_frame_buffer_.reset(backend_->allocFrameBuffer());
-  ss_frame_buffer_.reset(backend_->allocFrameBuffer());
-  colour_frame_buffer_.reset(backend_->allocFrameBuffer());
-  default_frame_buffer_.reset(backend_->defaultFrameBuffer());
+  shadow_frame_buffer_ = backend_->allocFrameBuffer();
+  ss_frame_buffer_ = backend_->allocFrameBuffer();
+  colour_frame_buffer_ = backend_->allocFrameBuffer();
+  default_frame_buffer_ = backend_->defaultFrameBuffer();
 
   auto ssao_noise = getSSAONoise(16);
-  ssao_noise_texture_.reset(backend_->generateTexture(
+  ssao_noise_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
-      gpu::DataType::FLOAT, 4, 4, 1, 1, 1, ssao_noise.data()));
+      gpu::DataType::FLOAT, 4, 4, 1, 1, 1, ssao_noise.data());
   ssao_samples_ = getSSAOKernel(64);
 
-  quad_batch_.reset(allocScreenQuadBatch());
+  ResourceManager::loadTexture("textures\\blue_noise.png", "blue_noise");
+  auto noise = uniformLinearSamples(128);
+  noise_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
+      gpu::DataType::FLOAT, noise.size(), 1, 1, 1, 1, noise.data());
+
+  auto disk_samples = uniformDiskSamples(512);
+  disk_samples_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
+      gpu::DataType::FLOAT, disk_samples.size() * 2, 1, 1, 1, 1,
+      disk_samples.data());
+
+  quad_batch_ = allocScreenQuadBatch();
+
+  shadow_map_texture_ = backend_->generateTexture(
+      gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
+      gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
+      MAX_DIRECTION_SHADOWS, nullptr, gpu::TextureFilter::NEAREST,
+      gpu::TextureFilter::LINEAR, gpu::TextureWrapping::CLAMP_TO_BORDER,
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
 
   this->resizeViewport(scr_width, scr_height);
 }
@@ -51,42 +69,36 @@ void Renderer::resizeViewport(int width, int height, float z_near,
 
   backend_->setViewport(0, 0, width, height);
 
-  shadow_map_texture_.reset(backend_->generateTexture(
-      gpu::TextureType::TEXTURE_2D_ARRAY, gpu::TextureFormat::DEPTH_32,
-      gpu::DataType::FLOAT, SHADOW_MAP_RESOLUTION, SHADOW_MAP_RESOLUTION, 1, 1,
-      MAX_DIRECTION_SHADOWS, nullptr, gpu::TextureFilter::NEAREST,
-      gpu::TextureFilter::NEAREST, gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER));
-  ao_texture_.reset(backend_->generateTexture(
+  ao_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
-      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureFilter::LINEAR, gpu::TextureFilter::LINEAR,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER));
-  blurred_ao_texture_.reset(backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  blurred_ao_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::R_32F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
-      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureFilter::LINEAR, gpu::TextureFilter::LINEAR,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER));
-  blurred_colour_texture_.reset(backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  blurred_colour_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
-      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr));
-  depth_texture_.reset(backend_->generateTexture(
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
+  depth_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::DEPTH_32,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
       gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER));
-  normal_texture_.reset(backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  normal_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGB_16F,
       gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr,
-      gpu::TextureFilter::NEAREST, gpu::TextureFilter::NEAREST,
+      gpu::TextureFilter::LINEAR, gpu::TextureFilter::LINEAR,
       gpu::TextureWrapping::CLAMP_TO_BORDER,
-      gpu::TextureWrapping::CLAMP_TO_BORDER));
-  colour_texture_.reset(backend_->generateTexture(
+      gpu::TextureWrapping::CLAMP_TO_BORDER);
+  colour_texture_ = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu::TextureFormat::RGBA_16F,
-      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr));
+      gpu::DataType::FLOAT, scr_width_, scr_height_, 1, 1, 1, nullptr);
 
   colour_frame_buffer_->addAttachment(
       gpu::FrameBufferAttachmentType::DepthAttachment,
@@ -114,7 +126,7 @@ void Renderer::draw(
     const std::vector<DirectionLight>& direction_lights) {
   backend_->clear(gpu::ClearType::ALL);
   uploadRenderData(camera, point_lights, direction_lights);
-  drawShadowPass(mesh_renderers, point_lights, direction_lights);
+  drawShadowPass(camera, mesh_renderers, point_lights, direction_lights);
   drawMainPass(camera, mesh_renderers);
 }
 
@@ -133,6 +145,7 @@ void Renderer::uploadRenderData(
   gpu_camera_buffer_.projection = projection_matrix;
   gpu_camera_buffer_.position = camera.Position;
   gpu_camera_buffer_.inverse_proj = glm::inverse(projection_matrix);
+  gpu_camera_buffer_.near_plane = z_near_;
 
   gpu_light_buffer_.ambient_light = ambient_light;
   gpu_light_buffer_.num_point_lights = static_cast<int>(point_lights.size());
@@ -153,14 +166,16 @@ void Renderer::uploadRenderData(
     direction_light.direction = direction_lights[i].direction;
 
     // TODO: Get this out of here!
-    float near_plane = 1.0f, far_plane = 20.0f;
+    float near_plane = 1.0f, far_plane = 30.0f;
     glm::mat4 light_projection =
-        glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
     glm::mat4 light_view =
-        glm::lookAt(direction_light.direction, glm::vec3(0.0, 0.0, 0.0),
-                    glm::vec3(0.0, 1.0, 0.0));
+        glm::lookAt(camera.Position - direction_lights[i].direction,
+                    camera.Position, glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 light_space_matrix = light_projection * light_view;
     direction_light.light_space_matrix = light_space_matrix;
+    direction_light.size = direction_lights[i].size;
+    direction_light.frustrum_width = 40.0f;
     gpu_light_buffer_.direction_lights[i] = direction_light;
   }
 
@@ -169,6 +184,7 @@ void Renderer::uploadRenderData(
 }
 
 void Renderer::drawShadowPass(
+    const Camera& camera,
     const std::vector<TransformAnd<MeshRenderer>>& mesh_renderers,
     const std::vector<TransformAnd<PointLight>>& point_lights,
     const std::vector<DirectionLight>& direction_lights) {
@@ -195,12 +211,13 @@ void Renderer::drawShadowPass(
     // clear texture before drawing depth
     backend_->clear(gpu::ClearType::DEPTH);
 
-    float near_plane = 1.0f, far_plane = 20.0f;
+    // TODO: Refactor to DirectionLight
+    float near_plane = 1.0f, far_plane = 30.0f;
     glm::mat4 lightProjection =
-        glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
     glm::mat4 lightView =
-        glm::lookAt(direction_lights[i].direction, glm::vec3(0.0, 0.0, 0.0),
-                    glm::vec3(0.0, 1.0, 0.0));
+        glm::lookAt(camera.Position - direction_lights[i].direction,
+                    camera.Position, glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     shadow_shader_->setMat4("lightSpaceMatrix", lightSpaceMatrix);
     for (const auto& mesh_renderer : mesh_renderers) {
@@ -253,12 +270,15 @@ void Renderer::drawMainPass(
 
   backend_->clear(gpu::ClearType::COLOR);
   for (const auto& mesh_renderer : mesh_renderers) {
-    gpu::ShaderProgram* shader =
+    auto shader =
         ShaderManager::getShader(mesh_renderer.data.material.shader_name);
     shader->use();
     setShaderInputsForMaterial(mesh_renderer.data.material, shader);
+    shader->setVec2("viewport", vec2(scr_width_, scr_height_));
     shadow_map_texture_->bind(10);
     depth_texture_->bind(11);
+    disk_samples_texture_->bind(12);
+    noise_texture_->bind(13);
     shader->setMat4("model", mesh_renderer.transform.transformation());
 
     const auto& batch = retrieveMeshGPUBatch(
@@ -275,6 +295,7 @@ void Renderer::drawMainPass(
   ss_frame_buffer_->bind();
   ao_shader_->use();
   ao_shader_->setVec3Arr("samples", ssao_samples_.data(), 64);
+  ao_shader_->setVec2("viewport", glm::vec2(scr_width_, scr_height_));
   depth_texture_->bind(0);
   normal_texture_->bind(1);
   ssao_noise_texture_->bind(5);
@@ -303,7 +324,7 @@ void Renderer::drawMainPass(
   glGetError();
 }
 
-gpu::Batch* Renderer::allocScreenQuadBatch() {
+gpu::BatchPtr Renderer::allocScreenQuadBatch() {
   float quadVertices[] = {// positions   // texCoords
                           -1.0f, 1.0f, 0.0f, 1.0f,  -1.0f, -1.0f,
                           0.0f,  0.0f, 1.0f, -1.0f, 1.0f,  0.0f,
@@ -315,17 +336,12 @@ gpu::Batch* Renderer::allocScreenQuadBatch() {
       {"pos", 0, 2, gpu::DataType::FLOAT, false, 4 * sizeof(float), (void*)0},
       {"uv", 1, 2, gpu::DataType::FLOAT, false, 4 * sizeof(float),
        (void*)(2 * sizeof(float))}};
-  gpu::VertexBuffer* vert_buffer = backend_->allocVertexBuffer();
+  gpu::VertexBufferPtr vert_buffer = backend_->allocVertexBuffer();
   vert_buffer->uploadData(attribs, 6, sizeof(quadVertices), quadVertices);
   return backend_->allocBatch(vert_buffer);
 }
 
-const std::unique_ptr<gpu::Texture>& Renderer::retrieveGPUTexture(
-    const Texture* texture) {
-  if (texture_cache_.find(texture->id) != texture_cache_.end()) {
-    return texture_cache_[texture->id];
-  }
-
+gpu::TexturePtr Renderer::loadGPUTexture(const Texture* texture) {
   gpu::TextureFormat gpu_texture_format;
   gpu::DataType gpu_data_type;
 
@@ -359,24 +375,31 @@ const std::unique_ptr<gpu::Texture>& Renderer::retrieveGPUTexture(
       gpu_data_type = gpu::DataType::UNSIGNED_BYTE;
   }
 
-  auto gpu_texture = std::unique_ptr<gpu::Texture>(backend_->generateTexture(
+  auto gpu_texture = backend_->generateTexture(
       gpu::TextureType::TEXTURE_2D, gpu_texture_format, gpu_data_type,
       texture->width, texture->height, 0, 0, 0, texture->data,
-      gpu::TextureFilter::LINEAR));
+      gpu::TextureFilter::LINEAR, gpu::TextureFilter::LINEAR);
   gpu_texture->generateMipmap();
 
+  return gpu_texture;
+}
+
+const gpu::TexturePtr& Renderer::retrieveGPUTexture(const Texture* texture) {
+  if (texture_cache_.find(texture->id) != texture_cache_.end()) {
+    return texture_cache_[texture->id];
+  }
+  gpu::TexturePtr gpu_texture = loadGPUTexture(texture);
   texture_cache_[texture->id] = std::move(gpu_texture);
   return texture_cache_[texture->id];
 }
 
-const std::unique_ptr<gpu::Batch>& Renderer::retrieveMeshGPUBatch(
-    const Mesh* mesh) {
+const gpu::BatchPtr& Renderer::retrieveMeshGPUBatch(const Mesh* mesh) {
   if (batch_cache_.find(mesh->id) != batch_cache_.end()) {
     return batch_cache_[mesh->id];
   }
 
-  gpu::VertexBuffer* vertex_buffer = backend_->allocVertexBuffer();
-  gpu::IndexBuffer* index_buffer = backend_->allocIndexBuffer();
+  auto vertex_buffer = backend_->allocVertexBuffer();
+  auto index_buffer = backend_->allocIndexBuffer();
 
   std::vector<gpu::VertexAttrib> vertex_attribs = {
       {"pos", 0, 3, gpu::DataType::FLOAT, false, sizeof(Vertex), (void*)0},
@@ -394,15 +417,14 @@ const std::unique_ptr<gpu::Batch>& Renderer::retrieveMeshGPUBatch(
                            mesh->indices_.size() * sizeof(unsigned int),
                            mesh->indices_.data());
 
-  auto batch = std::unique_ptr<gpu::Batch>(
-      backend_->allocBatch(vertex_buffer, index_buffer));
+  auto batch = backend_->allocBatch(vertex_buffer, index_buffer);
   batch_cache_[mesh->id] = std::move(batch);
 
   return batch_cache_[mesh->id];
 }
 
 void Renderer::setShaderInputsForMaterial(const Material& mat,
-                                          gpu::ShaderProgram* shader) {
+                                          const gpu::ShaderProgramPtr& shader) {
   for (auto&& [name, input] : mat.colour_inputs) {
     if (input.use_tex) {
       shader->setBool(name + "_use_tex", true);
@@ -474,4 +496,35 @@ std::vector<glm::vec3> Renderer::getSSAONoise(int num_samples) const {
     ssao_noise.push_back(glm::normalize(noise));
   }
   return ssao_noise;
+}
+
+std::vector<glm::vec2> Renderer::uniformDiskSamples(int num_samples) const {
+  std::uniform_real_distribution<float> random_floats(
+      0.0, 1.0);  // random floats between [0.0, 1.0]
+  std::default_random_engine generator;
+  std::vector<glm::vec2> samples;
+  int num = 0;
+  while (num < num_samples) {
+    glm::vec2 sample(random_floats(generator) - 0.5,
+                     random_floats(generator) - 0.5);
+    if ((sample.x * sample.x + sample.y * sample.y) < (0.5 * 0.5)) {
+      samples.push_back(sample);
+      num += 1;
+    }
+  }
+  return samples;
+}
+
+std::vector<float> Renderer::uniformLinearSamples(int num_samples) const {
+  std::uniform_real_distribution<float> random_floats(
+      0.0, 1.0);  // random floats between [0.0, 1.0]
+  std::default_random_engine generator;
+  std::vector<float> samples;
+  int num = 0;
+  while (num < num_samples) {
+    float sample = random_floats(generator);
+    samples.push_back(sample);
+    num += 1;
+  }
+  return samples;
 }
