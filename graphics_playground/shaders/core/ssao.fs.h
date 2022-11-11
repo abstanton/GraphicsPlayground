@@ -12,6 +12,7 @@ layout(std140, binding = 0) uniform CameraMatrices {
     mat4 projection;
     mat4 inverse_proj;
     vec4 cam_position;
+    float near_plane;
 };
 
 layout(binding=0) uniform sampler2D depth_texture;
@@ -21,14 +22,14 @@ layout(binding = 5) uniform sampler2D ssao_noise;
 uniform vec3 samples[64];
 
 //https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
-const vec4 viewport = vec4(0, 0, 1920, 1280);
+uniform vec2 viewport = vec2(1920, 1280);
 const vec2 depthrange = vec2(0,1);
 
 // TODO: Use more efficient version!
 vec4 CalcEyeFromWindow(in vec3 windowSpace)
 {
 	vec3 ndcPos;
-	ndcPos.xy = ((2.0 * windowSpace.xy) - (2.0 * viewport.xy)) / (viewport.zw) - 1;
+	ndcPos.xy = ((2.0 * windowSpace.xy) - (2.0 * 0)) / (viewport.xy) - 1;
 	ndcPos.z = (2.0 * windowSpace.z - depthrange.x - depthrange.y) /
     (depthrange.y - depthrange.x);
 
@@ -46,7 +47,7 @@ const vec2 noise_scale = vec2(1920, 1280) / 4.0;
 
 void main()
 { 
-    float depth = texture(depth_texture, gl_FragCoord.xy / viewport.zw).r;
+    float depth = texture(depth_texture, gl_FragCoord.xy / viewport.xy).r;
     vec3 fragPos   = CalcEyeFromWindow(vec3(gl_FragCoord.xy, depth)).xyz;
 
     vec3 normal = normalize(texture(normal_texture, TexCoords).rgb);
@@ -68,7 +69,7 @@ void main()
         offset.xyz /= offset.w;               // perspective divide
         offset.xyz  = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0  
         
-        vec3 view_pos = CalcEyeFromWindow(vec3(offset.xy * viewport.zw, texture(depth_texture, offset.xy).r)).xyz;
+        vec3 view_pos = CalcEyeFromWindow(vec3(offset.xy * viewport.xy, texture(depth_texture, offset.xy).r)).xyz;
         float sampleDepth = view_pos.z; 
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck; 
