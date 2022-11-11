@@ -14,6 +14,7 @@ layout(std140, binding = 0) uniform CameraMatrices {
     mat4 projection;
     mat4 inverse_proj;
     vec4 cam_position;
+    float near_plane;
 };
 
 layout(binding=0) uniform sampler2D screen_texture;
