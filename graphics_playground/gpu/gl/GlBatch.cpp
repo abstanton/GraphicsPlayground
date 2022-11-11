@@ -12,14 +12,14 @@ void GlBatch::vboBind() {
   }
 }
 
-GlBatch::GlBatch(VertexBuffer* vert_buff) : Batch(vert_buff) {
+GlBatch::GlBatch(VertexBufferPtr vert_buff) : Batch(vert_buff) {
   glGenVertexArrays(1, &vao_id_);
   glBindVertexArray(vao_id_);
   vboBind();
   glBindVertexArray(0);
 }
 
-GlBatch::GlBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff)
+GlBatch::GlBatch(VertexBufferPtr vert_buff, IndexBufferPtr index_buff)
     : Batch(vert_buff, index_buff) {
   glGenVertexArrays(1, &vao_id_);
   glBindVertexArray(vao_id_);

@@ -4,8 +4,6 @@
 namespace gpu {
 
 class UniformBuffer {
-  using UniformBufferPtr = std::shared_ptr<UniformBuffer>;
-
  public:
   UniformBuffer(size_t size) : size(size) {}
   virtual void uploadData(void* data) = 0;
@@ -15,5 +13,6 @@ class UniformBuffer {
  protected:
   size_t size;
 };
+using UniformBufferPtr = std::shared_ptr<UniformBuffer>;
 
 }  // namespace gpu

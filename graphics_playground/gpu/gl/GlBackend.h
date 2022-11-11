@@ -14,18 +14,19 @@ class GlBackend : public Backend {
  public:
   GlBackend();
 
-  FrameBuffer* defaultFrameBuffer() override;
-  UniformBuffer* allocUniformBuffer(size_t size) override;
-  FrameBuffer* allocFrameBuffer() override;
-  IndexBuffer* allocIndexBuffer() override;
-  VertexBuffer* allocVertexBuffer() override;
+  FrameBufferPtr defaultFrameBuffer() override;
+  UniformBufferPtr allocUniformBuffer(size_t size) override;
+  FrameBufferPtr allocFrameBuffer() override;
+  IndexBufferPtr allocIndexBuffer() override;
+  VertexBufferPtr allocVertexBuffer() override;
 
-  Batch* allocBatch(VertexBuffer* vert_buff) override;
-  Batch* allocBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff) override;
+  BatchPtr allocBatch(VertexBufferPtr vert_buff) override;
+  BatchPtr allocBatch(VertexBufferPtr vert_buff,
+                      IndexBufferPtr index_buff) override;
 
-  ShaderProgram* allocShaderProgram() override;
+  ShaderProgramPtr allocShaderProgram() override;
 
-  Texture* generateTexture(
+  TexturePtr generateTexture(
       TextureType type, TextureFormat format, DataType data_type,
       unsigned int width, unsigned int height, unsigned int depth,
       unsigned int mips, unsigned int levels, const void* data,

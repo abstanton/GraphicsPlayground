@@ -23,8 +23,6 @@ struct FrameBufferAttachment {
 };
 
 class FrameBuffer {
-  using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
-
  public:
   virtual void addAttachment(FrameBufferAttachmentType attachment_type,
                              FrameBufferAttachment attachment) {
@@ -45,5 +43,7 @@ class FrameBuffer {
   std::unordered_map<FrameBufferAttachmentType, FrameBufferAttachment>
       attachments_;
 };
+
+using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
 
 }  // namespace gpu

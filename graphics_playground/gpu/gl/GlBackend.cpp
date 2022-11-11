@@ -16,43 +16,48 @@ GlBackend::GlBackend() {
   glDebugMessageCallback(MessageCallback, 0);
 }
 
-FrameBuffer* GlBackend::defaultFrameBuffer() {
+FrameBufferPtr GlBackend::defaultFrameBuffer() {
   return GlFrameBuffer::defaultFrameBuffer();
 }
 
-FrameBuffer* GlBackend::allocFrameBuffer() { return new GlFrameBuffer(); }
-
-UniformBuffer* GlBackend::allocUniformBuffer(size_t size) {
-  return new GlUniformBuffer(size);
+FrameBufferPtr GlBackend::allocFrameBuffer() {
+  return std::make_shared<GlFrameBuffer>();
 }
 
-VertexBuffer* GlBackend::allocVertexBuffer() { return new GlVertexBuffer(); }
-
-IndexBuffer* GlBackend::allocIndexBuffer() { return new GlIndexBuffer(); }
-
-Batch* GlBackend::allocBatch(VertexBuffer* vert_buff) {
-  return new GlBatch(vert_buff);
-}
-Batch* GlBackend::allocBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff) {
-  return new GlBatch(vert_buff, index_buff);
+UniformBufferPtr GlBackend::allocUniformBuffer(size_t size) {
+  return std::make_shared<GlUniformBuffer>(size);
 }
 
-ShaderProgram* GlBackend::allocShaderProgram() {
-  auto shader_program = new GlShaderProgram();
+VertexBufferPtr GlBackend::allocVertexBuffer() {
+  return std::make_shared<GlVertexBuffer>();
+}
+
+IndexBufferPtr GlBackend::allocIndexBuffer() {
+  return std::make_shared<GlIndexBuffer>();
+}
+
+BatchPtr GlBackend::allocBatch(VertexBufferPtr vert_buff) {
+  return std::make_shared<GlBatch>(vert_buff);
+}
+BatchPtr GlBackend::allocBatch(VertexBufferPtr vert_buff,
+                               IndexBufferPtr index_buff) {
+  return std::make_shared<GlBatch>(vert_buff, index_buff);
+}
+
+ShaderProgramPtr GlBackend::allocShaderProgram() {
+  auto shader_program = std::make_shared<GlShaderProgram>();
   return shader_program;
 }
 
-Texture* GlBackend::generateTexture(TextureType type, TextureFormat format,
-                                    DataType data_type, unsigned int width,
-                                    unsigned int height, unsigned int depth,
-                                    unsigned int mips, unsigned int levels,
-                                    const void* data, TextureFilter min_filter,
-                                    TextureFilter mag_filter,
-                                    TextureWrapping wrap_s,
-                                    TextureWrapping wrap_t) {
-  return new GlTexture(type, format, data_type, width, height, depth, mips,
-                       levels, data, true, min_filter, mag_filter, wrap_s,
-                       wrap_t);
+TexturePtr GlBackend::generateTexture(
+    TextureType type, TextureFormat format, DataType data_type,
+    unsigned int width, unsigned int height, unsigned int depth,
+    unsigned int mips, unsigned int levels, const void* data,
+    TextureFilter min_filter, TextureFilter mag_filter, TextureWrapping wrap_s,
+    TextureWrapping wrap_t) {
+  return std::make_shared<GlTexture>(type, format, data_type, width, height,
+                                     depth, mips, levels, data, true,
+                                     min_filter, mag_filter, wrap_s, wrap_t);
 }
 
 void GlBackend::setViewport(int x, int y, int width, int height) {

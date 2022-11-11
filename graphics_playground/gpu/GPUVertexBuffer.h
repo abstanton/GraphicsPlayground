@@ -16,8 +16,6 @@ struct VertexAttrib {
 };
 
 class VertexBuffer {
-  using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
-
  public:
   size_t count() { return num_verts_; }
   std::vector<VertexAttrib> vertex_attribs_;
@@ -30,4 +28,5 @@ class VertexBuffer {
  protected:
   size_t num_verts_ = 0;
 };
+using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
 }  // namespace gpu

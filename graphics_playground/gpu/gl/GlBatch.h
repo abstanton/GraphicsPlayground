@@ -6,9 +6,9 @@
 namespace gpu {
 class GlBatch : public Batch {
  public:
-  GlBatch(VertexBuffer* vert_buff);
-  GlBatch(VertexBuffer* vert_buff, IndexBuffer* index_buff);
-  ~GlBatch();
+  GlBatch(VertexBufferPtr vert_buff);
+  GlBatch(VertexBufferPtr vert_buff, IndexBufferPtr index_buff);
+  ~GlBatch() {}
 
   void draw() const override;
   void drawIndirect() const override;

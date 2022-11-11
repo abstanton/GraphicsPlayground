@@ -17,7 +17,7 @@ class Backend {
  public:
   static Backend* get();
 
-  virtual Texture* generateTexture(
+  virtual TexturePtr generateTexture(
       TextureType type, TextureFormat format, DataType data_type,
       unsigned int width, unsigned int height, unsigned int depth,
       unsigned int mips, unsigned int levels, const void* data,
@@ -26,18 +26,18 @@ class Backend {
       TextureWrapping wrap_s = TextureWrapping::REPEAT,
       TextureWrapping wrap_t = TextureWrapping::REPEAT) = 0;
 
-  virtual FrameBuffer* defaultFrameBuffer() = 0;
-  virtual FrameBuffer* allocFrameBuffer() = 0;
+  virtual FrameBufferPtr defaultFrameBuffer() = 0;
+  virtual FrameBufferPtr allocFrameBuffer() = 0;
 
-  virtual UniformBuffer* allocUniformBuffer(size_t size) = 0;
-  virtual IndexBuffer* allocIndexBuffer() = 0;
-  virtual VertexBuffer* allocVertexBuffer() = 0;
+  virtual UniformBufferPtr allocUniformBuffer(size_t size) = 0;
+  virtual IndexBufferPtr allocIndexBuffer() = 0;
+  virtual VertexBufferPtr allocVertexBuffer() = 0;
 
-  virtual ShaderProgram* allocShaderProgram() = 0;
+  virtual ShaderProgramPtr allocShaderProgram() = 0;
 
-  virtual Batch* allocBatch(VertexBuffer* vert_buff) = 0;
-  virtual Batch* allocBatch(VertexBuffer* vert_buff,
-                            IndexBuffer* index_buff) = 0;
+  virtual BatchPtr allocBatch(VertexBufferPtr vert_buff) = 0;
+  virtual BatchPtr allocBatch(VertexBufferPtr vert_buff,
+                            IndexBufferPtr index_buff) = 0;
 
   virtual void setViewport(int x, int y, int width, int height) = 0;
   virtual void unbindFramebuffer() = 0;

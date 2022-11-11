@@ -12,9 +12,8 @@ class GlFrameBuffer : public FrameBuffer {
   GlFrameBuffer();
   GlFrameBuffer(GLuint id) : id_(id) {}
 
-  static GlFrameBuffer* defaultFrameBuffer() {
-    GlFrameBuffer* fb = new GlFrameBuffer(0);
-    return fb;
+  static FrameBufferPtr defaultFrameBuffer() {
+    return std::make_shared<GlFrameBuffer>(0);
   }
 
   void bindAttachment(FrameBufferAttachmentType attachment_type,

@@ -9,8 +9,6 @@ namespace gpu {
 enum class ShaderType { FRAG, VERT, COMPUTE, GEOM };
 
 class ShaderProgram {
-  using ShaderProgramPtr = std::shared_ptr<ShaderProgram>;
-
  public:
   virtual void use() const = 0;
   virtual void link() = 0;
@@ -38,4 +36,5 @@ class ShaderProgram {
   virtual void setMat4(const std::string& name,
                        const glm::mat4& value) const = 0;
 };
+using ShaderProgramPtr = std::shared_ptr<ShaderProgram>;
 }  // namespace gpu

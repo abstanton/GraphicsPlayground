@@ -3,8 +3,6 @@
 
 namespace gpu {
 class IndexBuffer {
-  using IndexBufferPtr = std::shared_ptr<IndexBuffer>;
-
  public:
   size_t count() { return num_indices_; }
 
@@ -16,4 +14,5 @@ class IndexBuffer {
  protected:
   size_t num_indices_;
 };
+using IndexBufferPtr = std::shared_ptr<IndexBuffer>;
 }  // namespace gpu
