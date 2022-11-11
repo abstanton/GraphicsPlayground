@@ -1,9 +1,14 @@
 #pragma once
+#include <memory>
+
 #include "GPUIndexBuffer.h"
 #include "GPUVertexBuffer.h"
 
 namespace gpu {
+
 class Batch {
+  using BatchPtr = std::shared_ptr<Batch>;
+
  protected:
   VertexBuffer* vert_buff_ = nullptr;
   IndexBuffer* index_buff_ = nullptr;

@@ -2,12 +2,15 @@
 #include <glad/glad.h>
 
 #include <glm/glm.hpp>
+#include <memory>
 
 #include "GPUTypes.h"
 
 namespace gpu {
 
 class Texture {
+  using TexturePtr = std::shared_ptr<Texture>;
+
  public:
   Texture(TextureType type, TextureFormat format, DataType data_type,
           unsigned int width, unsigned int height, unsigned int depth,

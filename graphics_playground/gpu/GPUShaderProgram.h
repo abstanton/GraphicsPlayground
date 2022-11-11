@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <memory>
 #include <string>
 
 #include "GPUTexture.h"
@@ -8,6 +9,8 @@ namespace gpu {
 enum class ShaderType { FRAG, VERT, COMPUTE, GEOM };
 
 class ShaderProgram {
+  using ShaderProgramPtr = std::shared_ptr<ShaderProgram>;
+
  public:
   virtual void use() const = 0;
   virtual void link() = 0;

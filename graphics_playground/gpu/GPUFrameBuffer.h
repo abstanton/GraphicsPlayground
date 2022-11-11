@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -22,6 +23,8 @@ struct FrameBufferAttachment {
 };
 
 class FrameBuffer {
+  using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
+
  public:
   virtual void addAttachment(FrameBufferAttachmentType attachment_type,
                              FrameBufferAttachment attachment) {

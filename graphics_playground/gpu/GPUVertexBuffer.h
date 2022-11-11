@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <vector>
 
 #include "GPUTypes.h"
@@ -15,6 +16,8 @@ struct VertexAttrib {
 };
 
 class VertexBuffer {
+  using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
+
  public:
   size_t count() { return num_verts_; }
   std::vector<VertexAttrib> vertex_attribs_;
