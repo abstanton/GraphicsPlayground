@@ -50,7 +50,7 @@ class Registry {
   template <typename... Components, typename = typename std::enable_if<
                                         sizeof...(Components) >= 2>::type>
   std::tuple<Components&...> addComponent(Entity entity) {
-    return std::forward_as_tuple(addComponent<Component>(entity)...);
+    return std::forward_as_tuple(addComponent<Components>(entity)...);
   }
 
   template <typename T>
