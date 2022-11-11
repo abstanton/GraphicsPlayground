@@ -7,8 +7,9 @@ struct DirectionLight {
   vec3 direction;
   vec3 colour;
   float intensity;
+  float size;
 
   DirectionLight() {}
-  DirectionLight(vec3 dir, vec3 col, float inten)
-      : direction(dir), colour(col), intensity(inten) {}
+  DirectionLight(vec3 dir, vec3 col, float siz, float inten)
+      : direction(dir), colour(col), size(siz), intensity(inten) {}
 };
