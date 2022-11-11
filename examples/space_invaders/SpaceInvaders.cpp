@@ -70,7 +70,7 @@ void SpaceInvaders::setup() {
   registry.addComponent<Player>(player_ent, Player());
 
   auto direction_light = registry.createEntity<DirectionLight>(
-      DirectionLight({0, 1, 0.5}, {1.0, 1.0, 1.0}, 30.0f));
+      DirectionLight({0, -1, -0.5}, {1.0, 1.0, 1.0}, 2.0, 30.0f));
 
   player_controller_system =
       std::make_unique<PlayerControllerSystem>(bullet_mesh);
