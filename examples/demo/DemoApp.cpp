@@ -5,6 +5,8 @@
 #include "components/RotateComponent.h"
 
 void DemoApp::setup() {
+  renderer->setClearColour({1.0, 1.0, 1.0});
+
   ResourceManager::loadTexture("textures\\metal_plate_diff_1k.png",
                                "metal_diff");
   ResourceManager::loadTexture("textures\\metal_plate_rough_1k.png",
@@ -55,7 +57,7 @@ void DemoApp::setup() {
                                         2.0f);
   auto light_1 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_1, -glm::vec3(2.5f, 6.0f, 0.0f),
-                                        glm::vec3(1.0f, 1.0f, 1.0f), 10.0f,
+                                        glm::vec3(1.0f, 1.0f, 1.0f), 20.0f,
                                         7.0f);
   auto light_2 = registry.createEntity();
   registry.addComponent<DirectionLight>(light_2, -glm::vec3(0.0f, 6.0f, -2.5f),
