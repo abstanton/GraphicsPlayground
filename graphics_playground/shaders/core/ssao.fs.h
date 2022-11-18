@@ -48,6 +48,11 @@ const vec2 noise_scale = vec2(1920, 1280) / 4.0;
 void main()
 { 
     float depth = texture(depth_texture, gl_FragCoord.xy / viewport.xy).r;
+    if (depth >= 0.9999f) {
+        FragColor = vec4(vec3(1.0), 1.0);
+        return;
+    }
+
     vec3 fragPos   = CalcEyeFromWindow(vec3(gl_FragCoord.xy, depth)).xyz;
 
     vec3 normal = normalize(texture(normal_texture, TexCoords).rgb);
