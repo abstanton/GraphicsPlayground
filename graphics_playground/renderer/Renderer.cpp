@@ -9,11 +9,12 @@
 Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
     : scr_width_(scr_width),
       scr_height_(scr_height),
-      clear_colour(clear_colour),
+      clear_colour_(clear_colour),
       gpu_light_buffer_({}),
       gpu_camera_buffer_({}) {
   backend_ = gpu::Backend::get();
-  backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z, 1.0f);
+  backend_->setClearColor(clear_colour_.x, clear_colour_.y, clear_colour_.z,
+                          1.0f);
 
   ao_shader_ = ShaderManager::getShader("ssao");
   blur_shader_ = ShaderManager::getShader("blur");
@@ -134,7 +135,7 @@ void Renderer::uploadRenderData(
     const Camera& camera,
     const std::vector<TransformAnd<PointLight>>& point_lights,
     const std::vector<DirectionLight>& direction_lights) {
-  glm::vec3 ambient_light = clear_colour;
+  glm::vec3 ambient_light = ambient_light_;
 
   glm::mat4 view_matrix = camera.getViewMatrix();
   glm::mat4 projection_matrix =

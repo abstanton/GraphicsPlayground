@@ -74,9 +74,15 @@ class Renderer {
                       float z_far = 100.0f);
 
   void setClearColour(glm::vec3 col) {
-    clear_colour = col;
-    backend_->setClearColor(clear_colour.x, clear_colour.y, clear_colour.z,
+    clear_colour_ = col;
+    backend_->setClearColor(clear_colour_.x, clear_colour_.y, clear_colour_.z,
                             1.0f);
+  }
+
+  /*TODO: use a World component with ambient light and optionally a texture for
+   * IBL*/
+  void setAmbientLight(glm::vec3 ambient_light) {
+    ambient_light_ = ambient_light;
   }
 
   void draw(const Camera& camera,
@@ -124,10 +130,13 @@ class Renderer {
   GPUCameraBuffer gpu_camera_buffer_;
 
   int scr_width_, scr_height_;
-  glm::vec3 clear_colour;
+  glm::vec3 clear_colour_;
   float z_near_;
   float z_far_;
 
+  glm::vec3 ambient_light_;
+
+  // Refactor to a GPUCache class?
   gpu::TexturePtr loadGPUTexture(const Texture* texture);
   const gpu::TexturePtr& retrieveGPUTexture(const Texture* texture);
   const gpu::BatchPtr& retrieveMeshGPUBatch(const Mesh* mesh);
