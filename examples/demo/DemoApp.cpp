@@ -5,7 +5,8 @@
 #include "components/RotateComponent.h"
 
 void DemoApp::setup() {
-  renderer->setClearColour({1.0, 1.0, 1.0});
+  renderer->setClearColour({10.0, 10.0, 10.0});
+  renderer->setAmbientLight({1.0, 1.0, 1.0});
 
   ResourceManager::loadTexture("textures\\metal_plate_diff_1k.png",
                                "metal_diff");

@@ -8,6 +8,7 @@
 
 void SpaceInvaders::setup() {
   renderer->setClearColour({0.0, 0.0, 0.0});
+  renderer->setAmbientLight({0.0, 0.0, 0.0});
 
   std::vector<MeshRenderer> asteroid_meshes =
       ResourceManager::loadObject("meshes\\asteroids.fbx", "asteroids");
