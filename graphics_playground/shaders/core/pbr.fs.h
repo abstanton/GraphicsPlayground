@@ -1,5 +1,10 @@
 #pragma once
 
+/*
+https://www.youtube.com/watch?v=NCptEJ1Uevg&ab_channel=OGLDEV pcf with random
+sampling
+*/
+
 const char* pbr_fs = R"(#version 460
 #extension GL_ARB_bindless_texture : require
 
@@ -29,6 +34,8 @@ struct DirectionLight {
     float intensity;
     int is_shadowed;
     mat4 light_space_matrix;
+    float size;
+    float frustrum_width;
 };
 
 layout(std140, binding = 0) uniform CameraMatrices {
@@ -36,6 +43,7 @@ layout(std140, binding = 0) uniform CameraMatrices {
     mat4 projection;
     mat4 inverse_proj;
     vec4 cam_position;
+    float near_plane;
 };
 
 layout(std140, binding = 1) uniform Lights {
@@ -68,34 +76,72 @@ uniform vec2 metalness_scale;
 
 layout(binding = 10) uniform sampler2DArray shadow_map_array;
 layout(binding = 11) uniform sampler2D depth_map;
+layout(binding = 12) uniform sampler2D disk_samples;
+layout(binding = 13) uniform sampler2D noise;
+
+uniform int pcf_samples = 64;
+uniform vec2 viewport;
+uniform float pcf_scale_fac = 0.0013f;
 
 const float PI = 3.14159265359;
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 light_dir, float i)
+mat2 RotationMat(float angle) {
+    return mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 light_dir, float width, float size, float i)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-
     projCoords = projCoords * 0.5 + 0.5;
   
     float currentDepth = projCoords.z;
 
-	float bias = max(0.05 * (1.0 - dot(normal, light_dir)), 0.005);  
+	float bias = max(0.03 * (1.0 - dot(normal, light_dir)), 0.0001);  
 
-   
-	float shadow = 0.0;
-	
     vec2 texelSize = vec2(1)/textureSize(shadow_map_array, 0).xy;
+    float light_size_uv =  size / width;
+    float searchWidth = light_size_uv * (currentDepth - 1.0f) / currentDepth;
+    float blocker_depth = 0;
+    int blocker_num = 0;
 
-    for(int x = -2; x <= 2; ++x)
-    {
-        for(int y = -2; y <= 2; ++y)
-        {
-            float pcfDepth = texture(shadow_map_array, vec3(projCoords.xy + (vec2(x, y) * texelSize), i)).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
+    for (float u = -2; u < 3; u++) {
+        for (float v = -2; v < 3; v++) {
+            vec2 offset = vec2(u, v) * searchWidth;
+            float depth = texture(shadow_map_array, vec3(projCoords.xy + offset, i)).r; 
+            if (depth < currentDepth) {
+                blocker_depth += depth;
+                blocker_num += 1;
+            }    
+        } 
     }
-    shadow = clamp(shadow / 25.0, 0.0, 1.0);
+
+    blocker_depth = blocker_depth / float(blocker_num);
+    float penumbra = (currentDepth - blocker_depth) / blocker_depth;
+    penumbra = penumbra * light_size_uv * 1.0 / currentDepth;
+
+    float noise_size = textureSize(noise, 0).x;
+    float noise_uv_scale = viewport.x * viewport.y / noise_size;
+    float x_pix = gl_FragCoord.x;
+    float y_pix = gl_FragCoord.y;
+    float noise_uv = (x_pix*y_pix)/(viewport.x*viewport.y) * noise_uv_scale;
+    float noise_val = texture(noise, vec2(noise_uv, 0)).x;
+    mat2 rot_mat = RotationMat(2 * PI * noise_val);
+
+    float disk_tex_size = 1.0f/1024.0f;
+	float shadow = 0.0;
+
+    for (int j = 0; j < pcf_samples*2; j+=2) {
+        float offset_x = texture(disk_samples, vec2(float(j)*disk_tex_size, 0.5)).x;
+        float offset_y = texture(disk_samples, vec2(float((j+1))*disk_tex_size, 0.5)).x;
+        vec2 offset = vec2(offset_x, offset_y);
+        offset = rot_mat * offset;
+        float pcf_depth = texture(shadow_map_array, vec3(projCoords.xy + (offset*pcf_scale_fac), i)).r; 
+        shadow += currentDepth - bias > pcf_depth ? 1.0 : 0.0;     
+    }
+
+    shadow = clamp(shadow / float(pcf_samples), 0.0, 1.0);
+
 	if(projCoords.z > 1.0)
         shadow = 0.0;
     return shadow;
@@ -210,12 +256,12 @@ void main()
 	for (int i = 0; i < numDirectionLights; i++) {
         DirectionLight light = direction_lights[i];
 		vec4 fragPosLightSpace = light.light_space_matrix * vec4(pos, 1.0);
-        float shadow = ShadowCalculation(fragPosLightSpace, world_norm, normalize(light.direction.xyz), i);
+        float shadow = ShadowCalculation(fragPosLightSpace, world_norm, normalize(-light.direction.xyz),  light.frustrum_width, light.size, i);
         vec3 colour = vec3(light.colour.x, light.colour.y, light.colour.z);
     
         vec3 radiance = colour * (1-shadow) * light.intensity;
 
-        vec3 L = normalize((view*vec4(vec3(light.direction), 0.0)).xyz);
+        vec3 L = normalize((view*vec4(vec3(-light.direction), 0.0)).xyz);
         Lo += lightingCalc(radiance, L, V, N, F0, albedo, roughness, metallic);
     }
 
