@@ -3,5 +3,6 @@
 .VSCodeCounter
 build
 out
+refs
 graphics_playground/build
 *.pdb
