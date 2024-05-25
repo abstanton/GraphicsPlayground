@@ -1,6 +1,9 @@
 #pragma once
+
 #include "../../renderer/Renderer.h"
 #include "../System.h"
+
+namespace gp {
 
 class RenderSystem : public System {
  public:
@@ -15,3 +18,5 @@ class RenderSystem : public System {
   Renderer* renderer_;
   ecs::Entity camera_entity_;
 };
+
+}

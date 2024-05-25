@@ -1,3 +1,2 @@
 #include "GPUTexture.h"
-namespace gpu {
-}
+namespace gp::gpu {}

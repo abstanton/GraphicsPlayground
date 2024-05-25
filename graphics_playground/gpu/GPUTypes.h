@@ -1,5 +1,5 @@
 #pragma once
-namespace gpu {
+namespace gp::gpu {
 enum class TextureType {
   TEXTURE_1D,
   TEXTURE_1D_ARRAY,
@@ -40,4 +40,4 @@ enum class DataType {
   FLOAT,
   UNSIGNED_BYTE,
 };
-}  // namespace gpu
+}  // namespace gp::gpu

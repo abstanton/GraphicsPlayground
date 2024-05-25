@@ -4,6 +4,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+namespace gp {
+
 struct Transform {
   Transform() {
     pos = glm::vec3();
@@ -78,3 +80,5 @@ struct Transform {
   glm::quat rot;
   glm::mat4 matrix_;
 };
+
+}

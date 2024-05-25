@@ -5,6 +5,8 @@
 #include "components/MeshRenderer.h"
 #include "resources/core/Material.h"
 
+namespace gp {
+
 GraphicsPlayground::GraphicsPlayground() {
   system_manager = std::make_unique<SystemManager>(registry);
 
@@ -41,4 +43,6 @@ void GraphicsPlayground::run() {
   }
 
   return;
+}
+
 }

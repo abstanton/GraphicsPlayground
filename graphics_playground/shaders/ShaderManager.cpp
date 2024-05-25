@@ -15,6 +15,8 @@
 #include "core/shadow.vs.h"
 #include "core/ssao.fs.h"
 
+namespace gp {
+
 ShaderManager::ShaderManager() {
   std::cout << "Loading builtin shaders" << std::endl;
   builtin_shaders_["blur"] =
@@ -149,4 +151,6 @@ Material ShaderManager::getMaterialForBuiltin(BuiltinShader type) {
     default:
       return genDefaultMaterial();
   }
+}
+
 }

@@ -4,7 +4,7 @@
 #include "GPUIndexBuffer.h"
 #include "GPUVertexBuffer.h"
 
-namespace gpu {
+namespace gp::gpu {
 
 class Batch {
  protected:
@@ -21,4 +21,4 @@ class Batch {
 };
 using BatchPtr = std::shared_ptr<Batch>;
 
-}  // namespace gpu
+}  // namespace gp::gpu

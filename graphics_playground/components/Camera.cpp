@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+namespace gp {
+
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch,
                float exposure)
     : Front(glm::vec3(0.0f, 0.0f, -1.0f)),
@@ -80,4 +82,6 @@ void Camera::updateCameraVectors() {
                          // closer to 0 the more you look up or down which
                          // results in slower movement.
   Up = glm::normalize(glm::cross(Right, Front));
+}
+
 }

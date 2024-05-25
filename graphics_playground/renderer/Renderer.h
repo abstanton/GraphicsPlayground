@@ -14,10 +14,37 @@
 #define SHADOW_MAP_RESOLUTION 4096
 #define MAX_DIRECTION_SHADOWS 10
 
+namespace gp {
+
 /*
 todo refs:
 https://gamedev.stackexchange.com/questions/73851/how-do-i-fit-the-camera-frustum-inside-directional-light-space
 (fit to frustrum)
+*/
+
+/*
+class RenderCommand {
+
+}
+
+class RenderPass {
+  RenderPass(Renderer* renderer)
+
+  virtual void begin(SceneDescription sd);
+
+  virtual void submit(RenderCommand cmd);
+
+  virtual void end();
+}
+
+class ShadowPass : public RenderPass {
+  ShadowPass(Renderer* renderer) : RenderPass(renderer) {
+    // create framebuffers etc etc
+  }
+
+  void begin(SceneDescription sd)
+}
+
 */
 
 template <typename T>
@@ -167,3 +194,5 @@ class Renderer {
 
   gpu::BatchPtr allocScreenQuadBatch();
 };
+
+}  // namespace gp

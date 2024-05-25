@@ -5,6 +5,8 @@
 #include "../gpu/GPUBackend.h"
 #include "../resources/core/Material.h"
 
+namespace gp {
+
 using std::string;
 
 enum class BuiltinShader {
@@ -32,7 +34,7 @@ class ShaderManager {
   ShaderManager();
 
   gpu::ShaderProgramPtr compileFromFiles(const char* vs_filename,
-                                       const char* fs_filename) const;
+                                         const char* fs_filename) const;
 
   gpu::ShaderProgramPtr ShaderManager::compileVertFragShaderProgram(
       const char* vs_source, const char* fs_source) const;
@@ -40,3 +42,5 @@ class ShaderManager {
   std::unordered_map<string, gpu::ShaderProgramPtr> custom_shaders_;
   std::unordered_map<string, gpu::ShaderProgramPtr> builtin_shaders_;
 };
+
+}  // namespace gp

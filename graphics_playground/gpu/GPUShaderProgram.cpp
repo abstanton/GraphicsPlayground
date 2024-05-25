@@ -1,2 +1,2 @@
 #include "GPUShaderProgram.h"
-namespace gpu {}
+namespace gp::gpu {}

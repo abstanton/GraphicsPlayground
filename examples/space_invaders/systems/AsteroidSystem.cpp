@@ -2,6 +2,8 @@
 
 #include <components/Transform.h>
 
+using namespace gp;
+
 float f_rand() {
   return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }

@@ -3,6 +3,8 @@
 
 #include "System.h"
 
+namespace gp {
+
 class SystemManager {
  public:
   SystemManager(ecs::Registry& registry) : registry_(registry) {}
@@ -17,3 +19,5 @@ class SystemManager {
   std::vector<System*> systems_;
   ecs::Registry& registry_;
 };
+
+}

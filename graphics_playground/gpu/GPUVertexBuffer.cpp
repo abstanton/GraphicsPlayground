@@ -1,3 +1,2 @@
 #include "GPUVertexBuffer.h"
-namespace gpu {
-}
+namespace gp::gpu {}

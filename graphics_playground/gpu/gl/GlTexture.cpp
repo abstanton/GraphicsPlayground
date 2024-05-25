@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "GlTypes.h"
-namespace gpu {
+namespace gp::gpu {
 GlTexture::GlTexture(TextureType type, TextureFormat format, DataType data_type,
                      unsigned int width, unsigned int height,
                      unsigned int depth, unsigned int mips, unsigned int levels,
@@ -102,4 +102,4 @@ void GlTexture::generateMipmap() {
 }
 
 GlTexture::~GlTexture() { glDeleteTextures(1, &id_); }
-}  // namespace gpu
+}  // namespace gp::gpu

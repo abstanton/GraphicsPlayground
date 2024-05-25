@@ -9,15 +9,17 @@
 
 #include "../components/Asteroid.h"
 
-class AsteroidSystem : public System {
+using namespace gp;
+
+class AsteroidSystem : public gp::System {
  public:
-  AsteroidSystem(std::vector<MeshRenderer> asteroid_meshes)
+  AsteroidSystem(std::vector<gp::MeshRenderer> asteroid_meshes)
       : asteroid_meshes_(asteroid_meshes), gen(dev()) {}
 
   void onUpdate(ecs::Registry& registry, float delta_time) override;
 
  private:
-  std::vector<MeshRenderer> asteroid_meshes_;
+  std::vector<gp::MeshRenderer> asteroid_meshes_;
 
   int max_asteroids = 40;
   glm::vec2 x_spawn_range = {-5, 5};
@@ -31,5 +33,5 @@ class AsteroidSystem : public System {
   std::mt19937 gen;
 
   void spawnAsteroid(ecs::Registry& registry, int mesh_index, Asteroid asteroid,
-                     Transform transform);
+                     gp::Transform transform);
 };

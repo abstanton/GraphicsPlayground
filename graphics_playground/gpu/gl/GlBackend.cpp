@@ -1,5 +1,5 @@
 #include "GlBackend.h"
-namespace gpu {
+namespace gp::gpu {
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
                                        GLenum severity, GLsizei length,
                                        const GLchar* message,
@@ -65,4 +65,4 @@ void GlBackend::setViewport(int x, int y, int width, int height) {
 }
 
 void GlBackend::unbindFramebuffer() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-}  // namespace gpu
+}  // namespace gp::gpu

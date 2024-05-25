@@ -4,6 +4,8 @@
 
 #include "components/RotateComponent.h"
 
+using namespace gp;
+
 void DemoApp::setup() {
   renderer->setClearColour({10.0, 10.0, 10.0});
   renderer->setAmbientLight({1.0, 1.0, 1.0});

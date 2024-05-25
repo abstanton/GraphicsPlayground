@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-namespace gpu {
+namespace gp::gpu {
 class IndexBuffer {
  public:
   size_t count() { return num_indices_; }
@@ -15,4 +15,4 @@ class IndexBuffer {
   size_t num_indices_;
 };
 using IndexBufferPtr = std::shared_ptr<IndexBuffer>;
-}  // namespace gpu
+}  // namespace gp::gpu

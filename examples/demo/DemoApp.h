@@ -4,7 +4,7 @@
 #include "systems/CameraMovementSystem.h"
 #include "systems/RotateSystem.h"
 
-class DemoApp : public GraphicsPlayground {
+class DemoApp : public gp::GraphicsPlayground {
  public:
   void setup() override;
   void load() override;

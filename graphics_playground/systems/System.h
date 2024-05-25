@@ -1,6 +1,7 @@
 #pragma once
 #include "../ecs/Registry.hpp"
 
+namespace gp {
 class System {
  public:
   virtual void onConfigure(ecs::Registry& registry) {}
@@ -10,3 +11,5 @@ class System {
   virtual void onRender(ecs::Registry& registry) {}
   virtual void onExit(ecs::Registry& registry) {}
 };
+
+}

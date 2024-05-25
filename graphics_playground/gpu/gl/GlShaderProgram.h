@@ -1,9 +1,9 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <glad/glad.h>
 
 #include <fstream>
-#include <glm/glm.hpp>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -11,7 +11,7 @@
 
 #include "../GPUShaderProgram.h"
 
-namespace gpu {
+namespace gp::gpu {
 
 struct GlShader {
   GLuint id;
@@ -49,4 +49,4 @@ class GlShaderProgram : public ShaderProgram {
   unsigned int shader_program_ = 0;
   std::unordered_map<GLuint, GlShader> shaders_;
 };
-}  // namespace gpu
+}  // namespace gp::gpu

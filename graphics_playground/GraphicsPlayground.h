@@ -7,6 +7,8 @@
 #include "systems/SystemManager.h"
 #include "systems/core/RenderSystem.h"
 
+namespace gp {
+
 class GraphicsPlayground {
  public:
   GraphicsPlayground();
@@ -27,3 +29,5 @@ class GraphicsPlayground {
   float delta_time;
   float last_time;
 };
+
+}  // namespace gp

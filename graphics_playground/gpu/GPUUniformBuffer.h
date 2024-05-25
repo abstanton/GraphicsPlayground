@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-namespace gpu {
+namespace gp::gpu {
 
 class UniformBuffer {
  public:
@@ -15,4 +15,4 @@ class UniformBuffer {
 };
 using UniformBufferPtr = std::shared_ptr<UniformBuffer>;
 
-}  // namespace gpu
+}  // namespace gp::gpu

@@ -3,7 +3,7 @@
 
 #include "../GPUBatch.h"
 
-namespace gpu {
+namespace gp::gpu {
 class GlBatch : public Batch {
  public:
   GlBatch(VertexBufferPtr vert_buff);
@@ -18,4 +18,4 @@ class GlBatch : public Batch {
 
   GLuint vao_id_;
 };
-}  // namespace gpu
+}  // namespace gp::gpu

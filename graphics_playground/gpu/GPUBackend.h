@@ -9,7 +9,7 @@
 #include "GPUUniformBuffer.h"
 #include "GPUVertexBuffer.h"
 
-namespace gpu {
+namespace gp::gpu {
 
 enum class ClearType { ALL, DEPTH, COLOR };
 
@@ -37,7 +37,7 @@ class Backend {
 
   virtual BatchPtr allocBatch(VertexBufferPtr vert_buff) = 0;
   virtual BatchPtr allocBatch(VertexBufferPtr vert_buff,
-                            IndexBufferPtr index_buff) = 0;
+                              IndexBufferPtr index_buff) = 0;
 
   virtual void setViewport(int x, int y, int width, int height) = 0;
   virtual void unbindFramebuffer() = 0;
@@ -45,4 +45,4 @@ class Backend {
   virtual void clear(ClearType) = 0;
   virtual void setClearColor(float r, float g, float b, float a) = 0;
 };
-}  // namespace gpu
+}  // namespace gp::gpu

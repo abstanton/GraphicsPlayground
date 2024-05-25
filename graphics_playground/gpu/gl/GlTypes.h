@@ -3,7 +3,7 @@
 
 #include "../GPUTypes.h"
 
-namespace gpu {
+namespace gp::gpu {
 inline GLenum textureFormatToGlInternalFormat(TextureFormat format) {
   switch (format) {
     case TextureFormat::DEPTH:
@@ -104,4 +104,4 @@ inline GLenum dataTypeToGlDataType(DataType data_type) {
       return -1;
   }
 }
-}  // namespace gpu
+}  // namespace gp::gpu

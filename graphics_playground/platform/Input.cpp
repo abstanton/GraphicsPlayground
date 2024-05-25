@@ -1,5 +1,7 @@
 #include "Input.h"
 
+namespace gp {
+
 glm::vec2 Input::getMouseMovement() {
   auto& inst = Input::get();
   double xpos = inst.input_state_.mouse_position[0];
@@ -30,4 +32,6 @@ KeyState Input::getKeyState(Key key) {
     return KeyState::UP;
   }
   return inst.window_->getKeyState(key);
+}
+
 }

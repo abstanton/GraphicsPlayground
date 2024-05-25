@@ -1,11 +1,11 @@
 #pragma once
-
-#include "../gpu/GPUBackend.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <functional>
 #include <vector>
 
+namespace gp {
 
 using MouseMoveCallback = std::function<void(double, double)>;
 using ScrollOffsetCallback = std::function<void(double, double)>;
@@ -97,3 +97,5 @@ class Window {
 
   KeyState processGlfwKey(int glfw_key) const;
 };
+
+}  // namespace gp

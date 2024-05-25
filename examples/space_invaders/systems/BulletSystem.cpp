@@ -6,6 +6,8 @@
 #include "../components/Bullet.h"
 #include "iostream"
 
+using namespace gp;
+
 void BulletSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   registry.view<Bullet, Transform, PointLight>().each([&](ecs::Entity ent,
                                                           Bullet& bullet,

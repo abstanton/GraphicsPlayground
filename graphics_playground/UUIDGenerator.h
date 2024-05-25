@@ -1,5 +1,7 @@
 #pragma once
 
+namespace gp {
+
 class UUIDGenerator {
  public:
   static unsigned int getUUID() {
@@ -17,3 +19,5 @@ class UUIDGenerator {
   UUIDGenerator() {}
   unsigned int counter_;
 };
+
+}

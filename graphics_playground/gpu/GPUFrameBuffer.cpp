@@ -1,3 +1,2 @@
 #include "GPUFrameBuffer.h"
-namespace gpu {
-}
+namespace gp::gpu {}

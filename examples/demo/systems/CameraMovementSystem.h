@@ -1,7 +1,7 @@
 #pragma once
 #include <systems/System.h>
 
-class CameraMovementSystem : public System {
+class CameraMovementSystem : public gp::System {
  public:
   CameraMovementSystem() {}
 

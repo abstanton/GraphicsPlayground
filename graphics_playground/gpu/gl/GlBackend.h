@@ -9,7 +9,7 @@
 #include "GlVertexArray.h"
 #include "GlVertexBuffer.h"
 
-namespace gpu {
+namespace gp::gpu {
 class GlBackend : public Backend {
  public:
   GlBackend();
@@ -56,4 +56,4 @@ class GlBackend : public Backend {
     glClearColor(r, g, b, a);
   }
 };
-}  // namespace gpu
+}  // namespace gp::gpu

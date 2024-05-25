@@ -2,7 +2,7 @@
 
 #include "GlTypes.h"
 
-namespace gpu {
+namespace gp::gpu {
 void GlBatch::vboBind() {
   vert_buff_->bind();
   for (const auto& v : vert_buff_->vertex_attribs_) {
@@ -39,4 +39,4 @@ void GlBatch::draw() const {
 }
 
 void GlBatch::drawIndirect() const {}
-}  // namespace gpu
+}  // namespace gp::gpu

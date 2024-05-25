@@ -3,6 +3,8 @@
 
 #include "IResource.h"
 
+namespace gp {
+
 enum class TextureFormat {
   R,
 
@@ -54,3 +56,5 @@ struct Texture : public IResource {
   const unsigned char* data;
   TextureFormat format;
 };
+
+}

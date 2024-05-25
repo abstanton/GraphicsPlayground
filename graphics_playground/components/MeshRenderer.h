@@ -3,6 +3,8 @@
 #include "../resources/core/Mesh.h"
 #include "Transform.h"
 
+namespace gp {
+
 using std::string;
 struct MeshRenderer {
   string mesh;
@@ -13,3 +15,5 @@ struct MeshRenderer {
   MeshRenderer(string mesh, Material material)
       : mesh(mesh), material(material) {}
 };
+
+}

@@ -5,7 +5,7 @@
 
 #include "GlTexture.h"
 
-namespace gpu {
+namespace gp::gpu {
 std::optional<GlShaderProgram> GlShaderProgram::fromFilepaths(
     const std::string& vertexShaderPath,
     const std::string& fragmentShaderPath) {
@@ -152,4 +152,4 @@ void GlShaderProgram::setMat4(const std::string& name,
   glUniformMatrix4fv(glGetUniformLocation(shader_program_, name.c_str()), 1,
                      GL_FALSE, glm::value_ptr(value));
 }
-}  // namespace gpu
+}  // namespace gp::gpu

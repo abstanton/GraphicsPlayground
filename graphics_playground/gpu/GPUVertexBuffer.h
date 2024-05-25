@@ -4,7 +4,7 @@
 
 #include "GPUTypes.h"
 
-namespace gpu {
+namespace gp::gpu {
 struct VertexAttrib {
   const char* label;
   int index;
@@ -29,4 +29,4 @@ class VertexBuffer {
   size_t num_verts_ = 0;
 };
 using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
-}  // namespace gpu
+}  // namespace gp::gpu

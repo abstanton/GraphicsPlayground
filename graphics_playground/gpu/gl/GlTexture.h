@@ -3,7 +3,7 @@
 
 #include "../GPUTexture.h"
 
-namespace gpu {
+namespace gp::gpu {
 class GlTexture : public Texture {
  public:
   GlTexture();
@@ -25,4 +25,4 @@ class GlTexture : public Texture {
   GLuint id_;
   GLuint64 handle_;
 };
-}  // namespace gpu
+}  // namespace gp::gpu

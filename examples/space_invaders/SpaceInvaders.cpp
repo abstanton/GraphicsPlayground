@@ -6,6 +6,8 @@
 
 #include "components/Player.h"
 
+using namespace gp;
+
 void SpaceInvaders::setup() {
   renderer->setClearColour({0.0, 0.0, 0.0});
   renderer->setAmbientLight({0.0, 0.0, 0.0});

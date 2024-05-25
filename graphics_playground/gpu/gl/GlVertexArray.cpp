@@ -1,3 +1,2 @@
 #include "GlVertexArray.h"
-namespace gpu {
-}
+namespace gp::gpu {}

@@ -8,6 +8,8 @@
 // gp
 #include <components/MeshRenderer.h>
 
+using namespace gp;
+
 class PlayerControllerSystem : public System {
  public:
   PlayerControllerSystem(MeshRenderer bullet_mesh)

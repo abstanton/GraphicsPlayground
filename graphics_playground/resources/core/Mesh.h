@@ -4,6 +4,8 @@
 
 #include "IResource.h"
 
+namespace gp {
+
 struct Vertex {
   glm::vec3 pos;
   glm::vec3 norm;
@@ -22,3 +24,5 @@ struct Mesh : IResource {
   Mesh() : has_indices_(false), num_verts_(0) {}
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 };
+
+}  // namespace gp

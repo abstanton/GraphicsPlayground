@@ -5,6 +5,8 @@
 #include "../components/MeshRenderer.h"
 #include "../components/PointLight.h"
 
+namespace gp {
+
 RenderSystem::RenderSystem(Renderer* renderer) { renderer_ = renderer; }
 
 void RenderSystem::onConfigure(ecs::Registry& registry) {
@@ -32,3 +34,5 @@ void RenderSystem::onRender(ecs::Registry& registry) {
 }
 
 void RenderSystem::onExit(ecs::Registry& registry) {}
+
+}

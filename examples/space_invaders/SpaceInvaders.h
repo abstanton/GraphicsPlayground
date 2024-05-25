@@ -5,7 +5,7 @@
 #include "systems/BulletSystem.h"
 #include "systems/PlayerControllerSystem.h"
 
-class SpaceInvaders : public GraphicsPlayground {
+class SpaceInvaders : public gp::GraphicsPlayground {
  public:
   void setup() override;
   void load() override;

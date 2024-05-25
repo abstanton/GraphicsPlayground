@@ -12,37 +12,16 @@
 #include "core/Mesh.h"
 #include "core/Texture.h"
 
+namespace gp {
+
 using std::map;
 using std::string;
 using std::vector;
 
 /*
-TODO:
+Refactor to be a bit more like Ogre,
 
-Return ResourceHandle<Type> instead of raw pointer
-then, we have a
-
-template <typename T>
-struct ResourceHandle {
-  string name;
-  uint64 id;
-}
-
-Type* resource_ptr = ResourceManager::getResource<Type>(ResourceHandle<Type>
-handle);
-
-ResourceHandle<Type> handle = ResourceManager::getHandle<Type>(string name);
-
-ResourceHandle<Type> handle = ResourceManager::loadResource<Type>(string path,
-options etc) // overloaded for different resource types, for custom resources...
-
-std::unordered_map<string type_name, IResourceLoader>
-
-const IResourceLoader*  loader = ResourceManager::getResourceLoader<Type>()
-
-loadResource<
-
-Then,
+https://www.ogre3d.org/docs/api/1.9/class_ogre_1_1_resource_manager.html
 */
 
 class ResourceManager {
@@ -83,3 +62,5 @@ class ResourceManager {
                    std::vector<MeshRenderer>& meshes, const char* base_name);
   Mesh processMesh(aiMesh* mesh);
 };
+
+}

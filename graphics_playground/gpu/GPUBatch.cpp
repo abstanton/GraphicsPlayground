@@ -1,3 +1,2 @@
 #include "GPUBatch.h"
-namespace gpu {
-}
+namespace gp::gpu {}

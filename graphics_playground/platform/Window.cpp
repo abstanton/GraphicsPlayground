@@ -1,5 +1,7 @@
 #include "Window.h"
 
+namespace gp {
+
 Window::Window(int width, int height, const char* title, bool hide_cursor)
     : width(width), height(height) {
   glfwInit();
@@ -98,3 +100,5 @@ KeyState Window::getKeyState(Key key) const {
   }
   return processGlfwKey(glfw_key);
 }
+
+}  // namespace gp

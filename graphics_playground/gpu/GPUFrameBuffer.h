@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "GPUTexture.h"
-namespace gpu {
+namespace gp::gpu {
 enum class FrameBufferAttachmentType {
   DepthAttachment,
   StencilAttachment,
@@ -46,4 +46,4 @@ class FrameBuffer {
 
 using FrameBufferPtr = std::shared_ptr<FrameBuffer>;
 
-}  // namespace gpu
+}  // namespace gp::gpu

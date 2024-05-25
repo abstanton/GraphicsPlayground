@@ -6,7 +6,7 @@
 #include "../GPUFrameBuffer.h"
 #include "GlTexture.h"
 
-namespace gpu {
+namespace gp::gpu {
 class GlFrameBuffer : public FrameBuffer {
  public:
   GlFrameBuffer();
@@ -26,4 +26,4 @@ class GlFrameBuffer : public FrameBuffer {
   GLuint id_;
   GLenum attachmentTypeToGlType(FrameBufferAttachmentType type) const;
 };
-}  // namespace gpu
+}  // namespace gp::gpu

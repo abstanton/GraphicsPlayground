@@ -5,7 +5,7 @@
 
 #include "GPUTexture.h"
 
-namespace gpu {
+namespace gp::gpu {
 enum class ShaderType { FRAG, VERT, COMPUTE, GEOM };
 
 class ShaderProgram {
@@ -37,4 +37,4 @@ class ShaderProgram {
                        const glm::mat4& value) const = 0;
 };
 using ShaderProgramPtr = std::shared_ptr<ShaderProgram>;
-}  // namespace gpu
+}  // namespace gp::gpu

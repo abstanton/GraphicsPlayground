@@ -1,7 +1,4 @@
 #pragma once
-namespace gpu {
-	class GlVertexArray
-	{
-	};
-}
-
+namespace gp::gpu {
+class GlVertexArray {};
+}  // namespace gp::gpu

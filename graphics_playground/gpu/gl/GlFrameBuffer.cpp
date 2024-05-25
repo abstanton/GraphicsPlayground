@@ -1,7 +1,7 @@
 #include "GlFrameBuffer.h"
 
 #include <iostream>
-namespace gpu {
+namespace gp::gpu {
 GlFrameBuffer::GlFrameBuffer() { glGenFramebuffers(1, &id_); }
 
 void GlFrameBuffer::bindAttachment(FrameBufferAttachmentType attachment_type,
@@ -77,4 +77,4 @@ GLenum GlFrameBuffer::attachmentTypeToGlType(
 }
 
 GlFrameBuffer::~GlFrameBuffer() { glDeleteFramebuffers(1, &id_); }
-}  // namespace gpu
+}  // namespace gp::gpu

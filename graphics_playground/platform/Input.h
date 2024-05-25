@@ -2,11 +2,14 @@
 #include <glm/glm.hpp>
 #include <map>
 
+#include "../common/Singleton.hpp"
 #include "Window.h"
+
+namespace gp {
 
 class GraphicsPlayground;
 
-class Input {
+class Input : public SingletonMixIn<Input> {
   friend GraphicsPlayground;
 
  public:
@@ -19,12 +22,7 @@ class Input {
   static glm::vec2 getScrollOffset();
 
  private:
-  Input() {}
-
-  static Input& get() {
-    static Input input_manager;
-    return input_manager;
-  }
+  // Input() {}
 
   bool first_mouse_movement = true;
   double last_mouse_pos[2] = {0, 0};
@@ -51,3 +49,5 @@ class Input {
 
   InputState input_state_{};
 };
+
+}  // namespace gp

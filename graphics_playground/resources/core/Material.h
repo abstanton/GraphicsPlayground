@@ -18,6 +18,9 @@
         uniform vec2 name_scale;
 
 */
+
+namespace gp {
+
 using std::string;
 
 template <typename T>
@@ -140,3 +143,5 @@ class MaterialBuilder {
  private:
   Material material_;
 };
+
+}

@@ -8,6 +8,8 @@
 #include "stb_image.h"
 #endif
 
+namespace gp {
+
 bool ResourceManager::loadTexture(const char* filepath, const char* name) {
   auto& inst = ResourceManager::get();
 
@@ -143,4 +145,6 @@ std::vector<MeshRenderer> ResourceManager::loadObject(const char* filepath,
   inst.processNode(scene, scene->mRootNode, mesh_renderers, base_name);
 
   return mesh_renderers;
+}
+
 }

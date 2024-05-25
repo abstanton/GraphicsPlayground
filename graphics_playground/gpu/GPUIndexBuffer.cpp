@@ -1,3 +1,2 @@
 #include "GPUIndexBuffer.h"
-namespace gpu {
-}
+namespace gp::gpu {}

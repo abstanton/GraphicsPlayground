@@ -4,6 +4,8 @@
 
 #include "../components/RotateComponent.h"
 
+using namespace gp;
+
 void RotateSystem::onUpdate(ecs::Registry& registry, float delta_time) {
   registry.view<MeshRenderer, Transform, Rotate>().each(
       [&](ecs::Entity ent, MeshRenderer& mr, Transform& tr, Rotate& rot) {

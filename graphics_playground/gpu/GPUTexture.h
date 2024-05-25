@@ -1,12 +1,12 @@
 #pragma once
+#include <glm/glm.hpp>
 #include <glad/glad.h>
 
-#include <glm/glm.hpp>
 #include <memory>
 
 #include "GPUTypes.h"
 
-namespace gpu {
+namespace gp::gpu {
 
 class Texture {
  public:
@@ -41,4 +41,4 @@ class Texture {
   unsigned int levels;
 };
 using TexturePtr = std::shared_ptr<Texture>;
-}  // namespace gpu
+}  // namespace gp::gpu

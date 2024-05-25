@@ -3,6 +3,8 @@
 #include <components/Camera.h>
 #include <platform/Input.h>
 
+using namespace gp;
+
 void CameraMovementSystem::onConfigure(ecs::Registry& registry) {
   registry.view<Camera>().each(
       [this](ecs::Entity ent, Camera& cam) { camera_entity = ent; });

@@ -5,6 +5,8 @@
 #include <components/Transform.h>
 #include <platform/Input.h>
 
+using namespace gp;
+
 template <typename T>
 T lerp(T curr, T target, float rate) {
   return curr + ((target - curr) * rate);

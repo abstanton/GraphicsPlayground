@@ -1,6 +1,7 @@
 #include "SystemManager.h"
 
 #include <algorithm>
+namespace gp {
 
 void SystemManager::addSystem(System* system) { systems_.push_back(system); }
 void SystemManager::configure() {
@@ -22,4 +23,6 @@ void SystemManager::render() {
 void SystemManager::exit() {
   std::for_each(systems_.begin(), systems_.end(),
                 [&](System* sys) { sys->onExit(registry_); });
+}
+
 }

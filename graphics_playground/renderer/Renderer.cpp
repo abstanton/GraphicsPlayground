@@ -6,6 +6,8 @@
 #include "../resources/ResourceManager.h"
 #include "../shaders/ShaderManager.h"
 
+namespace gp {
+
 Renderer::Renderer(int scr_width, int scr_height, glm::vec3 clear_colour)
     : scr_width_(scr_width),
       scr_height_(scr_height),
@@ -528,4 +530,6 @@ std::vector<float> Renderer::uniformLinearSamples(int num_samples) const {
     num += 1;
   }
   return samples;
+}
+
 }

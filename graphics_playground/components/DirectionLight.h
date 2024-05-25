@@ -1,6 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
 
+namespace gp {
+
 using namespace glm;
 
 struct DirectionLight {
@@ -13,3 +15,5 @@ struct DirectionLight {
   DirectionLight(vec3 dir, vec3 col, float siz, float inten)
       : direction(dir), colour(col), size(siz), intensity(inten) {}
 };
+
+}
