@@ -36,7 +36,7 @@ class World {
   }
 
   // ------ DestroyGameObject -----
-  bool destroyGameObject(GameObject gameObject) {
+  bool destroyGameObject(GameObject& gameObject) {
     registry_.destroyEntity(gameObject.entity_);
     std::erase_if(gameObjects_, [id = gameObject.id](const GameObject& obj) {
       return obj.id == id;
@@ -87,7 +87,7 @@ class World {
 
   // ----- GetComponent ------
   template <typename T>
-  T& getComponent(GameObject gameObject) {
+  T& getComponent(GameObject& gameObject) {
     return registry_.getComponent<T>(gameObject.entity_);
   }
 
