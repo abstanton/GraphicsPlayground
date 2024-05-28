@@ -68,7 +68,7 @@ struct Transform {
 
   glm::vec3 euler() const { return glm::eulerAngles(rot); }
 
-  glm::vec2 scale() const { return sca; }
+  glm::vec3 scale() const { return sca; }
 
   glm::quat rotation() const { return rot; }
 
@@ -81,4 +81,4 @@ struct Transform {
   glm::mat4 matrix_;
 };
 
-}
+}  // namespace gp

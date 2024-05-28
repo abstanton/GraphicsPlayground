@@ -20,9 +20,9 @@ class GameObject {
   void setIdentifier(std::string_view identifier) { identifier_ = identifier; }
 
   const World* getWorld() const { return world_; }
-  // Transform getLocalTransform() {
-  //   return world_->getComponent<Transform>(*this);
-  // }
+
+  Transform getLocalTransform();
+  glm::mat4 getGlobalTransform();
 
  private:
   GameObject(ecs::Entity entity, World* world)
