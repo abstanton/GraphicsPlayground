@@ -92,6 +92,11 @@ class Registry {
   }
 
   template <typename T>
+  const T& getComponent(Entity entity) const {
+    return component_manager_.getComponent<T>(entity);
+  }
+
+  template <typename T>
   bool hasComponent(Entity entity) {
     return component_manager_.hasComponent<T>(entity);
   }

@@ -160,6 +160,11 @@ class World {
     return registry_.getComponent<T>(gameObject.entity_);
   }
 
+  template <typename T>
+  const T& getComponent(const GameObject& gameObject) const {
+    return registry_.getComponent<T>(gameObject.entity_);
+  }
+
   std::optional<GameObject> getGameObject(ecs::Entity ent) {
     auto gameObjectItr = std::find_if(gameObjects_.begin(), gameObjects_.end(),
                                       [ent](const GameObject& gameObject) {

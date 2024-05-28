@@ -30,6 +30,13 @@ class ComponentArray : public IComponentArray {
     return components_[index];
   }
 
+  const T& getData(Entity entity) const {
+    assert(entity_index_map_.find(entity) != entity_index_map_.end());
+    size_t index = entity_index_map_.at(entity);
+    assert(index < MAX_ENTITIES);
+    return components_[index];
+  }
+
   std::tuple<T&> getDataAsTuple(Entity entity) {
     return std::forward_as_tuple(getData(entity));
   }

@@ -9,12 +9,12 @@ GameObject World::createGameObject() {
   return gameObject;
 }
 
-Transform GameObject::getLocalTransform() {
+Transform GameObject::getLocalTransform() const {
   return this->world_->getComponent<Transform>(*this);
 }
 
 // Walk hierarchy
-Transform GameObject::getGlobalTransform() {
+Transform GameObject::getGlobalTransform() const {
   auto parentOpt = this->world_->getParent(*this);
   if (!parentOpt.has_value()) {
     return getLocalTransform();

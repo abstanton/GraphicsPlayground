@@ -29,6 +29,13 @@ class ComponentManager {
   }
 
   template <typename T>
+  const T& getComponent(Entity entity) const {
+    const char* t_name = typeid(T).name();
+    assert(component_arrays_.find(t_name) != component_arrays_.end());
+    return getComponentArray<T>().getData(entity);
+  }
+
+  template <typename T>
   bool hasComponent(Entity entity) {
     const char* t_name = typeid(T).name();
     assert(component_arrays_.find(t_name) != component_arrays_.end());
@@ -67,6 +74,14 @@ class ComponentManager {
       registerComponent<T>();
     }
     return *static_cast<ComponentArray<T>*>(component_arrays_[t_name].get());
+  }
+
+  template <typename T>
+  const ComponentArray<T>& getComponentArray() const {
+    const char* t_name = typeid(T).name();
+    assert(component_arrays_.find(t_name) != component_arrays_.end());
+
+    return *static_cast<ComponentArray<T>*>(component_arrays_.at(t_name).get());
   }
 
   std::unordered_map<const char*, std::unique_ptr<IComponentArray>>

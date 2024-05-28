@@ -22,8 +22,8 @@ class GameObject {
 
   const World* getWorld() const { return world_; }
 
-  Transform getLocalTransform();
-  Transform getGlobalTransform();
+  Transform getLocalTransform() const;
+  Transform getGlobalTransform() const;
 
  private:
   GameObject(ecs::Entity entity, World* world)
