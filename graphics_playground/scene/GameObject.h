@@ -1,28 +1,38 @@
 #pragma once
 #include <vector>
 
+#include "../UUIDGenerator.h"
+#include "../components/Transform.h"
 #include "../ecs/Registry.hpp"
 
 namespace gp {
 
-class Scene;
+class World;
 
-// GameObjects can only be created, moved, updated or edited in any way by the
+// GameObjects are entities with transforms.
+// They can only be created, moved, updated or edited in any way by the
 // Scene which contains the GameObject
 class GameObject {
-  friend Scene;
+  using ID = unsigned int;
+  friend World;
 
- public:
-  GameObject(ecs::Entity entity) : entity_(entity) {}
+  std::string getIdentifier() { return identifier_; }
+  void setIdentifier(std::string_view identifier) { identifier_ = identifier; }
 
-  GameObject getParent() const { return parent; }
-  std::vector<GameObject> getChildren() { return children; }
+  // Transform getLocalTransform() {
+  //   return world_->getComponent<Transform>(*this);
+  // }
 
  private:
-  GameObject parent;
-  std::vector<GameObject> children;
+  GameObject(ecs::Entity entity, World* world)
+      : entity_(entity), world_(world) {
+    id = UUIDGenerator::getUUID();
+  }
   ecs::Entity entity_;
-  bool transform_dirty = true;
+  std::string identifier_;
+
+  World* world_;
+  ID id;
 };
 
-}
+}  // namespace gp

@@ -29,6 +29,13 @@ class ComponentManager {
   }
 
   template <typename T>
+  bool hasComponent(Entity entity) {
+    const char* t_name = typeid(T).name();
+    assert(component_arrays_.find(t_name) != component_arrays_.end());
+    return getComponentArray<T>().contains(entity);
+  }
+
+  template <typename T>
   void removeComponent(Entity entity) {
     const char* t_name = typeid(T).name();
     assert(component_arrays_.find(t_name) != component_arrays_.end());

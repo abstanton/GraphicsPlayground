@@ -1,15 +1,16 @@
 #pragma once
 #include "../ecs/Registry.hpp"
+#include "../scene/World.h"
 
 namespace gp {
 class System {
  public:
-  virtual void onConfigure(ecs::Registry& registry) {}
-  virtual void onPreUpdate(ecs::Registry& registry) {}
-  virtual void onUpdate(ecs::Registry& registry, float delta_time) {}
-  virtual void onPostUpdate(ecs::Registry& registry) {}
-  virtual void onRender(ecs::Registry& registry) {}
-  virtual void onExit(ecs::Registry& registry) {}
+  virtual void onConfigure(World& world) {}
+  virtual void onPreUpdate(World& world) {}
+  virtual void onUpdate(World& world, float delta_time) {}
+  virtual void onPostUpdate(World& world) {}
+  virtual void onRender(World& world) {}
+  virtual void onExit(World& world) {}
 };
 
 }

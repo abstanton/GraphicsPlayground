@@ -4,6 +4,7 @@
 #include "platform/Window.h"
 #include "renderer/Renderer.h"
 #include "resources/ResourceManager.h"
+#include "scene/World.h"
 #include "systems/SystemManager.h"
 #include "systems/core/RenderSystem.h"
 
@@ -23,7 +24,7 @@ class GraphicsPlayground {
   std::unique_ptr<Renderer> renderer;
   std::unique_ptr<SystemManager> system_manager;
 
-  ecs::Registry registry;
+  World world;
 
  private:
   float delta_time;

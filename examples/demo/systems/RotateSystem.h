@@ -2,5 +2,5 @@
 #include <systems/System.h>
 
 class RotateSystem : public gp::System {
-  void onUpdate(ecs::Registry& registry, float delta_time) override;
+  void onUpdate(gp::World& world, float delta_time) override;
 };

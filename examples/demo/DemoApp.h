@@ -1,6 +1,7 @@
 #pragma once
 #include <GraphicsPlayground.h>
 
+#include "scene/World.h"
 #include "systems/CameraMovementSystem.h"
 #include "systems/RotateSystem.h"
 

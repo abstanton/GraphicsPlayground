@@ -1,17 +1,12 @@
 #include "CameraMovementSystem.h"
 
-#include <components/Camera.h>
 #include <platform/Input.h>
+#include <scene/Camera.h>
 
 using namespace gp;
 
-void CameraMovementSystem::onConfigure(ecs::Registry& registry) {
-  registry.view<Camera>().each(
-      [this](ecs::Entity ent, Camera& cam) { camera_entity = ent; });
-}
-
-void CameraMovementSystem::onUpdate(ecs::Registry& registry, float delta_time) {
-  Camera& camera = registry.getComponent<Camera>(camera_entity);
+void CameraMovementSystem::onUpdate(gp::World& world, float delta_time) {
+  Camera& camera = world.getCamera();
 
   glm::vec2 mouse_movement = Input::getMouseMovement();
   glm::vec2 scroll_offset = Input::getScrollOffset();

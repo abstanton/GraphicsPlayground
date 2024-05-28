@@ -1,23 +1,23 @@
 #pragma once
 #include <vector>
 
+#include "../scene/World.h"
 #include "System.h"
 
 namespace gp {
 
 class SystemManager {
  public:
-  SystemManager(ecs::Registry& registry) : registry_(registry) {}
+  SystemManager() {}
 
   void addSystem(System* system);
-  void configure();
-  void update(float deltaTime);
-  void render();
-  void exit();
+  void configure(World& world);
+  void update(World& world, float deltaTime);
+  void render(World& world);
+  void exit(World& world);
 
  private:
   std::vector<System*> systems_;
-  ecs::Registry& registry_;
 };
 
-}
+}  // namespace gp

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2.0)
 project(gp_demo)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_executable(gp_demo main.cpp DemoApp.cpp systems/CameraMovementSystem.cpp systems/RotateSystem.cpp)
 

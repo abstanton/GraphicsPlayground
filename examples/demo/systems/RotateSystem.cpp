@@ -6,8 +6,8 @@
 
 using namespace gp;
 
-void RotateSystem::onUpdate(ecs::Registry& registry, float delta_time) {
-  registry.view<MeshRenderer, Transform, Rotate>().each(
+void RotateSystem::onUpdate(gp::World& world, float delta_time) {
+  world.view<MeshRenderer, Transform, Rotate>().each(
       [&](ecs::Entity ent, MeshRenderer& mr, Transform& tr, Rotate& rot) {
         tr.setRotation(
             tr.euler() +

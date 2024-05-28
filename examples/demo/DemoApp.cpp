@@ -38,39 +38,36 @@ void DemoApp::setup() {
   cube_component.material = blank_material;
   monkey_component.material = metal_material;
 
-  auto camera_ent = registry.createEntity();
-  Camera& camera =
-      registry.addComponent<Camera>(camera_ent, glm::vec3(-7.0f, 5.0f, -5.0f));
+  world.setCamera(Camera(glm::vec3(-7.0f, 5.0f, -5.0f)));
 
-  auto cube_0 = registry.createEntity();
-  registry.addComponent<Transform>(
-      cube_0, Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10}));
-  MeshRenderer& mr_0 =
-      registry.addComponent<MeshRenderer>(cube_0, cube_component);
+  auto cube_0 = world.createGameObject();
+  world.addComponent<Transform>(cube_0,
+                                Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10}));
+  MeshRenderer& mr_0 = world.addComponent<MeshRenderer>(cube_0, cube_component);
 
-  auto monkey_ent = registry.createEntity();
-  registry.addComponent<Transform>(
+  auto monkey_ent = world.createGameObject();
+  world.addComponent<Transform>(
       monkey_ent,
       Transform(glm::vec3(0, 3.5, 0), glm::vec3(0), glm::vec3(2.0f)));
-  registry.addComponent<MeshRenderer>(monkey_ent, monkey_component);
+  world.addComponent<MeshRenderer>(monkey_ent, monkey_component);
 
-  auto light_0 = registry.createEntity();
-  registry.addComponent<DirectionLight>(light_0, -glm::vec3(-2.5f, 6.0f, 1.0f),
-                                        glm::vec3(0.4f, 0.4f, 1.0f), 1.0f,
-                                        2.0f);
-  auto light_1 = registry.createEntity();
-  registry.addComponent<DirectionLight>(light_1, -glm::vec3(2.5f, 6.0f, 0.0f),
-                                        glm::vec3(1.0f, 1.0f, 1.0f), 20.0f,
-                                        7.0f);
-  auto light_2 = registry.createEntity();
-  registry.addComponent<DirectionLight>(light_2, -glm::vec3(0.0f, 6.0f, -2.5f),
-                                        glm::vec3(1.0f, 1.0f, 1.0f), 1.0f,
-                                        1.0f);
+  auto light_0 = world.createGameObject();
+  world.addComponent<DirectionLight>(
+      light_0, DirectionLight(-glm::vec3(-2.5f, 6.0f, 1.0f),
+                              glm::vec3(0.4f, 0.4f, 1.0f), 1.0f, 2.0f));
+  auto light_1 = world.createGameObject();
+  world.addComponent<DirectionLight>(
+      light_1, DirectionLight(-glm::vec3(2.5f, 6.0f, 0.0f),
+                              glm::vec3(1.0f, 1.0f, 1.0f), 20.0f, 7.0f));
+  auto light_2 = world.createGameObject();
+  world.addComponent<DirectionLight>(
+      light_2, DirectionLight(-glm::vec3(0.0f, 6.0f, -2.5f),
+                              glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 1.0f));
 
   MeshRenderer cube_mesh = mr_0;
   for (float i = 0; i < 5; i++) {
     for (float j = 0; j < 5; j++) {
-      registry.createEntity<MeshRenderer, Transform, Rotate>(
+      world.createGameObject<MeshRenderer, Transform, Rotate>(
           cube_mesh,
           Transform({-(i - 2) * 3, -2, -(j - 2) * 2.5}, {0, 0, 0},
                     {0.5, 0.5, 0.5}),

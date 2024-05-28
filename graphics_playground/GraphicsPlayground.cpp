@@ -8,7 +8,7 @@
 namespace gp {
 
 GraphicsPlayground::GraphicsPlayground() {
-  system_manager = std::make_unique<SystemManager>(registry);
+  system_manager = std::make_unique<SystemManager>();
 
   window = std::make_unique<Window>(1920, 1280, "Graphics Playground");
   Input::setWindow(window.get());
@@ -29,7 +29,7 @@ void GraphicsPlayground::run() {
   this->setup();
   this->load();
 
-  system_manager->configure();
+  system_manager->configure(world);
   while (!window->shouldClose()) {
     window->swapBuffers();
     window->pollEvents();
@@ -38,8 +38,8 @@ void GraphicsPlayground::run() {
     delta_time = current_frame - last_time;
     last_time = current_frame;
 
-    system_manager->update(delta_time);
-    system_manager->render();
+    system_manager->update(world, delta_time);
+    system_manager->render(world);
   }
 
   return;

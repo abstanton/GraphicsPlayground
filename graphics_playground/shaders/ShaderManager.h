@@ -36,7 +36,7 @@ class ShaderManager {
   gpu::ShaderProgramPtr compileFromFiles(const char* vs_filename,
                                          const char* fs_filename) const;
 
-  gpu::ShaderProgramPtr ShaderManager::compileVertFragShaderProgram(
+  gpu::ShaderProgramPtr compileVertFragShaderProgram(
       const char* vs_source, const char* fs_source) const;
 
   std::unordered_map<string, gpu::ShaderProgramPtr> custom_shaders_;

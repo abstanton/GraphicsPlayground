@@ -91,6 +91,11 @@ class Registry {
     return component_manager_.getComponent<T>(entity);
   }
 
+  template <typename T>
+  bool hasComponent(Entity entity) {
+    return component_manager_.hasComponent<T>(entity);
+  }
+
   std::set<Entity>::const_iterator begin() { return entities_.begin(); }
 
   std::set<Entity>::const_iterator end() { return entities_.end(); }
