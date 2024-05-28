@@ -26,14 +26,11 @@ class GameObject {
 
  private:
   GameObject(ecs::Entity entity, World* world)
-      : entity_(entity), world_(world) {
-    id = UUIDGenerator::getUUID();
-  }
+      : entity_(entity), world_(world) {}
   ecs::Entity entity_;
   std::string identifier_;
 
   World* world_;
-  ID id;
 };
 
 }  // namespace gp
