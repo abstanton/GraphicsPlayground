@@ -28,6 +28,11 @@ struct Transform {
     matrix_ = translation * rotation * scale_mat;
   }
 
+  explicit Transform(glm::mat4 matrix) : matrix_(matrix) {
+    // TODO: Also set scale/rot?
+    pos = {matrix_[0][2], matrix_[1][2], matrix_[2][2]};
+  }
+
   void setPosition(glm::vec3 p) {
     pos = p;
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), pos);

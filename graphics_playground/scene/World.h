@@ -74,7 +74,7 @@ class World {
                   });
   }
 
-  bool setParent(GameObject& child, GameObject& parent) {
+  void setParent(GameObject& child, GameObject& parent) {
     auto parentIt = parents_.find(child.entity_);
 
     // If child already has a parent, and it's not the current parent
@@ -158,6 +158,16 @@ class World {
   template <typename T>
   T& getComponent(GameObject& gameObject) {
     return registry_.getComponent<T>(gameObject.entity_);
+  }
+
+  std::optional<GameObject> getGameObject(ecs::Entity ent) {
+    auto gameObjectItr = std::find_if(gameObjects_.begin(), gameObjects_.end(),
+                                      [ent](const GameObject& gameObject) {
+                                        return gameObject.entity_ == ent;
+                                      });
+
+    if (gameObjectItr == gameObjects_.end()) return std::nullopt;
+    return *gameObjectItr;
   }
 
   std::vector<GameObject>::const_iterator begin() {

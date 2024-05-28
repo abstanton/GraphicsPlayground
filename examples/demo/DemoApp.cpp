@@ -42,7 +42,7 @@ void DemoApp::setup() {
 
   auto cube_0 = world.createGameObject();
   world.addComponent<Transform>(cube_0,
-                                Transform({0, -3, 0}, {0, 0, 0}, {10, 1, 10}));
+                                Transform({0, -5, 0}, {0, 0, 0}, {10, 1, 10}));
   MeshRenderer& mr_0 = world.addComponent<MeshRenderer>(cube_0, cube_component);
 
   auto monkey_ent = world.createGameObject();
@@ -64,16 +64,23 @@ void DemoApp::setup() {
       light_2, DirectionLight(-glm::vec3(0.0f, 6.0f, -2.5f),
                               glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 1.0f));
 
+  auto baseObject = world.createGameObject();
+
   MeshRenderer cube_mesh = mr_0;
   for (float i = 0; i < 5; i++) {
     for (float j = 0; j < 5; j++) {
-      world.createGameObject<MeshRenderer, Transform, Rotate>(
+      auto obj = world.createGameObject<MeshRenderer, Transform, Rotate>(
           cube_mesh,
           Transform({-(i - 2) * 3, -2, -(j - 2) * 2.5}, {0, 0, 0},
                     {0.5, 0.5, 0.5}),
           {(i / 10), 0, j / 10});
+      world.setParent(obj, baseObject);
     }
   }
+
+  Transform& transform = world.getComponent<Transform>(baseObject);
+  transform.setPosition({0.0f, 0.0f, 0.0f});
+  world.addComponent<Rotate>(baseObject, {0.3f, 0.0f, 0.5f});
 
   system_manager->addSystem(&camera_movement_system);
   system_manager->addSystem(&rotate_system);

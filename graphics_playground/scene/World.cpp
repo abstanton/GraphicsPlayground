@@ -14,12 +14,13 @@ Transform GameObject::getLocalTransform() {
 }
 
 // Walk hierarchy
-glm::mat4 GameObject::getGlobalTransform() {
+Transform GameObject::getGlobalTransform() {
   auto parentOpt = this->world_->getParent(*this);
   if (!parentOpt.has_value()) {
-    return getLocalTransform().transformation();
+    return getLocalTransform();
   }
-  return getLocalTransform().transformation() * parentOpt->getGlobalTransform();
+  return Transform(parentOpt->getGlobalTransform().transformation() *
+                   getLocalTransform().transformation());
 }
 
 }  // namespace gp

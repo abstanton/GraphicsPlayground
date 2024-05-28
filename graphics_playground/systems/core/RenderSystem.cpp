@@ -14,8 +14,10 @@ void RenderSystem::onConfigure(World& world) {}
 void RenderSystem::onRender(World& world) {
   std::vector<TransformAnd<MeshRenderer>> mesh_renderers;
   world.view<MeshRenderer, Transform>().each(
-      [&](ecs::Entity, MeshRenderer& mr, Transform& t) {
-        mesh_renderers.push_back({mr, t});
+      [&](ecs::Entity e, MeshRenderer& mr, Transform& t) {
+        std::optional<GameObject> gameObject = world.getGameObject(e);
+        if (gameObject.has_value())
+          mesh_renderers.push_back({mr, gameObject->getGlobalTransform()});
       });
   std::vector<TransformAnd<PointLight>> point_pairs;
   world.view<PointLight, Transform>().each(

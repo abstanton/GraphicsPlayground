@@ -16,13 +16,14 @@ class GameObject {
   using ID = unsigned int;
   friend World;
 
+ public:
   std::string getIdentifier() const { return identifier_; }
   void setIdentifier(std::string_view identifier) { identifier_ = identifier; }
 
   const World* getWorld() const { return world_; }
 
   Transform getLocalTransform();
-  glm::mat4 getGlobalTransform();
+  Transform getGlobalTransform();
 
  private:
   GameObject(ecs::Entity entity, World* world)
