@@ -25,6 +25,12 @@ class GameObject {
   Transform getLocalTransform() const;
   Transform getGlobalTransform() const;
 
+  template <typename T>
+  T& getComponent();
+
+  template <typename T>
+  const T& getComponent() const;
+
  private:
   GameObject(ecs::Entity entity, World* world)
       : entity_(entity), world_(world) {}

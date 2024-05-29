@@ -15,6 +15,7 @@ class World {
   struct View {
     View(ecs::View<Components...> view) : view_(view) {}
 
+    // TODO: Sort this out
     template <typename Func>
     void each(Func func) {
       view_.each(func);
@@ -193,5 +194,15 @@ class World {
 
   Camera camera_;
 };
+
+template <typename T>
+T& GameObject::getComponent() {
+  return world_->getComponent<T>(*this);
+}
+
+template <typename T>
+const T& GameObject::getComponent() const {
+  return world_->getComponent<T>(*this);
+}
 
 }  // namespace gp

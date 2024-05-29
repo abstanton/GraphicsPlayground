@@ -78,7 +78,7 @@ void DemoApp::setup() {
     }
   }
 
-  Transform& transform = world.getComponent<Transform>(baseObject);
+  Transform& transform = baseObject.getComponent<Transform>();
   transform.setPosition({0.0f, 0.0f, 0.0f});
   world.addComponent<Rotate>(baseObject, {0.3f, 0.0f, 0.5f});
 
